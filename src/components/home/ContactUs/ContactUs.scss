@@ -1,0 +1,140 @@
+@use "@/styles/variables" as *;
+
+// ─── Contact ──────────────────────────────────────────────────
+.contact {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: $spacing-sm $spacing-xs;
+  padding: $spacing-md;
+
+  // ─── Inner ────────────────────────────────────────────
+  &__inner {
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+    gap: $spacing-lg;
+
+    @media (max-width: $breakpoint-tablet) {
+      width: 90%;
+    }
+  }
+
+  // ─── Text ─────────────────────────────────────────────
+  &__heading {
+    margin: 0;
+    font-size: 2.5rem;
+    font-family: var(--font-headers);
+    text-align: center;
+  }
+
+  &__description {
+    margin: 0;
+    text-align: center;
+  }
+
+  // ─── Form ─────────────────────────────────────────────
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+
+    input {
+      all: unset;
+      text-transform: uppercase;
+      border: 1px solid $color-black;
+      font-family: var(--font-body);
+      padding: $spacing-xs $spacing-sm;
+      background-color: $color-white;
+
+      &::placeholder {
+        text-transform: uppercase;
+        font-family: var(--font-body);
+      }
+    }
+
+    textarea {
+      background-color: $color-white;
+      resize: none;
+      padding: $spacing-xs $spacing-sm;
+      padding-bottom: $spacing-xl;
+      border: 1px solid $color-black;
+      font-family: var(--font-body);
+      font-size: 1rem;
+
+      &::placeholder {
+        text-transform: uppercase;
+        font-family: var(--font-body);
+      }
+    }
+  }
+
+  // ─── Error ────────────────────────────────────────────
+  &__error {
+    color: $color-error;
+    font-size: 0.75rem;
+    font-family: var(--font-body);
+    display: block;
+  }
+
+  // ─── Button ───────────────────────────────────────────
+  &__btn {
+    all: unset;
+    background-color: $color-white;
+    padding: $spacing-sm 0;
+    width: 100%;
+    border: 1px solid $color-black;
+    text-align: center;
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
+
+    &:hover {
+      background-color: $color-black;
+      color: $color-white;
+    }
+
+    &--sent {
+      background-color: $color-black;
+      color: $color-white;
+      border: none;
+      cursor: default;
+
+      &:hover {
+        background-color: $color-black;
+      }
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  // ─── Icons ────────────────────────────────────────────
+  &__icons {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    a,
+    button {
+      color: $color-black;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  // ─── RTL ──────────────────────────────────────────────
+  &--rtl {
+    direction: rtl;
+  }
+}

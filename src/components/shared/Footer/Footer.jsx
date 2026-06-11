@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { AiFillInstagram, AiFillFacebook } from 'react-icons/ai';
-import { FaTiktok } from 'react-icons/fa6';
 import { IoLogoWhatsapp } from 'react-icons/io';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslations } from '@/hooks/useTranslations';
@@ -67,11 +66,6 @@ export default function Footer() {
           <li>
             <a href="" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
               <AiFillFacebook size={28} />
-            </a>
-          </li>
-          <li>
-            <a href="" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-              <FaTiktok size={24} />
             </a>
           </li>
           <li>
