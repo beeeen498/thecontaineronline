@@ -1,0 +1,33 @@
+// ─── Typography ───────────────────────────────────────────────
+// Fonts are loaded in layout.js via next/font/google
+$font-headers: 'Belleza', sans-serif;
+$font-body: 'Assistant', sans-serif;
+
+// ─── Colours ──────────────────────────────────────────────────
+$color-white: #F3F3F3;
+$color-black: #000000;
+$color-silver: #CBCBCB;
+$color-light-grey: #7C7C7C;
+
+// ─── Backgrounds ──────────────────────────────────────────────
+$color-background: $color-white;
+$color-text-primary: $color-black;
+$color-text-secondary: $color-light-grey;
+$color-border: $color-silver;
+
+// ─── Spacing ──────────────────────────────────────────────────
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 32px;
+$spacing-xl: 64px;
+
+// ─── Breakpoints ──────────────────────────────────────────────
+$breakpoint-mobile: 480px;
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1024px;
+$breakpoint-wide: 1440px;
+
+// ─── Layout ───────────────────────────────────────────────────
+$max-width: 1440px;
+$nav-height: 80px;

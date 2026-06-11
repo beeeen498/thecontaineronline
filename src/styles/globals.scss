@@ -1,0 +1,35 @@
+@use 'variables' as *;
+
+// ─── Reset ────────────────────────────────────────────────────
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+// ─── Base ─────────────────────────────────────────────────────
+body {
+  background-color: $color-background;
+  font-family: var(--font-body), $font-body;
+  color: $color-text-primary;
+}
+
+// ─── Typography ───────────────────────────────────────────────
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-headers), $font-headers;
+  font-weight: 400;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul, li {
+  list-style: none;
+}
+
+// ─── RTL Support ──────────────────────────────────────────────
+.rtl {
+  direction: rtl;
+}
