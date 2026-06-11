@@ -1,4 +1,4 @@
-@use '@/styles/variables' as *;
+@use "@/styles/variables" as *;
 
 // ─── Header ───────────────────────────────────────────────────
 // Top bar — black background, logo centered, language left, cart right
@@ -13,6 +13,7 @@
   width: 100%;
   height: 75px;
   direction: ltr;
+  flex-wrap: nowrap;
 
   // ─── Language ─────────────────────────────────────────────
   &__language {
@@ -27,6 +28,14 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+    // white-space: nowrap;
+
+    @media (max-width: $breakpoint-mobile) {
+      position: static;
+      transform: none;
+      flex: 1;
+      text-align: center;
+    }
 
     a {
       font-family: var(--font-headers);

@@ -1,7 +1,6 @@
 @use "@/styles/variables" as *;
 
-// ─── Nav ──────────────────────────────────────────────────────
-// Bottom bar — black background, centered links with underline hover
+// ─── Desktop Nav ──────────────────────────────────────────────
 .nav {
   background-color: $color-black;
   width: 100%;
@@ -9,7 +8,7 @@
   justify-content: center;
   border-bottom: 0.5px solid $color-white;
 
-  // ─── List ─────────────────────────────────────────────────
+  // ─── List ───────────────────────────────────────────────
   &__list {
     display: flex;
     justify-content: space-between;
@@ -20,10 +19,9 @@
     height: 100%;
   }
 
-  // ─── Item ─────────────────────────────────────────────────
+  // ─── Item ───────────────────────────────────────────────
   &__item {
     position: relative;
-    font-size: 1rem;
     font-family: var(--font-nav);
     font-size: 1rem;
     font-weight: 300;
@@ -52,8 +50,92 @@
     }
   }
 
-  // ─── RTL ──────────────────────────────────────────────────
+  // ─── RTL ────────────────────────────────────────────────
   &--rtl {
     direction: rtl;
+  }
+
+  // ─── Hide on mobile ─────────────────────────────────────
+  @media (max-width: $breakpoint-mobile) {
+    display: none;
+  }
+}
+
+// ─── Mobile Nav ───────────────────────────────────────────────
+.mobile-nav {
+  display: none;
+  background-color: $color-black;
+  border-bottom: 0.5px solid $color-white;
+
+  @media (max-width: $breakpoint-mobile) {
+    display: block;
+  }
+
+  // ─── Toggle button ──────────────────────────────────────
+  &__toggle {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    background: none;
+    border: none;
+    color: $color-white;
+    padding: $spacing-sm $spacing-md;
+    cursor: pointer;
+    position: relative;
+    z-index: 100;
+    outline: none;
+
+    &:focus-visible {
+      outline: none;
+    }
+
+    &:hover {
+      transform: scale(1.1);
+      transition: transform 0.5s;
+    }
+  }
+
+  // ─── Full screen sliding menu ───────────────────────────
+  &__menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 100%;
+    background-color: $color-black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translateX(100%);
+    transition: transform 0.5s ease;
+    z-index: 99;
+
+    &--open {
+      transform: translateX(0);
+    }
+  }
+
+  // ─── Mobile nav list ────────────────────────────────────
+  &__list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: $spacing-lg;
+    padding: 0;
+    margin: 0;
+
+    &--rtl {
+      direction: rtl;
+    }
+
+    // reuse nav__item styles for mobile items
+    .nav__item {
+      font-size: 2.5rem;
+
+      &::after {
+        display: none;
+      }
+    }
   }
 }
