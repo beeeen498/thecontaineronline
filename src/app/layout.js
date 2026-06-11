@@ -1,4 +1,5 @@
 import { Belleza, Assistant } from 'next/font/google';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 import '@/styles/globals.scss';
 
 // ─── Font Setup ───────────────────────────────────────────────
@@ -29,7 +30,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${belleza.variable} ${assistant.variable}`}>
-      <body>{children}</body>
+      <body>
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
+      </body>
     </html>
   );
 }
