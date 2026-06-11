@@ -1,0 +1,43 @@
+@use '@/styles/variables' as *;
+
+// ─── Pagination ───────────────────────────────────────────────
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: $spacing-sm;
+  margin: $spacing-lg 0;
+
+  // ─── RTL ────────────────────────────────────────────────
+  &--rtl {
+    direction: rtl;
+  }
+
+  // ─── Button ─────────────────────────────────────────────
+  &__btn {
+    all: unset;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: 10px;
+    border: 1px solid $color-black;
+    background-color: $color-white;
+    cursor: pointer;
+    font-family: var(--font-body);
+
+    &:hover:not(:disabled) {
+      background-color: $color-black;
+      color: $color-white;
+      transition: background-color 0.2s ease;
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+  }
+
+  // ─── Info ───────────────────────────────────────────────
+  &__info {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+  }
+}
