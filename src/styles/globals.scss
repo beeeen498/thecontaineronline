@@ -1,7 +1,9 @@
-@use 'variables' as *;
+@use "variables" as *;
 
 // ─── Reset ────────────────────────────────────────────────────
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -9,6 +11,9 @@
 
 // ─── Base ─────────────────────────────────────────────────────
 body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   background-color: $color-background;
   font-family: var(--font-body), $font-body;
   color: $color-text-primary;
@@ -24,11 +29,17 @@ body {
 }
 
 .main-content {
+  flex: 1;
   margin-top: 120px; // approximate height of Header + Nav — we'll fine tune this
 }
 
 // ─── Typography ───────────────────────────────────────────────
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-headers), $font-headers;
   font-weight: 400;
 }
@@ -38,7 +49,8 @@ a {
   color: inherit;
 }
 
-ul, li {
+ul,
+li {
   list-style: none;
 }
 

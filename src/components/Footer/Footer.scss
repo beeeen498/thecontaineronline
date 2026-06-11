@@ -1,0 +1,136 @@
+@use "@/styles/variables" as *;
+
+// ─── Footer ───────────────────────────────────────────────────
+.footer {
+  background-color: $color-black;
+  color: $color-white;
+  padding: $spacing-xl $spacing-lg $spacing-md;
+  margin-top: $spacing-xl;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: $spacing-lg;
+  align-items: start;
+
+  // ─── RTL ──────────────────────────────────────────────
+  &--rtl {
+    direction: rtl;
+  }
+
+  // ─── Heading ──────────────────────────────────────────
+  &__heading {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: $color-silver;
+    margin-bottom: $spacing-md;
+  }
+
+  // ─── Quick Nav ────────────────────────────────────────
+  &__nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    padding: 0;
+    margin: 0;
+
+    li a {
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      color: $color-white;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: $color-silver;
+      }
+    }
+  }
+
+  // ─── Brand ────────────────────────────────────────────
+  &__brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__logo {
+    font-family: var(--font-headers);
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    color: $color-white;
+    letter-spacing: 0.05em;
+  }
+
+  &__tagline {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: $color-silver;
+    margin: 0;
+  }
+
+  // ─── Socials ──────────────────────────────────────────
+  &__socials {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  &__socials-list {
+    display: flex;
+    gap: $spacing-md;
+    padding: 0;
+    margin: 0;
+
+    li {
+      a,
+      button {
+        color: $color-white;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        transition:
+          color 0.2s ease,
+          transform 0.2s ease;
+
+        &:hover {
+          color: $color-silver;
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+
+  // ─── Bottom / Copyright ───────────────────────────────
+  &__bottom {
+    grid-column: 1 / -1;
+    text-align: center;
+    border-top: 0.5px solid $color-silver;
+    padding-top: $spacing-md;
+    direction: ltr;
+
+    p {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      color: $color-silver;
+      margin: 0;
+    }
+  }
+
+  // ─── Mobile ───────────────────────────────────────────
+  @media (max-width: $breakpoint-tablet) {
+    grid-template-columns: 1fr;
+    text-align: center;
+
+    &__socials {
+      align-items: center;
+    }
+
+    &__nav-list {
+      align-items: center;
+    }
+  }
+}
