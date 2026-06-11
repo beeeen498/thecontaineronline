@@ -1,8 +1,8 @@
 import { Belleza, Assistant, Titillium_Web } from 'next/font/google';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-import Header from '@/components/Nav/Header';
-import Nav from '@/components/Nav/Nav';
-import Footer from '@/components/Footer/Footer';
+import Header from '@/components/shared/Nav/Header';
+import Nav from '@/components/shared/Nav/Nav';
+import Footer from '@/components/shared/Footer/Footer';
 import '@/styles/globals.scss';
 
 // ─── Font Setup ───────────────────────────────────────────────

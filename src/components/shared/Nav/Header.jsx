@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
-import LanguageButton from '@/components/Nav/LanguageButton';
+import LanguageButton from './LanguageButton';
 import './Header.scss';
 
 // ─── Header ───────────────────────────────────────────────────
