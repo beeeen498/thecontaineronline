@@ -1,12 +1,11 @@
-import { getAllProducts } from '@/lib/shopifyQueries';
+import { getAllProducts } from "@/lib/shopifyQueries";
+import Hero from "@/components/home/Hero/Hero";
 
-export default async function Home() {
-  const products = await getAllProducts();
-
+// ─── Homepage ─────────────────────────────────────────────────
+export default function HomePage() {
   return (
-    <main>
-      <h1>The Container</h1>
-      <p>Products found: {products.length}</p>
-    </main>
+    <>
+      <Hero />
+    </>
   );
 }

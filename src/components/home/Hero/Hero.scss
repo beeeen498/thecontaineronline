@@ -1,4 +1,4 @@
-@use '@/styles/variables' as *;
+@use "@/styles/variables" as *;
 
 // ─── Hero ─────────────────────────────────────────────────────
 // Full viewport height, video in a contained box with shadow
@@ -6,13 +6,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: calc(100vh - var(--topbar-height));
   width: 100%;
+  overflow: hidden;
   direction: ltr;
 
   // ─── Content Box ────────────────────────────────────────
   &__content {
-    margin-top: 100px;
     height: 70%;
     width: 90%;
     display: flex;
@@ -34,7 +34,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: $color-black;
+    background-color: $color-white;
     padding: $spacing-md;
 
     @media (max-width: $breakpoint-tablet) {
@@ -46,13 +46,16 @@
   &__socials-list {
     display: flex;
     flex-direction: column;
-    gap: $spacing-md;
+    justify-content: space-between;
+    gap: $spacing-lg;
+    height: 100%;
     padding: 0;
     margin: 0;
 
     li {
-      a, button {
-        color: $color-white;
+      a,
+      button {
+        color: $color-black;
         background: none;
         border: none;
         cursor: pointer;
@@ -70,6 +73,7 @@
     @media (max-width: $breakpoint-tablet) {
       flex-direction: row;
       gap: $spacing-lg;
+      height: auto;
     }
   }
 

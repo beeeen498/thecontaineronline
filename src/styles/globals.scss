@@ -9,6 +9,18 @@
   padding: 0;
 }
 
+// ─── Top Bar ──────────────────────────────────────────────────
+$topbar-height-desktop: 107.5px;
+$topbar-height-mobile: 60px; // header only, no nav row on mobile
+
+:root {
+  --topbar-height: #{$topbar-height-desktop};
+
+  @media (max-width: $breakpoint-mobile) {
+    --topbar-height: #{$topbar-height-mobile};
+  }
+}
+
 // ─── Base ─────────────────────────────────────────────────────
 body {
   display: flex;
@@ -30,8 +42,11 @@ body {
 
 .main-content {
   flex: 1;
-  margin-top: 120px; // approximate height of Header + Nav — we'll fine tune this
+  margin-top: var(--topbar-height);
+  display: flex;
+  flex-direction: column;
 }
+
 
 // ─── Typography ───────────────────────────────────────────────
 h1,
