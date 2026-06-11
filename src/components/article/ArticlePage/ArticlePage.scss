@@ -1,0 +1,80 @@
+@use '@/styles/variables' as *;
+
+// ─── Article Page ─────────────────────────────────────────────
+.article-page {
+  display: flex;
+  justify-content: center;
+  padding: $spacing-xl $spacing-md;
+
+  // ─── RTL ────────────────────────────────────────────────
+  &--rtl {
+    direction: rtl;
+  }
+
+  // ─── Inner ──────────────────────────────────────────────
+  &__inner {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  // ─── Image ──────────────────────────────────────────────
+  &__image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    border: 1px solid $color-black;
+    overflow: hidden;
+
+    @media (max-width: $breakpoint-tablet) {
+      height: 350px;
+    }
+
+    @media (max-width: $breakpoint-mobile) {
+      height: 250px;
+    }
+  }
+
+  // ─── Copyright ──────────────────────────────────────────
+  &__copyright {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.642);
+    color: $color-white;
+    font-size: 0.65rem;
+    padding: $spacing-xs;
+    margin: 0;
+  }
+
+  // ─── Title ──────────────────────────────────────────────
+  &__title {
+    font-family: var(--font-headers);
+    font-size: 2rem;
+    font-weight: 400;
+    margin: 0;
+
+    @media (max-width: $breakpoint-mobile) {
+      font-size: 1.5rem;
+    }
+  }
+
+  // ─── Body ───────────────────────────────────────────────
+  &__body {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    margin: 0;
+  }
+
+  // ─── Not Found ──────────────────────────────────────────
+  &__not-found {
+    text-align: center;
+    padding: $spacing-xl;
+    font-size: 1.25rem;
+  }
+}
