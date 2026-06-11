@@ -1,0 +1,73 @@
+@use '@/styles/variables' as *;
+
+// ─── Card ─────────────────────────────────────────────────────
+.card {
+  display: flex;
+  flex-direction: column;
+  width: 302px;
+  cursor: pointer;
+
+  // ─── Image Wrapper ────────────────────────────────────
+  &__image-wrapper {
+    border: 0.1px solid rgba(0, 0, 0, 0.208);
+    position: relative;
+    height: 400px;
+    width: 300px;
+    overflow: hidden;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  // ─── Sold Out Label ───────────────────────────────────
+  &__sold-out {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.62);
+    padding: $spacing-sm 0;
+    color: $color-white;
+    font-size: 0.875rem;
+  }
+
+  // ─── Details ──────────────────────────────────────────
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    text-align: center;
+  }
+
+  &__name {
+    font-size: 1.0625rem;
+    font-weight: 300;
+    margin-bottom: 0;
+  }
+
+  &__price {
+    font-size: 1.0625rem;
+    margin: 0;
+  }
+
+  // ─── Responsive ───────────────────────────────────────
+  @media (max-width: 830px) {
+    width: 202px;
+
+    &__image-wrapper {
+      height: 300px;
+      width: 200px;
+    }
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    width: 152px;
+
+    &__image-wrapper {
+      height: 250px;
+      width: 150px;
+    }
+  }
+}

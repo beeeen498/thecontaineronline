@@ -88,6 +88,7 @@ export default function About() {
             src="/assets/images/about/pink-prada-bag.jpg"
             alt="pink prada bag"
             fill
+            sizes="(max-width: 768px) 0px, 40vw"
             style={{ objectFit: "cover", objectPosition: "center" }}
           />
         </div>
@@ -98,6 +99,7 @@ export default function About() {
             src="/assets/images/about/vase.jpg"
             alt="handmade clay vase"
             fill
+            sizes="(max-width: 768px) 0px, 40vw"
             style={{ objectFit: "cover" }}
           />
         </div>
