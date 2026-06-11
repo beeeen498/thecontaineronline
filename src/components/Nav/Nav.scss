@@ -1,0 +1,59 @@
+@use "@/styles/variables" as *;
+
+// ─── Nav ──────────────────────────────────────────────────────
+// Bottom bar — black background, centered links with underline hover
+.nav {
+  background-color: $color-black;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  border-bottom: 0.5px solid $color-white;
+
+  // ─── List ─────────────────────────────────────────────────
+  &__list {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+  }
+
+  // ─── Item ─────────────────────────────────────────────────
+  &__item {
+    position: relative;
+    font-size: 1rem;
+    font-family: var(--font-nav);
+    font-size: 1rem;
+    font-weight: 300;
+    margin-bottom: $spacing-sm;
+    color: $color-white;
+
+    a {
+      color: $color-white;
+    }
+
+    // underline hover effect
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 2px;
+      background-color: $color-white;
+      transition: width 0.3s ease;
+    }
+
+    &:hover::after {
+      width: 100%;
+    }
+  }
+
+  // ─── RTL ──────────────────────────────────────────────────
+  &--rtl {
+    direction: rtl;
+  }
+}
