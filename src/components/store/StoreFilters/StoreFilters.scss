@@ -3,9 +3,9 @@
 // ─── Store Filters ────────────────────────────────────────────
 .store-filters {
   min-width: 200px;
-  padding: $spacing-md;
+  padding: $spacing-lg $spacing-md;
+  height: 100%;
 
-  // ─── Border side depends on language ──────────────────
   &--border-right {
     border-right: 1px solid $color-black;
   }
@@ -27,7 +27,6 @@
     justify-content: space-between;
     cursor: pointer;
     padding: $spacing-xs 0;
-    gap: $spacing-sm;
 
     &:hover {
       opacity: 0.7;
@@ -39,6 +38,7 @@
     font-size: 0.875rem;
     font-weight: 600;
     text-transform: uppercase;
+    flex: 1;
   }
 
   &__accordion-selected {
@@ -52,10 +52,7 @@
   &__accordion-arrow {
     display: flex;
     align-items: center;
-
-    &--rtl {
-      order: -1;
-    }
+    flex: 0;
   }
 
   // ─── Accordion Content ────────────────────────────────

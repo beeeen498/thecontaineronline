@@ -19,9 +19,7 @@ function Accordion({ title, selectedOption, isOpen, onToggle, children }) {
         <span className="store-filters__accordion-selected">
           {selectedOption}
         </span>
-        <span
-          className={`store-filters__accordion-arrow ${isHebrew ? "store-filters__accordion-arrow--rtl" : ""}`}
-        >
+        <span className="store-filters__accordion-arrow">
           {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
         </span>
       </div>
