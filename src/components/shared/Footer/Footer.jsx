@@ -5,44 +5,33 @@ import { AiFillInstagram, AiFillFacebook } from 'react-icons/ai';
 import { FaTiktok } from 'react-icons/fa6';
 import { IoLogoWhatsapp } from 'react-icons/io';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslations } from '@/hooks/useTranslations';
 import './Footer.scss';
 
-// ─── Social Links ─────────────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────
 const WHATSAPP_NUMBER = '+972553000357';
-
-// ─── Nav Links ────────────────────────────────────────────────
-const navLinks = {
-  english: [
-    { label: 'Home', href: '/' },
-    { label: 'Art', href: '/art' },
-    { label: 'Fashion', href: '/fashion' },
-    { label: 'Info', href: '/info' },
-    { label: 'About', href: '/#about' },
-    { label: 'Contact', href: '/#contact' },
-  ],
-  hebrew: [
-    { label: 'בית', href: '/' },
-    { label: 'אמנות', href: '/art' },
-    { label: 'אופנה', href: '/fashion' },
-    { label: 'מידע', href: '/info' },
-    { label: 'אודות', href: '/#about' },
-    { label: 'צור קשר', href: '/#contact' },
-  ],
-};
 
 // ─── Footer ───────────────────────────────────────────────────
 export default function Footer() {
   const { language } = useLanguage();
+  const t = useTranslations();
   const isHebrew = language === 'Hebrew';
   const currentYear = new Date().getFullYear();
-  const links = navLinks[isHebrew ? 'hebrew' : 'english'];
 
-  const whatsappMessage = isHebrew
-    ? 'שלום! יש לי שאלה :)'
-    : 'Hello! I have a question :)';
+  // ─── Nav Links ──────────────────────────────────────────
+  const navLinks = [
+    { label: t.nav.home, href: '/' },
+    { label: t.nav.art, href: '/art' },
+    { label: t.nav.fashion, href: '/fashion' },
+    { label: t.nav.info, href: '/info' },
+    { label: t.nav.about, href: '/#about' },
+    { label: t.nav.contact, href: '/#contact' },
+  ];
 
   const handleWhatsapp = () => {
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}/?text=${whatsappMessage}`);
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}/?text=${encodeURIComponent(
+      isHebrew ? 'שלום! יש לי שאלה :)' : 'Hello! I have a question :)'
+    )}`);
   };
 
   return (
@@ -50,11 +39,9 @@ export default function Footer() {
 
       {/* ─── Quick Nav ──────────────────────────────────── */}
       <div className="footer__nav">
-        <h3 className="footer__heading">
-          {isHebrew ? 'ניווט מהיר' : 'Quick Links'}
-        </h3>
+        <h3 className="footer__heading">{t.footer.quickLinks}</h3>
         <ul className="footer__nav-list">
-          {links.map(link => (
+          {navLinks.map(link => (
             <li key={link.href}>
               <Link href={link.href}>{link.label}</Link>
             </li>
@@ -65,16 +52,12 @@ export default function Footer() {
       {/* ─── Brand ──────────────────────────────────────── */}
       <div className="footer__brand">
         <Link href="/" className="footer__logo">the container</Link>
-        <p className="footer__tagline">
-          {isHebrew ? 'אמנות ואופנה' : 'Art & Fashion'}
-        </p>
+        <p className="footer__tagline">{t.footer.tagline}</p>
       </div>
 
       {/* ─── Socials ────────────────────────────────────── */}
       <div className="footer__socials">
-        <h3 className="footer__heading">
-          {isHebrew ? 'עקבו אחרינו' : 'Follow Us'}
-        </h3>
+        <h3 className="footer__heading">{t.footer.followUs}</h3>
         <ul className="footer__socials-list">
           <li>
             <a href="https://www.instagram.com/thecontainer.online/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
@@ -101,7 +84,7 @@ export default function Footer() {
 
       {/* ─── Copyright ──────────────────────────────────── */}
       <div className="footer__bottom">
-        <p>© {currentYear} The Container. All rights reserved.</p>
+        <p>© {currentYear} {t.footer.copyright}</p>
       </div>
 
     </footer>
