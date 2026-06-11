@@ -1,0 +1,64 @@
+@use '@/styles/variables' as *;
+
+// ─── Article ──────────────────────────────────────────────────
+.article {
+  cursor: pointer;
+
+  // ─── Image Wrapper ────────────────────────────────────
+  &__image-wrapper {
+    height: 350px;
+    width: 500px;
+    position: relative;
+    border: 1px solid $color-black;
+    overflow: hidden;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  // ─── Copyright ────────────────────────────────────────
+  &__copyright {
+    position: absolute;
+    font-size: 0.65rem;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.642);
+    color: $color-white;
+    bottom: 0;
+    margin: 0;
+    padding: $spacing-xs;
+  }
+
+  // ─── Title ────────────────────────────────────────────
+  &__title {
+    font-size: 1.125rem;
+    cursor: pointer;
+    margin: $spacing-sm 0 0;
+  }
+
+  // ─── Responsive ───────────────────────────────────────
+  @media (max-width: 1300px) {
+    &__title {
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 530px) {
+    &__image-wrapper {
+      height: 300px;
+      width: 400px;
+    }
+  }
+
+  @media (max-width: 420px) {
+    &__image-wrapper {
+      height: 150px;
+      width: 250px;
+    }
+
+    &__title {
+      width: 250px;
+      font-size: 0.8125rem;
+    }
+  }
+}

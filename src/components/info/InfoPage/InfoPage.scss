@@ -1,0 +1,132 @@
+@use "@/styles/variables" as *;
+
+// ─── Info Page ────────────────────────────────────────────────
+.info-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+
+  // ─── RTL ────────────────────────────────────────────────
+  &--rtl {
+    direction: rtl;
+  }
+
+  &__carousel-wrapper {
+    width: 100%;
+    margin-top: 250px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__carousel {
+    width: 90%;
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    transform: translate(-100px, -350px);
+  }
+  
+  &__carousel-item {
+    position: absolute;
+    bottom: 0;
+    transition:
+      transform 0.5s ease,
+      filter 0.5s ease,
+      opacity 0.5s ease;
+  }
+
+  // ─── Carousel Controls ──────────────────────────────────
+  &__carousel-controls {
+    margin: 0 $spacing-xl;
+    margin-bottom: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    direction: ltr;
+  }
+
+  // ─── Arrow ──────────────────────────────────────────────
+  &__arrow {
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  // ─── Company Text ───────────────────────────────────────
+  &__company-text {
+    width: 60%;
+    text-align: justify;
+    font-size: 1.1rem;
+    padding: $spacing-md;
+  }
+
+  // ─── Articles ───────────────────────────────────────────
+  &__articles {
+    width: 80%;
+    margin-bottom: $spacing-xl;
+  }
+
+  &__articles-heading {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: $spacing-lg;
+  }
+
+  &__articles-grid {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: $spacing-lg;
+  }
+
+  // ─── Responsive ─────────────────────────────────────────
+  @media (max-width: 1300px) {
+    &__articles-grid {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  @media (max-width: 1190px) {
+    &__company-text {
+      width: 80%;
+      margin: 0;
+    }
+  }
+
+  @media (max-width: 910px) {
+    &__carousel-controls {
+      width: 100%;
+    }
+
+    &__company-text {
+      font-size: 0.9375rem;
+    }
+  }
+
+  @media (max-width: 780px) {
+    &__carousel {
+      margin-top: 150px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    &__carousel {
+      margin-top: 100px;
+    }
+
+    &__company-text {
+      padding: $spacing-md 0;
+      font-size: 0.8125rem;
+    }
+  }
+}

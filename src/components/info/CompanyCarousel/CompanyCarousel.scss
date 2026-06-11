@@ -1,0 +1,108 @@
+@use "@/styles/variables" as *;
+
+// ─── Company Carousel ─────────────────────────────────────────
+.company-carousel {
+  width: 100%;
+
+  // ─── Cards Container ────────────────────────────────────
+  &__cards {
+    margin-top: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+  }
+
+  // ─── Individual Card ────────────────────────────────────
+  &__card {
+    height: 300px;
+    width: 300px;
+    border: 1px solid $color-black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+    position: absolute;
+    transition:
+      transform 0.5s ease,
+      filter 0.5s ease;
+    background-color: $color-white;
+    overflow: hidden;
+
+    &--focused {
+      filter: none;
+    }
+
+    &--blurred {
+      filter: blur(2px);
+      opacity: 0.6;
+    }
+
+    @media (max-width: 780px) {
+      height: 200px;
+      width: 200px;
+    }
+
+    @media (max-width: 570px) {
+      height: 150px;
+      width: 150px;
+    }
+  }
+
+  // ─── Controls ───────────────────────────────────────────
+  &__controls {
+    margin: 0 $spacing-xl;
+    margin-bottom: $spacing-xl;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    direction: ltr;
+
+    @media (max-width: 910px) {
+      width: 100%;
+      margin: 0;
+      margin-bottom: $spacing-xl;
+    }
+  }
+
+  // ─── Arrow ──────────────────────────────────────────────
+  &__arrow {
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.1);
+      transition: transform 1s;
+    }
+  }
+
+  // ─── Company Text ───────────────────────────────────────
+  &__text {
+    width: 60%;
+    text-align: justify;
+    font-size: 1.1rem;
+    padding: $spacing-md;
+
+    &--rtl {
+      direction: rtl;
+    }
+
+    @media (max-width: 1190px) {
+      width: 80%;
+      margin: 0;
+    }
+
+    @media (max-width: 910px) {
+      font-size: 0.9375rem;
+    }
+
+    @media (max-width: 600px) {
+      padding: $spacing-md 0;
+      font-size: 0.8125rem;
+    }
+  }
+}

@@ -86,6 +86,8 @@ export const translations = {
     // ─── Info Page ────────────────────────────────────────
     info: {
       articles: "Articles",
+      designersHeading: "Four Enterprises Dominate the Fashion World",
+      designersPlaceholder: "Click on an image to learn more",
     },
 
     // ─── Cookie Consent ───────────────────────────────────
@@ -187,6 +189,8 @@ export const translations = {
     // ─── Info Page ────────────────────────────────────────
     info: {
       articles: "מאמרים",
+      designersHeading: "ארבע חברות שולטות בעולם האופנה",
+      designersPlaceholder: "לחץ על תמונה כדי ללמוד עוד",
     },
 
     // ─── Cookie Consent ───────────────────────────────────

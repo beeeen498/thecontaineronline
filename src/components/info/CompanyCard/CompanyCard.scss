@@ -1,0 +1,61 @@
+@use '@/styles/variables' as *;
+
+// ─── Company Card ─────────────────────────────────────────────
+.company-card {
+  height: 300px;
+  width: 300px;
+  border: 1px solid $color-black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  position: absolute;
+  transition: transform 0.5s ease, filter 0.5s ease;
+  background-color: $color-white;
+  overflow: hidden;
+
+  // ─── States ───────────────────────────────────────────
+  &--focused {
+    filter: none;
+  }
+
+  &--blurred {
+    filter: blur(2px);
+    opacity: 0.6;
+  }
+
+  // ─── Logo ─────────────────────────────────────────────
+  &__logo {
+    background-size: contain;
+    width: 50%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: $color-white;
+  }
+
+  // ─── Name ─────────────────────────────────────────────
+  &__name {
+    position: absolute;
+    bottom: 0;
+    border-top: 1px solid $color-black;
+    width: 100%;
+    text-align: center;
+    margin: 0;
+    padding: $spacing-sm;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  // ─── Responsive ───────────────────────────────────────
+  @media (max-width: 780px) {
+    height: 200px;
+    width: 200px;
+  }
+
+  @media (max-width: 570px) {
+    height: 150px;
+    width: 150px;
+  }
+}

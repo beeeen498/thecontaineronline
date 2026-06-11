@@ -1,0 +1,27 @@
+@use '@/styles/variables' as *;
+
+// ─── Articles Section ─────────────────────────────────────────
+.articles-section {
+  width: 80%;
+  margin-bottom: $spacing-xl;
+
+  // ─── Heading ────────────────────────────────────────────
+  &__heading {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: $spacing-lg;
+  }
+
+  // ─── Grid ───────────────────────────────────────────────
+  &__grid {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: $spacing-lg;
+
+    @media (max-width: 1300px) {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+}

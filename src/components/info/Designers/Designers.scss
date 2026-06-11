@@ -1,0 +1,194 @@
+@use '@/styles/variables' as *;
+
+// ─── Designers ────────────────────────────────────────────────
+.designers {
+  margin-top: 150px;
+  margin-bottom: 150px;
+  width: 80%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: $spacing-xl;
+  position: relative;
+
+  // ─── Heading ────────────────────────────────────────────
+  &__heading {
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 1.875rem;
+    margin: 0;
+  }
+
+  // ─── Images Grid ────────────────────────────────────────
+  &__grid {
+    display: flex;
+    direction: ltr;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  // ─── Item ───────────────────────────────────────────────
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    margin-top: $spacing-md;
+    width: 130px;
+  }
+
+  // ─── Image Wrapper ──────────────────────────────────────
+  &__image-wrapper {
+    position: relative;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    overflow: hidden;
+    filter: grayscale(100%);
+    transition: filter 0.3s ease, transform 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+
+  &__item:hover &__image-wrapper {
+    filter: grayscale(0%);
+  }
+
+  &__image--color ~ &__image-wrapper {
+    filter: grayscale(0%);
+  }
+
+  // selected state
+  &__item--selected &__image-wrapper {
+    filter: grayscale(0%);
+  }
+
+  // ─── Overlay (not used — name shows below) ──────────────
+  &__overlay {
+    display: none;
+  }
+
+  // ─── Name ───────────────────────────────────────────────
+  &__name {
+    font-size: 1rem;
+    color: $color-black;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transform: translateY(10px);
+    margin: 0;
+    font-weight: bold;
+    width: 130px;
+    text-align: center;
+  }
+
+  // ─── Company ────────────────────────────────────────────
+  &__company {
+    font-size: 1rem;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transform: translateY(35px);
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    width: 130px;
+  }
+
+  // show name and company on hover or selected
+  &__item:hover &__name,
+  &__item:hover &__company {
+    opacity: 1;
+    transform: translateY(10px);
+  }
+
+  &__name--visible,
+  &__company--visible {
+    opacity: 1;
+    transform: translateY(10px);
+  }
+
+  // ─── Info Text ──────────────────────────────────────────
+  &__text {
+    text-align: justify;
+    margin-top: $spacing-xl;
+    width: 100%;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  &__placeholder {
+    text-align: center;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  // ─── RTL ────────────────────────────────────────────────
+  &--rtl {
+    direction: rtl;
+  }
+
+  // ─── Responsive ─────────────────────────────────────────
+  @media (max-width: 870px) {
+    width: 90%;
+
+    &__grid {
+      justify-content: space-between;
+    }
+  }
+
+  @media (max-width: 680px) {
+    &__heading {
+      font-size: 1.25rem;
+    }
+
+    &__item {
+      width: 80px;
+    }
+
+    &__image-wrapper {
+      width: 80px;
+      height: 80px;
+    }
+
+    &__name,
+    &__company {
+      font-size: 0.9rem;
+      width: 80px;
+    }
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    margin-top: 100px;
+  }
+
+  @media (max-width: 430px) {
+    &__heading {
+      font-size: 0.9375rem;
+    }
+
+    &__item {
+      width: 60px;
+    }
+
+    &__image-wrapper {
+      width: 60px;
+      height: 60px;
+    }
+
+    &__name,
+    &__company {
+      font-size: 0.7rem;
+      width: 60px;
+    }
+
+    &__text {
+      font-size: 0.75rem;
+    }
+  }
+}
