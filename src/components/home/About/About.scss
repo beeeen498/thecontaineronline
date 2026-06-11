@@ -1,0 +1,212 @@
+@use "@/styles/variables" as *;
+
+// ─── About ────────────────────────────────────────────────────
+.about {
+  height: 95vh;
+  margin: $spacing-xl $spacing-xs 0;
+  overflow: hidden;
+  background-image: url("/assets/images/concrete-background.png");
+  background-size: contain;
+
+  // ─── Grid ───────────────────────────────────────────────
+  &__grid {
+    display: grid;
+    grid-template-columns: 0.2fr repeat(4, 1fr);
+    grid-template-rows: 0.3fr repeat(4, 1fr);
+    gap: 0;
+    height: 100%;
+    border: 1.5px solid $color-black;
+    width: 100%;
+
+    // border on all grid children
+    > * {
+      border: 1.5px solid $color-black;
+    }
+  }
+
+  // ─── Marquee ────────────────────────────────────────────
+  &__marquee {
+    grid-area: 1 / 1 / 2 / 4;
+    background-color: $color-black;
+    color: $color-white;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    width: 100%;
+    direction: ltr;
+    gap: 0;
+  }
+
+  &__marquee-text {
+    white-space: nowrap;
+    width: max-content;
+    flex-shrink: 0;
+    animation: marqueeScroll 30s linear infinite;
+
+    &--offset {
+      animation: marqueeScroll 30s linear infinite;
+    }
+  }
+
+  // ─── Heading ────────────────────────────────────────────
+  &__heading {
+    grid-area: 2 / 1 / 3 / 4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--font-headers);
+
+    h2 {
+      margin: 0;
+      font-size: 2.5rem;
+    }
+  }
+
+  // ─── Bag Image ──────────────────────────────────────────
+  &__image-bag {
+    grid-area: 1 / 4 / 4 / 6;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    border-bottom: 0;
+  }
+
+  // ─── Vase Image ─────────────────────────────────────────
+  &__image-vase {
+    grid-area: 3 / 1 / 6 / 3;
+    position: relative;
+    overflow: hidden;
+  }
+
+  // ─── Quote ──────────────────────────────────────────────
+  &__quote {
+    grid-area: 3 / 3 / 4 / 4;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+    height: 100%;
+    border-bottom: 0;
+    direction: ltr;
+    padding: $spacing-sm;
+
+    &-text {
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+
+  &__quote-text {
+    font-size: 1.25rem;
+    font-family: var(--font-headers);
+    margin: $spacing-sm $spacing-xs 0;
+    font-weight: 300;
+
+    &--fade {
+      animation: fadeOut 2s ease-in;
+      opacity: 0;
+    }
+  }
+
+  &__quote-author {
+    font-size: 0.875rem;
+    color: $color-text-secondary;
+    margin: 0 0 $spacing-sm;
+
+    &--fade {
+      animation: fadeOut 2s ease-in;
+      opacity: 0;
+    }
+  }
+
+  // ─── Main Text ──────────────────────────────────────────
+  &__text {
+    grid-area: 4 / 3 / 6 / 6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    border-top: 2.5px solid $color-black;
+    white-space: pre-line;
+
+    p {
+      margin: $spacing-md;
+      text-align: center;
+    }
+  }
+
+  // ─── RTL ────────────────────────────────────────────────
+  &--rtl {
+    direction: rtl;
+  }
+
+  // ─── Mobile ─────────────────────────────────────────────
+  @media (max-width: $breakpoint-tablet) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: auto;
+    margin-bottom: $spacing-xl;
+
+    &__grid {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &__image-bag,
+    &__image-vase {
+      display: none;
+    }
+
+    &__marquee {
+      padding: $spacing-md 0;
+    }
+
+    &__heading {
+      border: 1px solid $color-black;
+      padding: $spacing-sm 0;
+    }
+
+    &__quote {
+      border: 1px solid $color-black;
+      border-top: none;
+    }
+
+    &__text {
+      border: 1px solid $color-black;
+      border-top: none;
+      font-size: 1rem;
+    }
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    &__text {
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// ─── Keyframes ────────────────────────────────────────────────
+@keyframes marqueeScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
