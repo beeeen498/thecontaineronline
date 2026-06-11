@@ -1,0 +1,94 @@
+@use "@/styles/variables" as *;
+
+// ─── Store Filters ────────────────────────────────────────────
+.store-filters {
+  min-width: 200px;
+  padding: $spacing-md;
+
+  // ─── Border side depends on language ──────────────────
+  &--border-right {
+    border-right: 1px solid $color-black;
+  }
+
+  &--border-left {
+    border-left: 1px solid $color-black;
+  }
+
+  // ─── Accordion ────────────────────────────────────────
+  &__accordion {
+    margin-bottom: $spacing-sm;
+    border-bottom: 0.5px solid $color-border;
+    padding-bottom: $spacing-sm;
+  }
+
+  &__accordion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: $spacing-xs 0;
+    gap: $spacing-sm;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+
+  &__accordion-title {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  &__accordion-selected {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: $color-text-secondary;
+    flex: 1;
+    text-align: center;
+  }
+
+  &__accordion-arrow {
+    display: flex;
+    align-items: center;
+
+    &--rtl {
+      order: -1;
+    }
+  }
+
+  // ─── Accordion Content ────────────────────────────────
+  &__accordion-content {
+    padding: $spacing-sm 0;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  // ─── Option ───────────────────────────────────────────
+  &__option {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+
+  &__option-label {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  // ─── Mobile ───────────────────────────────────────────
+  @media (max-width: $breakpoint-tablet) {
+    min-width: unset;
+    width: 100%;
+    border-right: none;
+    border-left: none;
+    border-bottom: 1px solid $color-black;
+  }
+}
