@@ -1,0 +1,57 @@
+@use '@/styles/variables' as *;
+
+// ─── Breadcrumb ───────────────────────────────────────────────
+.breadcrumb {
+  padding: $spacing-md $spacing-xl;
+  direction: ltr;
+
+  &--rtl {
+    direction: rtl;
+  }
+
+  // ─── List ───────────────────────────────────────────────
+  &__list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+    padding: 0;
+    margin: 0;
+  }
+
+  // ─── Item ───────────────────────────────────────────────
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+
+  // ─── Link ───────────────────────────────────────────────
+  &__link {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: $color-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $color-black;
+    }
+  }
+
+  // ─── Separator ──────────────────────────────────────────
+  &__separator {
+    font-size: 0.75rem;
+    color: $color-text-secondary;
+  }
+
+  // ─── Current ────────────────────────────────────────────
+  &__current {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: $color-black;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}

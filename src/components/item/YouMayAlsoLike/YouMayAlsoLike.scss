@@ -1,0 +1,31 @@
+@use "@/styles/variables" as *;
+
+.you-may-also-like {
+  width: 100%;
+  margin: $spacing-xl 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &__heading {
+    font-family: var(--font-headers);
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: $spacing-lg;
+    text-align: center;
+  }
+
+  &__cards {
+    display: flex;
+    gap: $spacing-lg;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    // show max 2 on mobile
+    .card:nth-child(n + 3) {
+      @media (max-width: 1213px) {
+        display: none;
+      }
+    }
+  }
+}

@@ -81,6 +81,8 @@ export const translations = {
       careInstructions: "Care Instructions",
       share: "Share",
       soldOut: "Sold Out",
+      outOfStock:
+        "This item is currently out of stock. Contact us for availability.",
     },
 
     // ─── Info Page ────────────────────────────────────────
@@ -184,6 +186,7 @@ export const translations = {
       careInstructions: "הוראות טיפול",
       share: "שיתוף",
       soldOut: "אזל המלאי",
+      outOfStock: "פריט זה אינו במלאי כרגע. צרו איתנו קשר לבדיקת זמינות.",
     },
 
     // ─── Info Page ────────────────────────────────────────

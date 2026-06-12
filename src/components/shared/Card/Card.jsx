@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useTranslations } from '@/hooks/useTranslations';
-import './Card.scss';
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "@/hooks/useTranslations";
+import "./Card.scss";
 
 // ─── Card ─────────────────────────────────────────────────────
 // Single product card used in store pages and featured items
@@ -16,19 +16,18 @@ export default function Card({ item }) {
   if (!item) return null;
 
   const handleClick = () => {
-    router.push(`/item/${item.id}`);
+    router.push(`/item/${item.handle}`);
   };
 
   return (
     <div className="card" onClick={handleClick}>
-
       {/* ─── Image ──────────────────────────────────────── */}
       <div className="card__image-wrapper">
         <Image
           src={item.imagePath}
           alt={item.title}
           fill
-          style={{ objectFit: 'cover', objectPosition: 'center' }}
+          style={{ objectFit: "cover", objectPosition: "center" }}
           sizes="(max-width: 630px) 150px, (max-width: 830px) 200px, 300px"
         />
         {!item.isInStock && (
@@ -41,7 +40,6 @@ export default function Card({ item }) {
         <h2 className="card__name">{item.title}</h2>
         <p className="card__price">{item.price}</p>
       </div>
-
     </div>
   );
 }

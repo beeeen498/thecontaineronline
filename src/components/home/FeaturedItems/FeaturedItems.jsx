@@ -9,10 +9,12 @@ import './FeaturedItems.scss';
 function formatItem(item, isEnglish) {
   return {
     id: item.id,
+    handle: item.handle, 
     title: isEnglish ? item.englishName : item.hebrewName,
     price: isEnglish ? item.globalPrice : item.israelPrice,
     imagePath: item.images?.[0] ?? '',
     isInStock: item.inStock,
+    typeOfItem: item.typeOfItem,
   };
 }
 
