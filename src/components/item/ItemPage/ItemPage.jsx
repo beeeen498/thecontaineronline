@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslations } from "@/hooks/useTranslations";
@@ -69,6 +69,19 @@ export default function ItemPage({ product, relatedProducts }) {
           : prev + 1,
     );
   };
+
+  // ─── Preload adjacent images ──────────────────────────
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const prevIdx =
+      currentImageIndex === 0 ? images.length - 1 : currentImageIndex - 1;
+    const nextIdx =
+      currentImageIndex === images.length - 1 ? 0 : currentImageIndex + 1;
+    [prevIdx, nextIdx].forEach((idx) => {
+      const img = new window.Image();
+      img.src = images[idx];
+    });
+  }, [currentImageIndex, images]);
 
   // ─── Product Data ─────────────────────────────────────
   const name = isEnglish ? product.englishName : product.hebrewName;
@@ -193,14 +206,20 @@ export default function ItemPage({ product, relatedProducts }) {
               <>
                 <button
                   className="item-page__arrow item-page__arrow--prev"
-                  onClick={() => handleCarousel("prev")}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCarousel("prev");
+                  }}
                   aria-label="Previous image"
                 >
                   <IoIosArrowBack size={24} />
                 </button>
                 <button
                   className="item-page__arrow item-page__arrow--next"
-                  onClick={() => handleCarousel("next")}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCarousel("next");
+                  }}
                   aria-label="Next image"
                 >
                   <IoIosArrowForward size={24} />
