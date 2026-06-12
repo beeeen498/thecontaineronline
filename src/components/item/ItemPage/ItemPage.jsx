@@ -75,9 +75,18 @@ export default function ItemPage({ product, relatedProducts }) {
   const description = isEnglish
     ? product.englishDescription
     : product.hebrewDescription;
-  const price = isEnglish
-    ? `$${parseFloat(product.globalPrice).toFixed(2)}`
-    : `₪${product.israelPrice}`;
+
+  // ─── Price ────────────────────────────────────────────
+  const globalPrice = parseFloat(product.globalPrice);
+  const israelPrice = parseFloat(product.israelPrice);
+
+  const price = isHebrew
+    ? israelPrice && !isNaN(israelPrice)
+      ? `₪${israelPrice.toFixed(0)}`
+      : ""
+    : globalPrice && !isNaN(globalPrice) && globalPrice > 0
+      ? `$${globalPrice.toFixed(2)}`
+      : "";
 
   // ─── Return Policy ────────────────────────────────────
   const returnPolicy =
@@ -215,6 +224,81 @@ export default function ItemPage({ product, relatedProducts }) {
             {/* description */}
             {description && (
               <p className="item-page__description">{description}</p>
+            )}
+
+            {/* ─── Product Details ──────────────────────────── */}
+            {product.typeOfItem === "fashion" && (
+              <div className="item-page__details">
+                {/* brand */}
+                {product.brand && (
+                  <div className="item-page__detail">
+                    <span className="item-page__detail-label">
+                      {isHebrew ? "מותג" : "Brand"}
+                    </span>
+                    <span className="item-page__detail-value">
+                      {product.brand}
+                    </span>
+                  </div>
+                )}
+
+                {/* colors */}
+                {(isEnglish ? product.colorsEnglish : product.colorsHebrew)
+                  ?.length > 0 && (
+                  <div className="item-page__detail">
+                    <span className="item-page__detail-label">
+                      {isHebrew ? "צבע" : "Color"}
+                    </span>
+                    <span className="item-page__detail-value">
+                      {(isEnglish
+                        ? product.colorsEnglish
+                        : product.colorsHebrew
+                      ).join(", ")}
+                    </span>
+                  </div>
+                )}
+
+                {/* size */}
+                {(isEnglish ? product.englishSize : product.hebrewSize) && (
+                  <div className="item-page__detail">
+                    <span className="item-page__detail-label">
+                      {isHebrew ? "מידה" : "Size"}
+                    </span>
+                    <span className="item-page__detail-value">
+                      {isEnglish ? product.englishSize : product.hebrewSize}
+                    </span>
+                  </div>
+                )}
+
+                {/* condition */}
+                {(isEnglish
+                  ? product.englishCondition
+                  : product.hebrewCondition) && (
+                  <div className="item-page__detail">
+                    <span className="item-page__detail-label">
+                      {isHebrew ? "מצב" : "Condition"}
+                    </span>
+                    <span className="item-page__detail-value">
+                      {isEnglish
+                        ? product.englishCondition
+                        : product.hebrewCondition}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* art specific */}
+            {product.typeOfItem === "art" && product.numOfItems && (
+              <div className="item-page__details">
+                <div className="item-page__detail">
+                  <span className="item-page__detail-label">
+                    {isHebrew ? "כמות פריטים" : "Number of Items"}
+                  </span>
+                  <span className="item-page__detail-value">
+                    {product.numOfItems}
+                  </span>
+                </div>
+              </div>
             )}
 
             {/* out of stock button */}

@@ -23,6 +23,7 @@
     display: flex;
     min-height: calc(100vh - var(--topbar-height));
     border-bottom: 1px solid $color-border;
+    align-items: flex-start; // add this
 
     @media (max-width: $breakpoint-tablet) {
       flex-direction: column;
@@ -35,13 +36,19 @@
     width: 55%;
     display: flex;
     flex-direction: row;
-    position: relative;
-    padding-top: $spacing-xl;
+    position: sticky; // make left side sticky too
+    top: var(--topbar-height); // stick to top
+    height: calc(100vh - var(--topbar-height)); // fixed height
 
     @media (max-width: $breakpoint-tablet) {
+      position: relative;
       width: 100%;
-      min-height: 60vw;
-      padding-top: 0;
+      height: 60vw;
+      top: 0;
+    }
+
+    @media (max-width: $breakpoint-mobile) {
+      height: 80vw;
     }
   }
 
@@ -176,6 +183,40 @@
     margin: 0;
     max-height: 150px;
     overflow-y: auto;
+  }
+
+  // ─── Product Details ────────────────────────────────────
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-xs 0;
+    border-bottom: 0.5px solid $color-border;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__detail-label {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $color-text-secondary;
+  }
+
+  &__detail-value {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: $color-black;
+    text-align: right;
   }
 
   // ─── CTA Button ─────────────────────────────────────────
