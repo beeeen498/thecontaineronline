@@ -193,7 +193,7 @@ export default function ItemPage({ product, relatedProducts }) {
             {mainImage && (
               <Image
                 src={mainImage}
-                alt={name}
+                alt={name || "Product image"}
                 fill
                 sizes="(max-width: 768px) 100vw, 55vw"
                 style={{ objectFit: "contain", objectPosition: "center" }}

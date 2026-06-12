@@ -25,7 +25,7 @@ export default function Card({ item }) {
       <div className="card__image-wrapper">
         <Image
           src={item.imagePath}
-          alt={item.title}
+          alt={item.title || "Product"}
           fill
           style={{ objectFit: "cover", objectPosition: "center" }}
           sizes="(max-width: 630px) 150px, (max-width: 830px) 200px, 300px"

@@ -1,0 +1,131 @@
+@use '@/styles/variables' as *;
+
+// ─── Select Language Page ─────────────────────────────────────
+// Full screen overlay on first visit
+// Black background, centered content, subtle fade in
+.select-language {
+  position: fixed;
+  inset: 0;
+  background-color: $color-black;
+  color: $color-white;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xl;
+  animation: fadeIn 0.8s ease;
+
+  // ─── Logo ───────────────────────────────────────────────
+  &__logo {
+    font-family: var(--font-headers);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0;
+    color: $color-white;
+  }
+
+  // ─── Headings ───────────────────────────────────────────
+  &__headings {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-sm;
+    text-align: center;
+  }
+
+  &__title {
+    font-family: var(--font-body);
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 200;
+    margin: 0;
+  }
+
+  &__subtitle {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: $color-silver;
+    margin: 0;
+  }
+
+  // ─── Buttons ────────────────────────────────────────────
+  &__buttons {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xl;
+  }
+
+  &__btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-md;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $color-white;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05);
+      opacity: 0.8;
+    }
+  }
+
+  // ─── Flag ───────────────────────────────────────────────
+  &__flag-wrapper {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: border-color 0.3s ease;
+
+    .select-language__btn:hover & {
+      border-color: $color-white;
+    }
+  }
+
+  // ─── Divider ────────────────────────────────────────────
+  &__divider {
+    width: 1px;
+    height: 80px;
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  // ─── Mobile ─────────────────────────────────────────────
+  @media (max-width: $breakpoint-mobile) {
+    gap: $spacing-lg;
+
+    &__buttons {
+      gap: $spacing-lg;
+    }
+
+    &__flag-wrapper {
+      width: 55px;
+      height: 55px;
+    }
+  }
+}
+
+// ─── Animations ───────────────────────────────────────────────
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

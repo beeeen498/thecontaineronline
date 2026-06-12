@@ -3,6 +3,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import Header from '@/components/shared/Nav/Header';
 import Nav from '@/components/shared/Nav/Nav';
 import Footer from '@/components/shared/Footer/Footer';
+import LanguageGate from '@/components/selectLanguage/LanguageGate';
 import '@/styles/globals.scss';
 
 // ─── Font Setup ───────────────────────────────────────────────
@@ -42,18 +43,16 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${belleza.variable} ${assistant.variable} ${titilliumWeb.variable}`}>
       <body>
         <LanguageProvider>
-          {/* Fixed top bar — Header + Nav stacked together */}
-          <div className="top-bar">
-            <Header />
-            <Nav />
-          </div>
-
-          {/* Page content pushed below the fixed top bar */}
-          <main className="main-content">
-            {children}
-          </main>
-
-          <Footer />
+          <LanguageGate>
+            <div className="top-bar">
+              <Header />
+              <Nav />
+            </div>
+            <main className="main-content">
+              {children}
+            </main>
+            <Footer />
+          </LanguageGate>
         </LanguageProvider>
       </body>
     </html>
