@@ -1,0 +1,83 @@
+@use "@/styles/variables" as *;
+
+// ─── Image PopUp ──────────────────────────────────────────────
+.image-popup {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.95);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  // ─── Close Button ───────────────────────────────────────
+  &__close {
+    position: absolute;
+    top: $spacing-lg;
+    right: $spacing-lg;
+    background: none;
+    border: none;
+    color: $color-white;
+    cursor: pointer;
+    z-index: 2;
+    padding: $spacing-xs;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  // ─── Image Wrapper ──────────────────────────────────────
+  &__image-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90vw;
+    height: 90vh;
+    position: relative;
+  }
+
+  // ─── Arrows ─────────────────────────────────────────────
+  &__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: $color-white;
+    cursor: pointer;
+    padding: $spacing-sm;
+    z-index: 2;
+    transition:
+      transform 0.2s ease,
+      opacity 0.2s ease;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    &--prev {
+      left: $spacing-lg;
+    }
+
+    &--next {
+      right: $spacing-lg;
+    }
+  }
+
+  // ─── Counter ────────────────────────────────────────────
+  &__counter {
+    position: absolute;
+    bottom: $spacing-lg;
+    left: 50%;
+    transform: translateX(-50%);
+    color: $color-white;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    opacity: 0.7;
+    margin: 0;
+  }
+}

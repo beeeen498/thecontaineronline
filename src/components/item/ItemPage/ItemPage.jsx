@@ -17,6 +17,7 @@ import Breadcrumb from "@/components/shared/Breadcrumb/Breadcrumb";
 import YouMayAlsoLike from "@/components/item/YouMayAlsoLike/YouMayAlsoLike";
 import returnPolicyData from "@/data/returnPolicyData";
 import takingCareData from "@/data/takingCareData";
+import ImagePopUp from "@/components/shared/ImagePopUp/ImagePopUp";
 import "./ItemPage.scss";
 
 // ─── Constants ────────────────────────────────────────────────
@@ -50,6 +51,7 @@ export default function ItemPage({ product, relatedProducts }) {
   const t = useTranslations();
   const isHebrew = language === "Hebrew";
   const isEnglish = !isHebrew;
+  const [isPopUpOpen, setIsPopUpOpen] = useState(false);
 
   // ─── Image State ──────────────────────────────────────
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -100,6 +102,19 @@ export default function ItemPage({ product, relatedProducts }) {
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 
+  // ─── Image Popup ─────────────────────────────────────────
+  const handlePopUpNavigate = (dir) => {
+    setCurrentImageIndex((prev) =>
+      dir === "prev"
+        ? prev === 0
+          ? images.length - 1
+          : prev - 1
+        : prev === images.length - 1
+          ? 0
+          : prev + 1,
+    );
+  };
+
   return (
     <div className={`item-page ${isHebrew ? "item-page--rtl" : ""}`}>
       {/* ─── Breadcrumb ───────────────────────────────── */}
@@ -120,7 +135,7 @@ export default function ItemPage({ product, relatedProducts }) {
           { label: name, href: "#" },
         ]}
       />
-      
+
       {/* ─── Main Content ─────────────────────────────── */}
       <div className="item-page__content">
         {/* ─── Left — Images ────────────────────────────── */}
@@ -148,7 +163,11 @@ export default function ItemPage({ product, relatedProducts }) {
           )}
 
           {/* main image */}
-          <div className="item-page__main-image">
+          <div
+            className="item-page__main-image"
+            onClick={() => setIsPopUpOpen(true)}
+            style={{ cursor: "zoom-in" }}
+          >
             {mainImage && (
               <Image
                 src={mainImage}
@@ -272,6 +291,16 @@ export default function ItemPage({ product, relatedProducts }) {
         products={relatedProducts}
         currentHandle={product.handle}
       />
+
+      {/* ─── Image PopUp ──────────────────────────────── */}
+      {isPopUpOpen && (
+        <ImagePopUp
+          images={images}
+          currentIndex={currentImageIndex}
+          onClose={() => setIsPopUpOpen(false)}
+          onNavigate={handlePopUpNavigate}
+        />
+      )}
     </div>
   );
 }
