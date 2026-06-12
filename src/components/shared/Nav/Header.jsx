@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useLanguage } from '@/contexts/LanguageContext';
-import LanguageButton from './LanguageButton';
-import './Header.scss';
+import Link from "next/link";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageButton from "./LanguageButton";
+import { BsHandbag } from "react-icons/bs";
+import "./Header.scss";
 
 // ─── Header ───────────────────────────────────────────────────
 // Top bar — logo, language toggle, cart icon placeholder
@@ -11,11 +12,10 @@ import './Header.scss';
 
 export default function Header() {
   const { language } = useLanguage();
-  const isHebrew = language === 'Hebrew';
+  const isHebrew = language === "Hebrew";
 
   return (
-    <header className={`header ${isHebrew ? 'rtl' : ''}`}>
-
+    <header className={`header ${isHebrew ? "rtl" : ""}`}>
       {/* Language toggle — left side */}
       <div className="header__language">
         <LanguageButton />
@@ -28,12 +28,10 @@ export default function Header() {
 
       {/* Cart — right side */}
       <div className="header__cart">
-        {/* cart icon placeholder — will be wired up later */}
         <button className="header__cart-button" aria-label="Cart">
-          🛒
+          <BsHandbag size={22} />
         </button>
       </div>
-
     </header>
   );
 }
