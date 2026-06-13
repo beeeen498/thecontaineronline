@@ -5,6 +5,7 @@ import Nav from "@/components/shared/Nav/Nav";
 import Footer from "@/components/shared/Footer/Footer";
 import HtmlAttributes from "@/components/shared/HtmlAttributes/HtmlAttributes";
 import ScrollToTop from "@/components/shared/ScrollToTop/ScrollToTop";
+import AnchorScroll from "@/components/shared/AnchorScroll/AnchorScroll";
 import LanguageGate from "@/components/selectLanguage/LanguageGate";
 import "@/styles/globals.scss";
 
@@ -50,6 +51,7 @@ export default function RootLayout({ children }) {
         <LanguageProvider>
           <HtmlAttributes />
           <ScrollToTop />
+          <AnchorScroll />
           <LanguageGate>
             <div className="top-bar">
               <Header />

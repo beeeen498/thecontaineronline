@@ -4,13 +4,16 @@ import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
 // ─── ScrollToTop ──────────────────────────────────────────────
-// Scrolls to top of page on every route change
+// Scrolls to top on route change, but NOT when only hash changes
 
 export default function ScrollToTop() {
   const pathname = usePathname();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // only scroll to top if there's no hash in the URL
+    if (!window.location.hash) {
+      window.scrollTo(0, 0);
+    }
   }, [pathname]);
 
   return null;
