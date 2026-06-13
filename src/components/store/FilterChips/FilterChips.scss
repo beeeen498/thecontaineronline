@@ -1,0 +1,60 @@
+@use '@/styles/variables' as *;
+
+// ─── Filter Chips ─────────────────────────────────────────────
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  border-bottom: 0.5px solid $color-border;
+  direction: ltr;
+
+  &--rtl {
+    direction: rtl;
+  }
+
+  // ─── Chip ───────────────────────────────────────────────
+  &__chip {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    background: none;
+    border: 1px solid $color-black;
+    padding: $spacing-xs $spacing-sm;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    &:hover {
+      background-color: $color-black;
+      color: $color-white;
+    }
+  }
+
+  // ─── Remove Icon ────────────────────────────────────────
+  &__remove {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  // ─── Clear All ──────────────────────────────────────────
+  &__clear {
+    background: none;
+    border: none;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    text-decoration: underline;
+    cursor: pointer;
+    color: $color-text-secondary;
+    padding: $spacing-xs;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+
+    &:hover {
+      color: $color-black;
+    }
+  }
+}

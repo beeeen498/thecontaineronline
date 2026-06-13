@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { LuSlidersHorizontal } from "react-icons/lu";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useTranslations } from "@/hooks/useTranslations";
+import FilterChips from "@/components/store/FilterChips/FilterChips";
 import StoreFilters from "@/components/store/StoreFilters/StoreFilters";
 import Pagination from "@/components/store/Pagination/Pagination";
 import Card from "@/components/shared/Card/Card";
@@ -48,6 +48,9 @@ export default function StoreLayout({
           {isHebrew ? "סינון" : "Filters"}
         </button>
       </div>
+
+      {/* ─── Active Filter Chips ────────────────────────────── */}
+      <FilterChips filters={filters} />
 
       <div className="store-layout__main">
         {/* ─── Filters Wrapper ────────────────────────────── */}
