@@ -3,8 +3,9 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import Header from "@/components/shared/Nav/Header";
 import Nav from "@/components/shared/Nav/Nav";
 import Footer from "@/components/shared/Footer/Footer";
-import LanguageGate from "@/components/selectLanguage/LanguageGate";
 import HtmlAttributes from "@/components/shared/HtmlAttributes/HtmlAttributes";
+import ScrollToTop from "@/components/shared/ScrollToTop/ScrollToTop";
+import LanguageGate from "@/components/selectLanguage/LanguageGate";
 import "@/styles/globals.scss";
 
 // ─── Font Setup ───────────────────────────────────────────────
@@ -48,6 +49,7 @@ export default function RootLayout({ children }) {
       <body>
         <LanguageProvider>
           <HtmlAttributes />
+          <ScrollToTop />
           <LanguageGate>
             <div className="top-bar">
               <Header />
