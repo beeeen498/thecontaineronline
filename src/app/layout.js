@@ -35,10 +35,41 @@ const titilliumWeb = Titillium_Web({
 // ─── Metadata ─────────────────────────────────────────────────
 export const metadata = {
   title: {
-    default: "The Container",
+    default: "The Container | Art & Fashion",
     template: "%s | The Container",
   },
-  description: "Art and fashion store",
+  description:
+    "The Container — a unique studio for handmade ceramic art and authentic luxury fashion. Based in Israel.",
+  keywords: [
+    "art",
+    "fashion",
+    "ceramic",
+    "luxury",
+    "Israel",
+    "handmade",
+    "אמנות",
+    "אופנה",
+  ],
+  openGraph: {
+    title: "The Container | Art & Fashion",
+    description:
+      "A unique studio for handmade ceramic art and authentic luxury fashion.",
+    url: "https://thecontaineronline.com",
+    siteName: "The Container",
+    locale: "en_US",
+    type: "website",
+  },
+  alternates: {
+    canonical: "https://thecontaineronline.com",
+    languages: {
+      en: "https://thecontaineronline.com",
+      he: "https://thecontaineronline.com",
+    },
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 // ─── Root Layout ──────────────────────────────────────────────
