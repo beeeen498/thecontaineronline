@@ -1,0 +1,89 @@
+@use '@/styles/variables' as *;
+
+// ─── Cookie Consent ───────────────────────────────────────────
+// Fixed bar at the bottom of the screen
+.cookie-consent {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: $color-black;
+  color: $color-white;
+  padding: $spacing-md $spacing-xl;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-lg;
+  z-index: 999;
+  direction: ltr;
+
+  // ─── RTL ────────────────────────────────────────────────
+  &--rtl {
+    direction: rtl;
+  }
+
+  // ─── Message ────────────────────────────────────────────
+  &__message {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    margin: 0;
+    line-height: 1.6;
+    color: $color-silver;
+  }
+
+  // ─── Link ───────────────────────────────────────────────
+  &__link {
+    color: $color-white;
+    text-decoration: underline;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+
+  // ─── Buttons ────────────────────────────────────────────
+  &__buttons {
+    display: flex;
+    gap: $spacing-sm;
+    flex-shrink: 0;
+  }
+
+  &__btn {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: $spacing-xs $spacing-md;
+    cursor: pointer;
+    border: 1px solid $color-white;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    // ─── Decline ────────────────────────────────────────
+    &--decline {
+      background: none;
+      color: $color-white;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    // ─── Accept ─────────────────────────────────────────
+    &--accept {
+      background-color: $color-white;
+      color: $color-black;
+
+      &:hover {
+        background-color: $color-silver;
+      }
+    }
+  }
+
+  // ─── Mobile ─────────────────────────────────────────────
+  @media (max-width: $breakpoint-tablet) {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: $spacing-md;
+  }
+}
