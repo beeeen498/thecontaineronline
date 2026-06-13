@@ -1,56 +1,59 @@
-import { Belleza, Assistant, Titillium_Web } from 'next/font/google';
-import { LanguageProvider } from '@/contexts/LanguageContext';
-import Header from '@/components/shared/Nav/Header';
-import Nav from '@/components/shared/Nav/Nav';
-import Footer from '@/components/shared/Footer/Footer';
-import LanguageGate from '@/components/selectLanguage/LanguageGate';
-import '@/styles/globals.scss';
+import { Belleza, Assistant, Titillium_Web } from "next/font/google";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import Header from "@/components/shared/Nav/Header";
+import Nav from "@/components/shared/Nav/Nav";
+import Footer from "@/components/shared/Footer/Footer";
+import LanguageGate from "@/components/selectLanguage/LanguageGate";
+import HtmlAttributes from "@/components/shared/HtmlAttributes/HtmlAttributes";
+import "@/styles/globals.scss";
 
 // ─── Font Setup ───────────────────────────────────────────────
 const belleza = Belleza({
-  weight: '400',
-  subsets: ['latin'],
-  variable: '--font-headers',
-  display: 'swap',
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-headers",
+  display: "swap",
 });
 
 const assistant = Assistant({
-  weight: ['200', '300', '400', '500', '600', '700', '800'],
-  subsets: ['latin', 'hebrew'],
-  variable: '--font-body',
-  display: 'swap',
+  weight: ["200", "300", "400", "500", "600", "700", "800"],
+  subsets: ["latin", "hebrew"],
+  variable: "--font-body",
+  display: "swap",
 });
 
 const titilliumWeb = Titillium_Web({
-  weight: ['300', '400', '600'],
-  subsets: ['latin'],
-  variable: '--font-nav',
-  display: 'swap',
+  weight: ["300", "400", "600"],
+  subsets: ["latin"],
+  variable: "--font-nav",
+  display: "swap",
 });
 
 // ─── Metadata ─────────────────────────────────────────────────
 export const metadata = {
   title: {
-    default: 'The Container',
-    template: '%s | The Container',
+    default: "The Container",
+    template: "%s | The Container",
   },
-  description: 'Art and fashion store',
+  description: "Art and fashion store",
 };
 
 // ─── Root Layout ──────────────────────────────────────────────
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${belleza.variable} ${assistant.variable} ${titilliumWeb.variable}`}>
+    <html
+      lang="en"
+      className={`${belleza.variable} ${assistant.variable} ${titilliumWeb.variable}`}
+    >
       <body>
         <LanguageProvider>
+          <HtmlAttributes />
           <LanguageGate>
             <div className="top-bar">
               <Header />
               <Nav />
             </div>
-            <main className="main-content">
-              {children}
-            </main>
+            <main className="main-content">{children}</main>
             <Footer />
           </LanguageGate>
         </LanguageProvider>
