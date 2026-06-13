@@ -110,12 +110,27 @@
     border-top: 0.5px solid $color-silver;
     padding-top: $spacing-md;
     direction: ltr;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: $spacing-lg;
 
     p {
       font-family: var(--font-body);
       font-size: 0.75rem;
       color: $color-silver;
       margin: 0;
+    }
+  }
+
+  &__privacy {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: $color-silver;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $color-white;
     }
   }
 

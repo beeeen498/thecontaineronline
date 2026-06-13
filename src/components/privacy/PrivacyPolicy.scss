@@ -1,0 +1,54 @@
+@use '@/styles/variables' as *;
+
+// ─── Privacy Policy ───────────────────────────────────────────
+.privacy-policy {
+  display: flex;
+  justify-content: center;
+  padding: $spacing-xl $spacing-md;
+
+  &--rtl {
+    direction: rtl;
+  }
+
+  // ─── Inner ──────────────────────────────────────────────
+  &__inner {
+    max-width: 800px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  // ─── Title ──────────────────────────────────────────────
+  &__title {
+    font-family: var(--font-headers);
+    font-size: 2rem;
+    font-weight: 400;
+    margin: 0;
+  }
+
+  // ─── Updated ────────────────────────────────────────────
+  &__updated {
+    font-size: 0.875rem;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  // ─── Content ────────────────────────────────────────────
+  &__content {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.8;
+    color: $color-text-primary;
+
+    p {
+      margin: 0 0 $spacing-md;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 500;
+      margin: $spacing-lg 0 $spacing-sm;
+    }
+  }
+}
