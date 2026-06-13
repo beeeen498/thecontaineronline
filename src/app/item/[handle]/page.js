@@ -1,6 +1,7 @@
 import { getProductByHandle, getAllProducts } from '@/lib/shopifyQueries';
 import ItemPage from '@/components/item/ItemPage/ItemPage';
 import { notFound } from 'next/navigation';
+import Script from 'next/script';
 
 // ─── Dynamic Metadata ─────────────────────────────────────────
 export async function generateMetadata({ params }) {
@@ -34,5 +35,40 @@ export default async function ItemRoute({ params }) {
     p.handle !== product.handle
   );
 
-  return <ItemPage product={product} relatedProducts={relatedProducts} />;
+  // ─── JSON-LD ────────────────────────────────────────────
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.englishName,
+    description: product.englishDescription,
+    image: product.images || [],
+    brand: {
+      '@type': 'Brand',
+      name: product.brand || 'The Container',
+    },
+    offers: {
+      '@type': 'Offer',
+      url: `https://thecontaineronline.com/item/${product.handle}`,
+      priceCurrency: 'USD',
+      price: product.globalPrice,
+      availability: product.inStock
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      seller: {
+        '@type': 'Organization',
+        name: 'The Container',
+      },
+    },
+  };
+
+  return (
+    <>
+      <Script
+        id="product-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ItemPage product={product} relatedProducts={relatedProducts} />
+    </>
+  );
 }
