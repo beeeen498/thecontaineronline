@@ -52,6 +52,7 @@ export default function ItemPage({ product, relatedProducts }) {
   const isHebrew = language === "Hebrew";
   const isEnglish = !isHebrew;
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   // ─── Image State ──────────────────────────────────────
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -242,7 +243,32 @@ export default function ItemPage({ product, relatedProducts }) {
 
             {/* description */}
             {description && (
-              <p className="item-page__description">{description}</p>
+              <div className="item-page__description-outer">
+                <div
+                  className={`item-page__description-wrapper ${isDescriptionExpanded ? "item-page__description-wrapper--expanded" : ""}`}
+                >
+                  <p className="item-page__description">{description}</p>
+                </div>
+                <button
+                  className="item-page__description-toggle"
+                  onClick={() => setIsDescriptionExpanded((prev) => !prev)}
+                >
+                  {isDescriptionExpanded
+                    ? isHebrew
+                      ? "הצג פחות"
+                      : "Show less"
+                    : isHebrew
+                      ? "הצג עוד"
+                      : "Show more"}
+                </button>
+              </div>
+            )}
+
+            {/* notice */}
+            {(isHebrew ? product.hebrewNotice : product.englishNotice) && (
+              <p className="item-page__notice">
+                * {isHebrew ? product.hebrewNotice : product.englishNotice}
+              </p>
             )}
 
             {/* ─── Product Details ──────────────────────────── */}

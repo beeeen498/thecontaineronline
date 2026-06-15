@@ -63,6 +63,8 @@ function buildProduct(node, meta) {
       id: v.id,
       options: v.selectedOptions,
     })),
+    hebrewNotice: meta.hebrewnotice,
+    englishNotice: meta.englishnotice,
   };
 }
 
@@ -81,6 +83,8 @@ const METAFIELD_IDENTIFIERS = `
     { namespace: "custom", key: "hebrewcondition" },
     { namespace: "custom", key: "instock" },
     { namespace: "custom", key: "brand" }
+    { namespace: "custom", key: "hebrewnotice" },
+    { namespace: "custom", key: "englishnotice" },
   ]) {
     key
     value
