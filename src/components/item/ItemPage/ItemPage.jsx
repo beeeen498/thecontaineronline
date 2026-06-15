@@ -95,10 +95,10 @@ export default function ItemPage({ product, relatedProducts }) {
 
   const price = isHebrew
     ? israelPrice && !isNaN(israelPrice)
-      ? `₪${israelPrice.toFixed(0)}`
+      ? `₪${Math.round(israelPrice)}`
       : ""
     : globalPrice && !isNaN(globalPrice) && globalPrice > 0
-      ? `$${globalPrice.toFixed(2)}`
+      ? `$${Math.round(globalPrice)}`
       : "";
 
   // ─── Return Policy ────────────────────────────────────

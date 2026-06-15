@@ -10,11 +10,22 @@ const ITEMS_PER_PAGE = 12;
 
 // ─── Format Product ───────────────────────────────────────────
 function formatItem(item, isEnglish) {
+  const globalPrice = item.globalPrice;
+  const israelPrice = parseFloat(item.israelPrice);
+
+  const price = isEnglish
+    ? globalPrice && !isNaN(globalPrice) && globalPrice > 0
+      ? `$${Math.round(globalPrice)}`
+      : ""
+    : israelPrice && !isNaN(israelPrice)
+      ? `₪${Math.round(israelPrice)}`
+      : "";
+
   return {
     id: item.id,
-    handle: item.handle, 
+    handle: item.handle,
     title: isEnglish ? item.englishName : item.hebrewName,
-    price: isEnglish ? item.globalPrice : item.israelPrice,
+    price,
     imagePath: item.images?.[0] ?? "",
     isInStock: item.inStock,
     typeOfItem: item.typeOfItem,

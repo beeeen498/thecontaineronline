@@ -16,9 +16,6 @@ export const metadata = {
 // ─── Fashion Route ────────────────────────────────────────────
 export default async function FashionRoute() {
   const allProducts = await getAllProducts();
-
-  // temporary — until typeOfItem metafield is set in Shopify
-  const fashionProducts = allProducts.slice(25);
-
+  const fashionProducts = allProducts.filter((p) => p.typeOfItem === "fashion");
   return <FashionStorePage products={fashionProducts} />;
 }

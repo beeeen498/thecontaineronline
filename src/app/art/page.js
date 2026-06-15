@@ -19,9 +19,6 @@ export const metadata = {
 
 export default async function ArtRoute() {
   const allProducts = await getAllProducts();
-
-  // temporary — until typeOfItem metafield is set in Shopify
-  const artProducts = allProducts.slice(0, 25);
-
+  const artProducts = allProducts.filter((p) => p.typeOfItem === "art");
   return <ArtStorePage products={artProducts} />;
 }
