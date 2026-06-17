@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslations } from "@/hooks/useTranslations";
@@ -38,21 +37,39 @@ export default function FashionStorePage({ products = [] }) {
   const { language } = useLanguage();
   const t = useTranslations();
   const isEnglish = language.toLowerCase() === "english";
-
-  // ─── Filter State ─────────────────────────────────────
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedBrand, setSelectedBrand] = useState([]);
-  const [selectedColors, setSelectedColors] = useState([]);
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const currentPage = parseInt(searchParams.get("page") || "1");
+  const searchParams = useSearchParams();
 
-  const setCurrentPage = (page) => {
-    router.push(`?page=${page}`, { scroll: false });
+  // ─── Read filters from URL ────────────────────────────
+  const currentPage = parseInt(searchParams.get("page") || "1");
+  const selectedCategory = searchParams.get("category") || "all";
+  const selectedBrand =
+    searchParams.get("brand")?.split(",").filter(Boolean) || [];
+  const selectedColors =
+    searchParams.get("colors")?.split(",").filter(Boolean) || [];
+
+  // ─── Update URL params ────────────────────────────────
+  const updateParams = (updates) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(updates).forEach(([key, value]) => {
+      if (
+        !value ||
+        value === "all" ||
+        value === "1" ||
+        value === 1 ||
+        (Array.isArray(value) && value.length === 0)
+      ) {
+        params.delete(key);
+      } else if (Array.isArray(value)) {
+        params.set(key, value.join(","));
+      } else {
+        params.set(key, value);
+      }
+    });
+    router.push(`?${params.toString()}`, { scroll: false });
   };
 
   // ─── Category Options ─────────────────────────────────
-  // Built dynamically from subCategory metafields
   const seen = new Set();
   const categoryOptions = [
     { value: "all", en: "All", he: "הכל" },
@@ -64,14 +81,15 @@ export default function FashionStorePage({ products = [] }) {
           p.categoryEnglish !== "Art",
       )
       .filter((p) => {
-        if (seen.has(p.categoryEnglish)) return false;
-        seen.add(p.categoryEnglish);
+        const key = p.categoryEnglish.trim().toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
         return true;
       })
       .map((p) => ({
-        value: p.categoryEnglish,
-        en: p.categoryEnglish,
-        he: p.categoryHebrew || p.categoryEnglish,
+        value: p.categoryEnglish.trim(),
+        en: p.categoryEnglish.trim(),
+        he: p.categoryHebrew?.trim() || p.categoryEnglish.trim(),
       })),
   ];
 
@@ -84,19 +102,25 @@ export default function FashionStorePage({ products = [] }) {
     ...brandValues.map((b) => ({ value: b, en: b, he: b })),
   ];
 
-  // ─── Color Options ────────────────────────────────────
+  // ─── Color Options ────────────────────────────────────────
   const colorValues = [
-    ...new Set(
-      products
-        .flatMap((p) =>
-          isEnglish ? p.colorsEnglish || [] : p.colorsHebrew || [],
-        )
-        .filter(Boolean),
-    ),
+    ...new Set(products.flatMap((p) => p.colorsEnglish || []).filter(Boolean)),
   ].sort();
+
   const colorOptions = [
     { value: "all", en: "All", he: "הכל" },
-    ...colorValues.map((c) => ({ value: c, en: c, he: c })),
+    ...colorValues.map((englishColor) => {
+      const product = products.find((p) =>
+        p.colorsEnglish?.includes(englishColor),
+      );
+      const idx = product?.colorsEnglish?.indexOf(englishColor);
+      const hebrewColor = product?.colorsHebrew?.[idx];
+      return {
+        value: englishColor,
+        en: englishColor,
+        he: hebrewColor || englishColor,
+      };
+    }),
   ];
 
   // ─── Filters Config ───────────────────────────────────
@@ -107,11 +131,7 @@ export default function FashionStorePage({ products = [] }) {
       type: "radio",
       options: categoryOptions,
       selected: selectedCategory,
-      onChange: (val) => {
-        setSelectedCategory(val);
-        setSelectedBrand([]);
-        setCurrentPage(1);
-      },
+      onChange: (val) => updateParams({ category: val, page: 1 }),
     },
     {
       key: "brand",
@@ -119,10 +139,7 @@ export default function FashionStorePage({ products = [] }) {
       type: "checkbox",
       options: brandOptions,
       selected: selectedBrand,
-      onChange: (val) => {
-        setSelectedBrand(val);
-        setCurrentPage(1);
-      },
+      onChange: (val) => updateParams({ brand: val, page: 1 }),
     },
     {
       key: "colors",
@@ -130,10 +147,7 @@ export default function FashionStorePage({ products = [] }) {
       type: "checkbox",
       options: colorOptions,
       selected: selectedColors,
-      onChange: (val) => {
-        setSelectedColors(val);
-        setCurrentPage(1);
-      },
+      onChange: (val) => updateParams({ colors: val, page: 1 }),
     },
   ];
 
@@ -142,7 +156,7 @@ export default function FashionStorePage({ products = [] }) {
 
   if (selectedCategory !== "all") {
     filtered = filtered.filter(
-      (item) => item.categoryEnglish === selectedCategory,
+      (item) => item.categoryEnglish?.trim() === selectedCategory,
     );
   }
 
@@ -151,10 +165,11 @@ export default function FashionStorePage({ products = [] }) {
   }
 
   if (selectedColors.length > 0) {
-    filtered = filtered.filter((item) => {
-      const itemColors = isEnglish ? item.colorsEnglish : item.colorsHebrew;
-      return itemColors && selectedColors.every((c) => itemColors.includes(c));
-    });
+    filtered = filtered.filter(
+      (item) =>
+        item.colorsEnglish &&
+        selectedColors.every((c) => item.colorsEnglish.includes(c)),
+    );
   }
 
   // ─── Pagination ───────────────────────────────────────
@@ -164,13 +179,19 @@ export default function FashionStorePage({ products = [] }) {
     currentPage * ITEMS_PER_PAGE,
   );
 
+  console.log(
+    "first product colors:",
+    products[0]?.colorsEnglish,
+    products[0]?.colorsHebrew,
+  );
+
   return (
     <StoreLayout
       filters={filters}
       items={currentItems.map((item) => formatItem(item, isEnglish))}
       currentPage={currentPage}
       totalPages={totalPages}
-      onPageChange={setCurrentPage}
+      onPageChange={(page) => updateParams({ page })}
       emptyMessage={t.store.noItems}
     />
   );
