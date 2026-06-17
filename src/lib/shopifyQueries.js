@@ -12,20 +12,9 @@ function parseMeta(metafields) {
 
 // ─── Helper — build product object from node + meta ───────────
 function buildProduct(node, meta) {
-  // ─── Read variant options ──────────────────────────────────
+  // ─── Read variant ID (for cart) ───────────────────────
   const variants = node.variants?.edges?.map(({ node }) => node) || [];
-  const allOptions = variants.flatMap((v) => v.selectedOptions || []);
-
-  const getOption = (name) =>
-    allOptions.find((o) => o.name.toLowerCase() === name.toLowerCase())?.value;
-
-  const getAllOptions = (name) => [
-    ...new Set(
-      allOptions
-        .filter((o) => o.name.toLowerCase() === name.toLowerCase())
-        .map((o) => o.value),
-    ),
-  ];
+  const firstVariantId = variants[0]?.id || null;
 
   return {
     id: node.id,
@@ -50,21 +39,18 @@ function buildProduct(node, meta) {
     typeOfItem:
       meta.productcategory?.toLowerCase() === "fashion" ? "fashion" : "art",
     numOfItems: meta.numofitems,
-    colorsEnglish: getAllOptions("colorenglish"),
-    colorsHebrew: getAllOptions("colorhebrew"),
-    englishSize: getOption("size"),
-    hebrewSize: getOption("size"),
+    colorsEnglish: meta.colorenglish?.split(',').map(c => c.trim()).filter(Boolean) || [],
+colorsHebrew: meta.colorhebrew?.split(',').map(c => c.trim()).filter(Boolean) || [],
+    englishSize: meta.size,
+    hebrewSize: meta.size,
     englishCondition: meta.englishcondition,
     hebrewCondition: meta.hebrewcondition,
+    englishNotice: meta.englishnotice,
+    hebrewNotice: meta.hebrewnotice,
     images: node.images.edges.map(({ node }) => node.url),
     brand: meta.brand || node.vendor,
     inStock: meta.instock?.toLowerCase() !== "false",
-    variants: variants.map((v) => ({
-      id: v.id,
-      options: v.selectedOptions,
-    })),
-    hebrewNotice: meta.hebrewnotice,
-    englishNotice: meta.englishnotice,
+    variantId: firstVariantId,
   };
 }
 
@@ -79,28 +65,27 @@ const METAFIELD_IDENTIFIERS = `
     { namespace: "custom", key: "subcategoryenglish" },
     { namespace: "custom", key: "subcategoryhebrew" },
     { namespace: "custom", key: "numofitems" },
+    { namespace: "custom", key: "colorenglish" },
+    { namespace: "custom", key: "colorhebrew" },
+    { namespace: "custom", key: "size" },
     { namespace: "custom", key: "englishcondition" },
     { namespace: "custom", key: "hebrewcondition" },
+    { namespace: "custom", key: "englishnotice" },
+    { namespace: "custom", key: "hebrewnotice" },
     { namespace: "custom", key: "instock" },
     { namespace: "custom", key: "brand" }
-    { namespace: "custom", key: "hebrewnotice" },
-    { namespace: "custom", key: "englishnotice" },
   ]) {
     key
     value
   }
 `;
 
-// ─── Variants query ───────────────────────────────────────────
+// ─── Variants query — just need the ID for cart ───────────────
 const VARIANTS_QUERY = `
-  variants(first: 10) {
+  variants(first: 1) {
     edges {
       node {
         id
-        selectedOptions {
-          name
-          value
-        }
       }
     }
   }
@@ -112,7 +97,6 @@ export const getAllProducts = async () => {
   let hasNextPage = true;
   let cursor = null;
 
-  // ─── Fetch all products in batches of 50 ──────────────
   while (hasNextPage) {
     const { data } = await client.request(`{
       products(first: 50${cursor ? `, after: "${cursor}"` : ""}) {
@@ -155,12 +139,6 @@ export const getAllProducts = async () => {
 
     hasNextPage = pageInfo.hasNextPage;
     cursor = pageInfo.endCursor;
-    console.log(
-      "subcategory raw:",
-      data.products.edges
-        .find((e) => e.node.metafields.find((m) => m?.key === "subcategory"))
-        ?.node.metafields.find((m) => m?.key === "subcategory"),
-    );
   }
 
   return allProducts;

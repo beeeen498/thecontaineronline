@@ -168,7 +168,7 @@ export default function FashionStorePage({ products = [] }) {
     filtered = filtered.filter(
       (item) =>
         item.colorsEnglish &&
-        selectedColors.every((c) => item.colorsEnglish.includes(c)),
+        selectedColors.some((c) => item.colorsEnglish.includes(c)),
     );
   }
 

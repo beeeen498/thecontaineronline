@@ -66,13 +66,16 @@ export default async function FeaturedItems({ language = "english" }) {
   const isEnglish = lang === "english";
 
   const allProducts = await getAllProducts();
+  const artProducts = allProducts.filter((p) => p.typeOfItem === "art");
+  const fashionProducts = allProducts.filter((p) => p.typeOfItem === "fashion");
 
   // temporary split until typeOfItem metafield is set in Shopify
-  const featuredFashion = allProducts
+  const featuredArt = artProducts
     .slice(0, 3)
     .map((item) => formatItem(item, isEnglish));
-  const featuredArt = allProducts
-    .slice(3, 6)
+
+  const featuredFashion = fashionProducts
+    .slice(0, 3)
     .map((item) => formatItem(item, isEnglish));
 
   return (
