@@ -1,104 +1,19 @@
-import Link from "next/link";
-import Card from "@/components/shared/Card/Card";
-import { getAllProducts } from "@/lib/shopifyQueries";
-import { translations } from "@/translations";
-import "./FeaturedItems.scss";
-
-// ─── Format Product ───────────────────────────────────────────
-// Formats a Shopify product into the shape Card expects
-function formatItem(item, isEnglish) {
-  const globalPrice = parseFloat(item.globalPrice);
-  const israelPrice = parseFloat(item.israelPrice);
-
-  const price = isEnglish
-    ? globalPrice && !isNaN(globalPrice) && globalPrice > 0
-      ? `$${Math.round(globalPrice)}`
-      : ""
-    : israelPrice && !isNaN(israelPrice)
-      ? `₪${Math.round(israelPrice)}`
-      : "";
-
-  return {
-    id: item.id,
-    handle: item.handle,
-    title: isEnglish ? item.englishName : item.hebrewName,
-    price,
-    imagePath: item.images?.[0] ?? "",
-    isInStock: item.inStock,
-    typeOfItem: item.typeOfItem,
-  };
-}
-
-// ─── Featured Row ─────────────────────────────────────────────
-// One row of featured items — text block on one side, cards on the other
-function FeaturedRow({ heading, text, buttonText, href, items, reversed }) {
-  return (
-    <div
-      className={`featured__row ${reversed ? "featured__row--reversed" : ""}`}
-    >
-      {/* ─── Text + Button ──────────────────────────────── */}
-      <div className="featured__text-block">
-        <h2 className="featured__heading">{heading}</h2>
-        <p className="featured__description">{text}</p>
-        <div className="featured__btn-wrapper">
-          <Link href={href} className="featured__btn">
-            {buttonText}
-          </Link>
-        </div>
-      </div>
-
-      {/* ─── Cards ──────────────────────────────────────── */}
-      <div className="featured__cards">
-        {items.map((item, idx) => (
-          <Card key={idx} item={item} />
-        ))}
-      </div>
-    </div>
-  );
-}
+import { getAllProducts } from '@/lib/shopifyQueries';
+import FeaturedItemsClient from './FeaturedItemsClient.jsx';
 
 // ─── Featured Items ───────────────────────────────────────────
 // Server component — fetches products from Shopify
-// Temporarily splits all products in half until typeOfItem metafield is set
-export default async function FeaturedItems({ language = "english" }) {
-  const lang = language.toLowerCase();
-  const t = translations[lang] ?? translations.english;
-  const isEnglish = lang === "english";
+// Passes raw data to client component for language-aware display
 
+export default async function FeaturedItems() {
   const allProducts = await getAllProducts();
-  const artProducts = allProducts.filter((p) => p.typeOfItem === "art");
-  const fashionProducts = allProducts.filter((p) => p.typeOfItem === "fashion");
-
-  // temporary split until typeOfItem metafield is set in Shopify
-  const featuredArt = artProducts
-    .slice(0, 3)
-    .map((item) => formatItem(item, isEnglish));
-
-  const featuredFashion = fashionProducts
-    .slice(0, 3)
-    .map((item) => formatItem(item, isEnglish));
+  const artProducts = allProducts.filter(p => p.typeOfItem === 'art').slice(0, 3);
+  const fashionProducts = allProducts.filter(p => p.typeOfItem === 'fashion').slice(0, 3);
 
   return (
-    <section className="featured">
-      {/* ─── Fashion Row ────────────────────────────────── */}
-      <FeaturedRow
-        heading={t.featuredItems.fashionHeading}
-        text={t.featuredItems.fashionText}
-        buttonText={t.featuredItems.buttonText}
-        href="/fashion"
-        items={featuredFashion}
-        reversed={false}
-      />
-
-      {/* ─── Art Row ────────────────────────────────────── */}
-      <FeaturedRow
-        heading={t.featuredItems.artHeading}
-        text={t.featuredItems.artText}
-        buttonText={t.featuredItems.buttonText}
-        href="/art"
-        items={featuredArt}
-        reversed={true}
-      />
-    </section>
+    <FeaturedItemsClient
+      artProducts={artProducts}
+      fashionProducts={fashionProducts}
+    />
   );
 }
