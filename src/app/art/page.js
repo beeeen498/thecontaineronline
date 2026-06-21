@@ -1,6 +1,10 @@
 import { getAllProducts } from "@/lib/shopifyQueries";
 import ArtStorePage from "@/components/store/ArtStorePage/ArtStorePage";
 
+// ─── Revalidate ───────────────────────────────────────────────
+// Always fetch fresh data from Shopify, never cache
+export const revalidate = 0;
+
 // ─── Metadata ─────────────────────────────────────────────────
 export const metadata = {
   title: "Art",
@@ -22,3 +26,4 @@ export default async function ArtRoute() {
   const artProducts = allProducts.filter((p) => p.typeOfItem === "art");
   return <ArtStorePage products={artProducts} />;
 }
+

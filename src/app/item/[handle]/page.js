@@ -3,6 +3,10 @@ import ItemPage from '@/components/item/ItemPage/ItemPage';
 import { notFound } from 'next/navigation';
 import Script from 'next/script';
 
+// ─── Revalidate ───────────────────────────────────────────────
+// Always fetch fresh data from Shopify, never cache
+export const revalidate = 0;
+
 // ─── Dynamic Metadata ─────────────────────────────────────────
 export async function generateMetadata({ params }) {
   const { handle } = await params;

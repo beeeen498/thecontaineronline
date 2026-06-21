@@ -1,6 +1,10 @@
 import { getAllProducts } from "@/lib/shopifyQueries";
 import FashionStorePage from "@/components/store/FashionStorePage/FashionStorePage";
 
+// ─── Revalidate ───────────────────────────────────────────────
+// Always fetch fresh data from Shopify, never cache
+export const revalidate = 0;
+
 // ─── Metadata ─────────────────────────────────────────────────
 export const metadata = {
   title: "Fashion",
