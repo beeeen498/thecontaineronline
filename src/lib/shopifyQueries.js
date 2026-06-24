@@ -63,7 +63,6 @@ function buildProduct(node, meta) {
     quantityAvailable,
     inStock: meta.instock?.toLowerCase() !== "false" && quantityAvailable > 0,
   };
-  
 }
 
 // ─── Metafield identifiers ────────────────────────────────────
@@ -201,4 +200,328 @@ export const getProductByHandle = async (handle) => {
   const node = data.productByHandle;
   const meta = parseMeta(node.metafields);
   return buildProduct(node, meta);
+};
+
+// ─── Cart Mutations ────────────────────────────────────────────
+
+// ─── Create a new cart with one item ──────────────────────────
+export const createCart = async (variantId, quantity = 1) => {
+  const { data } = await client.request(
+    `
+    mutation cartCreate($input: CartInput!) {
+      cartCreate(input: $input) {
+        cart {
+          id
+          checkoutUrl
+          totalQuantity
+          lines(first: 50) {
+            edges {
+              node {
+                id
+                quantity
+                merchandise {
+                  ... on ProductVariant {
+                    id
+                    title
+                    product {
+                      title
+                      handle
+                      images(first: 1) {
+                        edges {
+                          node {
+                            url
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                cost {
+                  totalAmount {
+                    amount
+                    currencyCode
+                  }
+                }
+              }
+            }
+          }
+          cost {
+            totalAmount {
+              amount
+              currencyCode
+            }
+          }
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `,
+    {
+      variables: {
+        input: {
+          lines: [{ merchandiseId: variantId, quantity }],
+        },
+      },
+    },
+  );
+
+  return data.cartCreate.cart;
+};
+
+// ─── Add a line item to an existing cart ──────────────────────
+export const addCartLine = async (cartId, variantId, quantity = 1) => {
+  const { data } = await client.request(
+    `
+    mutation cartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
+      cartLinesAdd(cartId: $cartId, lines: $lines) {
+        cart {
+          id
+          checkoutUrl
+          totalQuantity
+          lines(first: 50) {
+            edges {
+              node {
+                id
+                quantity
+                merchandise {
+                  ... on ProductVariant {
+                    id
+                    title
+                    product {
+                      title
+                      handle
+                      images(first: 1) {
+                        edges {
+                          node {
+                            url
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                cost {
+                  totalAmount {
+                    amount
+                    currencyCode
+                  }
+                }
+              }
+            }
+          }
+          cost {
+            totalAmount {
+              amount
+              currencyCode
+            }
+          }
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `,
+    {
+      variables: {
+        cartId,
+        lines: [{ merchandiseId: variantId, quantity }],
+      },
+    },
+  );
+
+  return data.cartLinesAdd.cart;
+};
+
+// ─── Update line item quantity ─────────────────────────────────
+export const updateCartLine = async (cartId, lineId, quantity) => {
+  const { data } = await client.request(
+    `
+    mutation cartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
+      cartLinesUpdate(cartId: $cartId, lines: $lines) {
+        cart {
+          id
+          checkoutUrl
+          totalQuantity
+          lines(first: 50) {
+            edges {
+              node {
+                id
+                quantity
+                merchandise {
+                  ... on ProductVariant {
+                    id
+                    title
+                    product {
+                      title
+                      handle
+                      images(first: 1) {
+                        edges {
+                          node {
+                            url
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                cost {
+                  totalAmount {
+                    amount
+                    currencyCode
+                  }
+                }
+              }
+            }
+          }
+          cost {
+            totalAmount {
+              amount
+              currencyCode
+            }
+          }
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `,
+    {
+      variables: {
+        cartId,
+        lines: [{ id: lineId, quantity }],
+      },
+    },
+  );
+
+  return data.cartLinesUpdate.cart;
+};
+
+// ─── Remove a line item ────────────────────────────────────────
+export const removeCartLine = async (cartId, lineId) => {
+  const { data } = await client.request(
+    `
+    mutation cartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
+      cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
+        cart {
+          id
+          checkoutUrl
+          totalQuantity
+          lines(first: 50) {
+            edges {
+              node {
+                id
+                quantity
+                merchandise {
+                  ... on ProductVariant {
+                    id
+                    title
+                    product {
+                      title
+                      handle
+                      images(first: 1) {
+                        edges {
+                          node {
+                            url
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                cost {
+                  totalAmount {
+                    amount
+                    currencyCode
+                  }
+                }
+              }
+            }
+          }
+          cost {
+            totalAmount {
+              amount
+              currencyCode
+            }
+          }
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `,
+    {
+      variables: {
+        cartId,
+        lineIds: [lineId],
+      },
+    },
+  );
+
+  return data.cartLinesRemove.cart;
+};
+
+// ─── Fetch existing cart by ID ─────────────────────────────────
+export const getCart = async (cartId) => {
+  const { data } = await client.request(
+    `
+    query getCart($cartId: ID!) {
+      cart(id: $cartId) {
+        id
+        checkoutUrl
+        totalQuantity
+        lines(first: 50) {
+          edges {
+            node {
+              id
+              quantity
+              merchandise {
+                ... on ProductVariant {
+                  id
+                  title
+                  product {
+                    title
+                    handle
+                    images(first: 1) {
+                      edges {
+                        node {
+                          url
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              cost {
+                totalAmount {
+                  amount
+                  currencyCode
+                }
+              }
+            }
+          }
+        }
+        cost {
+          totalAmount {
+            amount
+            currencyCode
+          }
+        }
+      }
+    }
+  `,
+    {
+      variables: { cartId },
+    },
+  );
+
+  return data.cart;
 };

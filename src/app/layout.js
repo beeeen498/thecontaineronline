@@ -7,6 +7,7 @@ import CookieConsent from "@/components/shared/CookieConsent/CookieConsent";
 import HtmlAttributes from "@/components/shared/HtmlAttributes/HtmlAttributes";
 import ScrollToTop from "@/components/shared/ScrollToTop/ScrollToTop";
 import AnchorScroll from "@/components/shared/AnchorScroll/AnchorScroll";
+import { CartProvider } from "@/contexts/CartContext";
 import LanguageGate from "@/components/selectLanguage/LanguageGate";
 import "@/styles/globals.scss";
 
@@ -84,15 +85,17 @@ export default function RootLayout({ children }) {
           <HtmlAttributes />
           <ScrollToTop />
           <AnchorScroll />
-          <LanguageGate>
-            <div className="top-bar">
-              <Header />
-              <Nav />
-            </div>
-            <main className="main-content">{children}</main>
-            <Footer />
-            <CookieConsent />
-          </LanguageGate>
+          <CartProvider>
+            <LanguageGate>
+              <div className="top-bar">
+                <Header />
+                <Nav />
+              </div>
+              <main className="main-content">{children}</main>
+              <Footer />
+              <CookieConsent />
+            </LanguageGate>
+          </CartProvider>
         </LanguageProvider>
       </body>
     </html>
