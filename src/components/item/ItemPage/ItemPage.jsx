@@ -18,6 +18,7 @@ import YouMayAlsoLike from "@/components/item/YouMayAlsoLike/YouMayAlsoLike";
 import returnPolicyData from "@/data/returnPolicyData";
 import takingCareData from "@/data/takingCareData";
 import ImagePopUp from "@/components/shared/ImagePopUp/ImagePopUp";
+import { useCart } from "@/contexts/CartContext";
 import "./ItemPage.scss";
 
 // ─── Constants ────────────────────────────────────────────────
@@ -53,6 +54,7 @@ export default function ItemPage({ product, relatedProducts }) {
   const isEnglish = !isHebrew;
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const { cart, addToCart, isLoading } = useCart();
 
   // ─── Image State ──────────────────────────────────────
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -137,6 +139,19 @@ export default function ItemPage({ product, relatedProducts }) {
           : prev + 1,
     );
   };
+
+  // ─── Add to Cart ──────────────────────────────────────
+  const handleAddToCart = () => {
+    if (!product.variantId) return;
+    addToCart(product.variantId, 1);
+  };
+
+  // ─── Check current cart quantity for this item ────────
+  const cartLine = cart?.lines?.edges?.find(
+    ({ node }) => node.merchandise.id === product.variantId,
+  );
+  const quantityInCart = cartLine?.node?.quantity || 0;
+  const isMaxedOut = quantityInCart >= product.quantityAvailable;
 
   return (
     <div className={`item-page ${isHebrew ? "item-page--rtl" : ""}`}>
@@ -346,8 +361,26 @@ export default function ItemPage({ product, relatedProducts }) {
               </div>
             )}
 
-            {/* out of stock button */}
-            {!product.inStock && (
+            {/* CTA */}
+            {product.inStock ? (
+              <button
+                className="item-page__cta"
+                onClick={handleAddToCart}
+                disabled={isLoading || isMaxedOut}
+              >
+                {isLoading
+                  ? isHebrew
+                    ? "מוסיף..."
+                    : "Adding..."
+                  : isMaxedOut
+                    ? isHebrew
+                      ? "בעגלה"
+                      : "In Cart"
+                    : isHebrew
+                      ? "הוסף לעגלה"
+                      : "Add to Cart"}
+              </button>
+            ) : (
               <button className="item-page__cta" onClick={handleWhatsapp}>
                 {t.item.moreInfo}
               </button>
