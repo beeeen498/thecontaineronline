@@ -12,9 +12,11 @@ function parseMeta(metafields) {
 
 // ─── Helper — build product object from node + meta ───────────
 function buildProduct(node, meta) {
-  // ─── Read variant ID (for cart) ───────────────────────
+  // ─── Read variant info (for cart and stock) ────────────
   const variants = node.variants?.edges?.map(({ node }) => node) || [];
-  const firstVariantId = variants[0]?.id || null;
+  const firstVariant = variants[0];
+  const firstVariantId = firstVariant?.id || null;
+  const quantityAvailable = firstVariant?.quantityAvailable ?? 0;
 
   return {
     id: node.id,
@@ -39,8 +41,16 @@ function buildProduct(node, meta) {
     typeOfItem:
       meta.productcategory?.toLowerCase() === "fashion" ? "fashion" : "art",
     numOfItems: meta.numofitems,
-    colorsEnglish: meta.colorenglish?.split(',').map(c => c.trim()).filter(Boolean) || [],
-colorsHebrew: meta.colorhebrew?.split(',').map(c => c.trim()).filter(Boolean) || [],
+    colorsEnglish:
+      meta.colorenglish
+        ?.split(",")
+        .map((c) => c.trim())
+        .filter(Boolean) || [],
+    colorsHebrew:
+      meta.colorhebrew
+        ?.split(",")
+        .map((c) => c.trim())
+        .filter(Boolean) || [],
     englishSize: meta.size,
     hebrewSize: meta.size,
     englishCondition: meta.englishcondition,
@@ -49,9 +59,11 @@ colorsHebrew: meta.colorhebrew?.split(',').map(c => c.trim()).filter(Boolean) ||
     hebrewNotice: meta.hebrewnotice,
     images: node.images.edges.map(({ node }) => node.url),
     brand: meta.brand || node.vendor,
-    inStock: meta.instock?.toLowerCase() !== "false",
     variantId: firstVariantId,
+    quantityAvailable,
+    inStock: meta.instock?.toLowerCase() !== "false" && quantityAvailable > 0,
   };
+  
 }
 
 // ─── Metafield identifiers ────────────────────────────────────
@@ -86,6 +98,7 @@ const VARIANTS_QUERY = `
     edges {
       node {
         id
+        quantityAvailable
       }
     }
   }
