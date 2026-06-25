@@ -56,7 +56,9 @@ export function CartProvider({ children }) {
           localStorage.setItem(CART_ID_KEY, updatedCart.id);
         }
         setCart(updatedCart);
-        setIsDrawerOpen(true);
+
+        // small delay so the cart icon bounce is visible before drawer opens
+        setTimeout(() => setIsDrawerOpen(true), 400);
       } catch (error) {
         console.error("Error adding to cart:", error);
       } finally {
@@ -72,11 +74,15 @@ export function CartProvider({ children }) {
       if (!cart?.id) return { maxedOut: false };
       setIsLoading(true);
       try {
-        const updatedCart = await updateCartLine(cart.id, lineId, requestedQuantity);
+        const updatedCart = await updateCartLine(
+          cart.id,
+          lineId,
+          requestedQuantity,
+        );
         setCart(updatedCart);
 
         const updatedLine = updatedCart.lines.edges.find(
-          ({ node }) => node.id === lineId
+          ({ node }) => node.id === lineId,
         );
         const actualQuantity = updatedLine?.node?.quantity ?? requestedQuantity;
 

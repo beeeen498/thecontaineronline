@@ -68,6 +68,20 @@
       opacity: 0.7;
       transition: opacity 0.3s ease;
     }
+
+    &--bounce {
+      animation: cartBounce 0.4s ease;
+    }
+  }
+
+  @keyframes cartBounce {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.2);
+    }
   }
 
   &__cart-count {

@@ -1,38 +1,42 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useLanguage } from "@/contexts/LanguageContext";
-import LanguageButton from "./LanguageButton";
-import { BsHandbag } from "react-icons/bs";
-import { useCart } from "@/contexts/CartContext";
-import "./Header.scss";
-
-// ─── Header ───────────────────────────────────────────────────
-// Top bar — logo, language toggle, cart icon placeholder
-// Sits above the Nav component
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageButton from './LanguageButton';
+import { BsHandbag } from 'react-icons/bs';
+import { useCart } from '@/contexts/CartContext';
+import './Header.scss';
 
 export default function Header() {
   const { language } = useLanguage();
-  const isHebrew = language === "Hebrew";
+  const isHebrew = language === 'Hebrew';
   const { cart, openDrawer } = useCart();
   const itemCount = cart?.totalQuantity || 0;
 
+  // ─── Bounce animation on count change ──────────────────
+  const [isBouncing, setIsBouncing] = useState(false);
+
+  useEffect(() => {
+    if (itemCount === 0) return;
+    setIsBouncing(true);
+    const timer = setTimeout(() => setIsBouncing(false), 400);
+    return () => clearTimeout(timer);
+  }, [itemCount]);
+
   return (
-    <header className={`header ${isHebrew ? "rtl" : ""}`}>
-      {/* Language toggle — left side */}
+    <header className={`header ${isHebrew ? 'rtl' : ''}`}>
       <div className="header__language">
         <LanguageButton />
       </div>
 
-      {/* Logo — center */}
       <div className="header__logo">
         <Link href="/">the container</Link>
       </div>
 
-      {/* Cart — right side */}
       <div className="header__cart">
         <button
-          className="header__cart-button"
+          className={`header__cart-button ${isBouncing ? 'header__cart-button--bounce' : ''}`}
           onClick={openDrawer}
           aria-label="Cart"
         >

@@ -27,6 +27,7 @@ function formatItem(item, isEnglish) {
     imagePath: item.images?.[0] ?? '',
     isInStock: item.inStock,
     typeOfItem: item.typeOfItem,
+    variantId: item.variantId,
   };
 }
 

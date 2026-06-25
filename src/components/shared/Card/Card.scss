@@ -33,6 +33,20 @@
     font-size: 0.875rem;
   }
 
+  // ─── In Cart Label ────────────────────────────────────
+  &__in-cart {
+    position: absolute;
+    top: $spacing-sm;
+    right: $spacing-sm;
+    background-color: $color-white;
+    color: $color-black;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border: 1px solid $color-black;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
   // ─── Details ──────────────────────────────────────────
   &__details {
     display: flex;
