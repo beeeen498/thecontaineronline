@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageButton from "./LanguageButton";
 import { BsHandbag } from "react-icons/bs";
+import { useCart } from "@/contexts/CartContext";
 import "./Header.scss";
 
 // ─── Header ───────────────────────────────────────────────────
@@ -13,6 +14,8 @@ import "./Header.scss";
 export default function Header() {
   const { language } = useLanguage();
   const isHebrew = language === "Hebrew";
+  const { cart, openDrawer } = useCart();
+  const itemCount = cart?.totalQuantity || 0;
 
   return (
     <header className={`header ${isHebrew ? "rtl" : ""}`}>
@@ -28,8 +31,15 @@ export default function Header() {
 
       {/* Cart — right side */}
       <div className="header__cart">
-        <button className="header__cart-button" aria-label="Cart">
+        <button
+          className="header__cart-button"
+          onClick={openDrawer}
+          aria-label="Cart"
+        >
           <BsHandbag size={22} />
+          {itemCount > 0 && (
+            <span className="header__cart-count">{itemCount}</span>
+          )}
         </button>
       </div>
     </header>

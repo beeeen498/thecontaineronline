@@ -1,0 +1,236 @@
+@use "@/styles/variables" as *;
+
+// ─── Overlay ────────────────────────────────────────────────────
+.cart-drawer__overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0);
+  transition: background-color 0.3s ease;
+  pointer-events: none;
+  z-index: 998;
+
+  &--open {
+    background-color: rgba(0, 0, 0, 0.4);
+    pointer-events: all;
+  }
+}
+
+// ─── Panel ──────────────────────────────────────────────────────
+.cart-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 400px;
+  max-width: 90vw;
+  background-color: $color-white;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+
+  &--open {
+    transform: translateX(0);
+  }
+
+  &--rtl {
+    right: auto;
+    left: 0;
+    transform: translateX(-100%);
+
+    &.cart-drawer--open {
+      transform: translateX(0);
+    }
+  }
+
+  // ─── Header ───────────────────────────────────────────────
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-lg;
+    border-bottom: 1px solid $color-border;
+  }
+
+  &__title {
+    font-family: var(--font-headers);
+    font-size: 1.25rem;
+    font-weight: 400;
+    margin: 0;
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $color-black;
+    padding: 0;
+    display: flex;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+
+  // ─── Empty State ────────────────────────────────────────────
+  &__empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $color-text-secondary;
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+  }
+
+  // ─── Items List ─────────────────────────────────────────────
+  &__items {
+    flex: 1;
+    overflow-y: auto;
+    padding: $spacing-md $spacing-lg;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  // ─── Item ───────────────────────────────────────────────────
+  &__item {
+    display: flex;
+    gap: $spacing-md;
+    align-items: flex-start;
+  }
+
+  &__item-image {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    background-color: $color-silver;
+  }
+
+  &__item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__item-name {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: $color-black;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__item-price {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  &__item-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $color-text-secondary;
+    padding: 0;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $color-black;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+
+  // ─── Quantity Controls ──────────────────────────────────────
+  &__quantity {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-top: $spacing-xs;
+
+    button {
+      background: none;
+      border: 1px solid $color-border;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background-color: $color-silver;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+    }
+
+    span {
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    &__max-stock {
+      font-size: 0.6875rem;
+      color: $color-text-secondary;
+      margin: $spacing-xs 0 0;
+      font-style: italic;
+    }
+  }
+
+  // ─── Footer ─────────────────────────────────────────────────
+  &__footer {
+    padding: $spacing-lg;
+    border-top: 1px solid $color-border;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  &__subtotal {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  &__checkout {
+    background-color: $color-black;
+    color: $color-white;
+    border: none;
+    padding: $spacing-md;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+
+    &:hover:not(:disabled) {
+      opacity: 0.8;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+}

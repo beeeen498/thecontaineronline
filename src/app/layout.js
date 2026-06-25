@@ -4,6 +4,7 @@ import Header from "@/components/shared/Nav/Header";
 import Nav from "@/components/shared/Nav/Nav";
 import Footer from "@/components/shared/Footer/Footer";
 import CookieConsent from "@/components/shared/CookieConsent/CookieConsent";
+import CartDrawer from "@/components/cart/CartDrawer/CartDrawer";
 import HtmlAttributes from "@/components/shared/HtmlAttributes/HtmlAttributes";
 import ScrollToTop from "@/components/shared/ScrollToTop/ScrollToTop";
 import AnchorScroll from "@/components/shared/AnchorScroll/AnchorScroll";
@@ -94,6 +95,7 @@ export default function RootLayout({ children }) {
               <main className="main-content">{children}</main>
               <Footer />
               <CookieConsent />
+              <CartDrawer />
             </LanguageGate>
           </CartProvider>
         </LanguageProvider>

@@ -12,7 +12,6 @@ function parseMeta(metafields) {
 
 // ─── Helper — build product object from node + meta ───────────
 function buildProduct(node, meta) {
-  // ─── Read variant info (for cart and stock) ────────────
   const variants = node.variants?.edges?.map(({ node }) => node) || [];
   const firstVariant = variants[0];
   const firstVariantId = firstVariant?.id || null;
@@ -91,7 +90,7 @@ const METAFIELD_IDENTIFIERS = `
   }
 `;
 
-// ─── Variants query — just need the ID for cart ───────────────
+// ─── Variants query ─────────────────────────────────────────────
 const VARIANTS_QUERY = `
   variants(first: 1) {
     edges {
@@ -202,55 +201,64 @@ export const getProductByHandle = async (handle) => {
   return buildProduct(node, meta);
 };
 
-// ─── Cart Mutations ────────────────────────────────────────────
-
-// ─── Create a new cart with one item ──────────────────────────
-export const createCart = async (variantId, quantity = 1) => {
-  const { data } = await client.request(
-    `
-    mutation cartCreate($input: CartInput!) {
-      cartCreate(input: $input) {
-        cart {
-          id
-          checkoutUrl
-          totalQuantity
-          lines(first: 50) {
-            edges {
-              node {
-                id
-                quantity
-                merchandise {
-                  ... on ProductVariant {
-                    id
-                    title
-                    product {
-                      title
-                      handle
-                      images(first: 1) {
-                        edges {
-                          node {
-                            url
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-                cost {
-                  totalAmount {
-                    amount
-                    currencyCode
+// ─── Shared cart line fields (kept identical everywhere) ──────
+const CART_LINE_FIELDS = `
+  id
+  checkoutUrl
+  totalQuantity
+  lines(first: 50) {
+    edges {
+      node {
+        id
+        quantity
+        attributes {
+          key
+          value
+        }
+        merchandise {
+          ... on ProductVariant {
+            id
+            title
+            product {
+              title
+              handle
+              images(first: 1) {
+                edges {
+                  node {
+                    url
                   }
                 }
               }
             }
           }
-          cost {
-            totalAmount {
-              amount
-              currencyCode
-            }
+        }
+        cost {
+          totalAmount {
+            amount
+            currencyCode
           }
+        }
+      }
+    }
+  }
+  cost {
+    totalAmount {
+      amount
+      currencyCode
+    }
+  }
+`;
+
+// ─── Cart Mutations ────────────────────────────────────────────
+
+// ─── Create a new cart with one item ──────────────────────────
+export const createCart = async (variantId, quantity = 1, attributes = []) => {
+  const { data } = await client.request(
+    `
+    mutation cartCreate($input: CartInput!) {
+      cartCreate(input: $input) {
+        cart {
+          ${CART_LINE_FIELDS}
         }
         userErrors {
           field
@@ -262,7 +270,7 @@ export const createCart = async (variantId, quantity = 1) => {
     {
       variables: {
         input: {
-          lines: [{ merchandiseId: variantId, quantity }],
+          lines: [{ merchandiseId: variantId, quantity, attributes }],
         },
       },
     },
@@ -272,52 +280,18 @@ export const createCart = async (variantId, quantity = 1) => {
 };
 
 // ─── Add a line item to an existing cart ──────────────────────
-export const addCartLine = async (cartId, variantId, quantity = 1) => {
+export const addCartLine = async (
+  cartId,
+  variantId,
+  quantity = 1,
+  attributes = [],
+) => {
   const { data } = await client.request(
     `
     mutation cartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
       cartLinesAdd(cartId: $cartId, lines: $lines) {
         cart {
-          id
-          checkoutUrl
-          totalQuantity
-          lines(first: 50) {
-            edges {
-              node {
-                id
-                quantity
-                merchandise {
-                  ... on ProductVariant {
-                    id
-                    title
-                    product {
-                      title
-                      handle
-                      images(first: 1) {
-                        edges {
-                          node {
-                            url
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-                cost {
-                  totalAmount {
-                    amount
-                    currencyCode
-                  }
-                }
-              }
-            }
-          }
-          cost {
-            totalAmount {
-              amount
-              currencyCode
-            }
-          }
+          ${CART_LINE_FIELDS}
         }
         userErrors {
           field
@@ -329,7 +303,7 @@ export const addCartLine = async (cartId, variantId, quantity = 1) => {
     {
       variables: {
         cartId,
-        lines: [{ merchandiseId: variantId, quantity }],
+        lines: [{ merchandiseId: variantId, quantity, attributes }],
       },
     },
   );
@@ -344,46 +318,7 @@ export const updateCartLine = async (cartId, lineId, quantity) => {
     mutation cartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
       cartLinesUpdate(cartId: $cartId, lines: $lines) {
         cart {
-          id
-          checkoutUrl
-          totalQuantity
-          lines(first: 50) {
-            edges {
-              node {
-                id
-                quantity
-                merchandise {
-                  ... on ProductVariant {
-                    id
-                    title
-                    product {
-                      title
-                      handle
-                      images(first: 1) {
-                        edges {
-                          node {
-                            url
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-                cost {
-                  totalAmount {
-                    amount
-                    currencyCode
-                  }
-                }
-              }
-            }
-          }
-          cost {
-            totalAmount {
-              amount
-              currencyCode
-            }
-          }
+          ${CART_LINE_FIELDS}
         }
         userErrors {
           field
@@ -410,46 +345,7 @@ export const removeCartLine = async (cartId, lineId) => {
     mutation cartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
       cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
         cart {
-          id
-          checkoutUrl
-          totalQuantity
-          lines(first: 50) {
-            edges {
-              node {
-                id
-                quantity
-                merchandise {
-                  ... on ProductVariant {
-                    id
-                    title
-                    product {
-                      title
-                      handle
-                      images(first: 1) {
-                        edges {
-                          node {
-                            url
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-                cost {
-                  totalAmount {
-                    amount
-                    currencyCode
-                  }
-                }
-              }
-            }
-          }
-          cost {
-            totalAmount {
-              amount
-              currencyCode
-            }
-          }
+          ${CART_LINE_FIELDS}
         }
         userErrors {
           field
@@ -475,46 +371,7 @@ export const getCart = async (cartId) => {
     `
     query getCart($cartId: ID!) {
       cart(id: $cartId) {
-        id
-        checkoutUrl
-        totalQuantity
-        lines(first: 50) {
-          edges {
-            node {
-              id
-              quantity
-              merchandise {
-                ... on ProductVariant {
-                  id
-                  title
-                  product {
-                    title
-                    handle
-                    images(first: 1) {
-                      edges {
-                        node {
-                          url
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-              cost {
-                totalAmount {
-                  amount
-                  currencyCode
-                }
-              }
-            }
-          }
-        }
-        cost {
-          totalAmount {
-            amount
-            currencyCode
-          }
-        }
+        ${CART_LINE_FIELDS}
       }
     }
   `,
