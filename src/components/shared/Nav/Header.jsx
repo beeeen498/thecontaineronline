@@ -11,10 +11,9 @@ import './Header.scss';
 export default function Header() {
   const { language } = useLanguage();
   const isHebrew = language === 'Hebrew';
-  const { cart, openDrawer } = useCart();
+  const { cart, openDrawer, isLoading } = useCart();
   const itemCount = cart?.totalQuantity || 0;
 
-  // ─── Bounce animation on count change ──────────────────
   const [isBouncing, setIsBouncing] = useState(false);
 
   useEffect(() => {
@@ -36,7 +35,7 @@ export default function Header() {
 
       <div className="header__cart">
         <button
-          className={`header__cart-button ${isBouncing ? 'header__cart-button--bounce' : ''}`}
+          className={`header__cart-button ${isBouncing ? 'header__cart-button--bounce' : ''} ${isLoading ? 'header__cart-button--loading' : ''}`}
           onClick={openDrawer}
           aria-label="Cart"
         >
