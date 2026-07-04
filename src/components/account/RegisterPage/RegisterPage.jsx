@@ -55,6 +55,19 @@ export default function RegisterPage() {
     }
   }, [isLoggedIn, isLoading, router]);
 
+  // ─── Error translations ───────────────────
+  const ERROR_TRANSLATIONS = {
+    "Unidentified customer": "משתמש לא מזוהה",
+    "Invalid credentials": "פרטי התחברות שגויים",
+    "Customer is disabled": "החשבון מושבת",
+    "Email has already been taken": "כתובת האימייל כבר בשימוש",
+    "Password is too short (minimum is 5 characters)":
+      "הסיסמה קצרה מדי (מינימום 5 תווים)",
+  };
+
+  // ─── Display Error ────────────────────────────────────
+  const displayError = isHebrew ? ERROR_TRANSLATIONS[error] || error : error;
+
   return (
     <div className={`register-page ${isHebrew ? "register-page--rtl" : ""}`}>
       <div className="register-page__box">
@@ -64,7 +77,7 @@ export default function RegisterPage() {
         </h1>
 
         {/* ─── Error Message ────────────────────────────── */}
-        {error && <p className="register-page__error">{error}</p>}
+        {error && <p className="register-page__error">{displayError}</p>}
 
         {/* ─── Form ─────────────────────────────────────── */}
         <div className="register-page__form">

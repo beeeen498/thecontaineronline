@@ -44,6 +44,19 @@ export default function LoginPage() {
     }
   }, [isLoggedIn, isLoading, router]);
 
+  // ─── Error translations ───────────────────
+  const ERROR_TRANSLATIONS = {
+    "Unidentified customer": "משתמש לא מזוהה",
+    "Invalid credentials": "פרטי התחברות שגויים",
+    "Customer is disabled": "החשבון מושבת",
+    "Email has already been taken": "כתובת האימייל כבר בשימוש",
+    "Password is too short (minimum is 5 characters)":
+      "הסיסמה קצרה מדי (מינימום 5 תווים)",
+  };
+
+  // ─── Display Error ────────────────────────────────────
+  const displayError = isHebrew ? ERROR_TRANSLATIONS[error] || error : error;
+
   return (
     <div className={`login-page ${isHebrew ? "login-page--rtl" : ""}`}>
       <div className="login-page__box">
@@ -53,7 +66,7 @@ export default function LoginPage() {
         </h1>
 
         {/* ─── Error Message ────────────────────────────── */}
-        {error && <p className="login-page__error">{error}</p>}
+        {error && <p className="login-page__error">{displayError}</p>}
 
         {/* ─── Form ─────────────────────────────────────── */}
         <div className="login-page__form">
