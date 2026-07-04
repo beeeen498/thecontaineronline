@@ -1,18 +1,14 @@
 @use '@/styles/variables' as *;
 
 // ─── Account Page ─────────────────────────────────────────────
-// Protected page showing customer info, orders, and actions
+// Two-column layout: sidebar + content
+// Protected page — requires login
 .account-page {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: $spacing-xl $spacing-md;
   display: flex;
-  flex-direction: column;
-  gap: $spacing-xl;
   min-height: calc(100vh - var(--topbar-height));
   direction: ltr;
 
-  // ─── RTL ────────────────────────────────────────────────
+  // ─── RTL ──────────────────────────────────────────────────
   &--rtl {
     direction: rtl;
   }
@@ -23,28 +19,61 @@
     align-items: center;
     justify-content: center;
     min-height: calc(100vh - var(--topbar-height));
+    width: 100%;
     font-family: var(--font-body);
     color: $color-text-secondary;
+  }
+
+  // ─── Sidebar ────────────────────────────────────────────
+  &__sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    border-right: 1px solid $color-border;
+    padding: $spacing-xl $spacing-lg;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+
+    .account-page--rtl & {
+      border-right: none;
+      border-left: 1px solid $color-border;
+    }
+
+    @media (max-width: $breakpoint-tablet) {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid $color-border;
+      padding: $spacing-md $spacing-lg;
+      flex-direction: row;
+      align-items: center;
+      gap: $spacing-md;
+    }
   }
 
   // ─── Greeting ───────────────────────────────────────────
   &__greeting {
     display: flex;
     flex-direction: column;
-    gap: $spacing-sm;
+    gap: 2px;
+
+    @media (max-width: $breakpoint-tablet) {
+      flex: 1;
+    }
   }
 
-  &__heading {
-    font-family: var(--font-headers);
-    font-size: clamp(1.5rem, 3vw, 2.5rem);
-    font-weight: 400;
+  &__welcome {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: $color-text-secondary;
     margin: 0;
   }
 
-  &__email {
-    font-family: var(--font-body);
-    font-size: 0.9375rem;
-    color: $color-text-secondary;
+  &__name {
+    font-family: var(--font-headers);
+    font-size: 1.5rem;
+    font-weight: 400;
     margin: 0;
   }
 
@@ -52,6 +81,61 @@
   &__divider {
     height: 1px;
     background-color: $color-border;
+
+    @media (max-width: $breakpoint-tablet) {
+      display: none;
+    }
+  }
+
+  // ─── Sidebar Nav ────────────────────────────────────────
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+
+    @media (max-width: $breakpoint-tablet) {
+      flex-direction: row;
+      gap: $spacing-md;
+    }
+  }
+
+  &__nav-item {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $color-text-secondary;
+    padding: $spacing-xs 0;
+    text-align: left;
+    transition: color 0.2s ease;
+
+    .account-page--rtl & {
+      text-align: right;
+    }
+
+    &:hover {
+      color: $color-black;
+    }
+
+    // ─── Active State ──────────────────────────────────
+    &--active {
+      color: $color-black;
+      font-weight: 500;
+      border-bottom: 2px solid $color-black;
+    }
+  }
+
+  // ─── Main Content ───────────────────────────────────────
+  &__content {
+    flex: 1;
+    padding: $spacing-xl;
+
+    @media (max-width: $breakpoint-tablet) {
+      padding: $spacing-md;
+    }
   }
 
   // ─── Section ────────────────────────────────────────────
@@ -59,6 +143,7 @@
     display: flex;
     flex-direction: column;
     gap: $spacing-lg;
+    max-width: 700px;
   }
 
   &__section-heading {
@@ -67,8 +152,8 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     font-weight: 400;
-    margin: 0;
     color: $color-text-secondary;
+    margin: 0;
   }
 
   // ─── Empty State ────────────────────────────────────────
@@ -79,14 +164,13 @@
     margin: 0;
   }
 
-  // ─── Orders List ────────────────────────────────────────
+  // ─── Orders ─────────────────────────────────────────────
   &__orders {
     display: flex;
     flex-direction: column;
     gap: $spacing-md;
   }
 
-  // ─── Single Order ────────────────────────────────────────
   &__order {
     border: 1px solid $color-border;
     padding: $spacing-md;
@@ -148,51 +232,96 @@
     margin: 0;
   }
 
-  // ─── Actions ────────────────────────────────────────────
-  &__actions {
+  // ─── Settings ───────────────────────────────────────────
+  &__settings {
     display: flex;
     flex-direction: column;
-    gap: $spacing-md;
-    align-items: flex-start;
+    gap: $spacing-lg;
   }
 
-  // ─── Logout Button ──────────────────────────────────────
-  &__logout {
-    background-color: $color-black;
-    color: $color-white;
-    border: none;
-    padding: $spacing-sm $spacing-xl;
+  &__setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: $spacing-lg;
+
+    @media (max-width: $breakpoint-mobile) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  &__setting-info {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__setting-title {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    margin: 0;
+
+    &--danger {
+      color: #c0392b;
+    }
+  }
+
+  &__setting-description {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  // ─── Buttons ────────────────────────────────────────────
+  &__btn {
     font-family: var(--font-body);
     font-size: 0.875rem;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
+    padding: $spacing-sm $spacing-lg;
     cursor: pointer;
+    border: none;
     transition: opacity 0.2s ease;
-
-    &:hover:not(:disabled) {
-      opacity: 0.8;
-    }
+    white-space: nowrap;
 
     &:disabled {
       opacity: 0.5;
       cursor: default;
     }
-  }
 
-  // ─── Delete Button ──────────────────────────────────────
-  &__delete {
-    background: none;
-    border: none;
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    color: $color-text-secondary;
-    cursor: pointer;
-    text-decoration: underline;
-    padding: 0;
-    transition: color 0.2s ease;
+    // ─── Primary ────────────────────────────────────────
+    &--primary {
+      background-color: $color-black;
+      color: $color-white;
 
-    &:hover {
-      color: #c0392b;
+      &:hover:not(:disabled) {
+        opacity: 0.8;
+      }
+    }
+
+    // ─── Danger ─────────────────────────────────────────
+    &--danger {
+      background-color: #c0392b;
+      color: $color-white;
+
+      &:hover:not(:disabled) {
+        opacity: 0.8;
+      }
+    }
+
+    // ─── Secondary ──────────────────────────────────────
+    &--secondary {
+      background: none;
+      border: 1px solid $color-black;
+      color: $color-black;
+
+      &:hover:not(:disabled) {
+        background-color: $color-black;
+        color: $color-white;
+      }
     }
   }
 
@@ -200,18 +329,23 @@
   &__confirm {
     display: flex;
     flex-direction: column;
-    gap: $spacing-md;
-    border: 1px solid $color-border;
-    padding: $spacing-md;
-    width: 100%;
+    gap: $spacing-sm;
   }
 
   &__confirm-text {
     font-family: var(--font-body);
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
+    color: $color-text-secondary;
     margin: 0;
   }
 
+  &__confirm-buttons {
+    display: flex;
+    gap: $spacing-sm;
+    flex-wrap: wrap;
+  }
+
+  // ─── Error ──────────────────────────────────────────────
   &__error {
     font-family: var(--font-body);
     font-size: 0.875rem;
@@ -219,44 +353,8 @@
     margin: 0;
   }
 
-  &__confirm-buttons {
-    display: flex;
-    gap: $spacing-md;
-    flex-wrap: wrap;
-  }
-
-  &__confirm-yes {
-    background-color: #c0392b;
-    color: $color-white;
-    border: none;
-    padding: $spacing-sm $spacing-md;
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
-
-    &:hover:not(:disabled) {
-      opacity: 0.8;
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: default;
-    }
-  }
-
-  &__confirm-no {
-    background: none;
-    border: 1px solid $color-black;
-    padding: $spacing-sm $spacing-md;
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
-
-    &:hover {
-      background-color: $color-black;
-      color: $color-white;
-    }
+  // ─── Mobile layout ──────────────────────────────────────
+  @media (max-width: $breakpoint-tablet) {
+    flex-direction: column;
   }
 }
