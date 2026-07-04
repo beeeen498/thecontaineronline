@@ -62,7 +62,6 @@ function buildProduct(node, meta) {
     quantityAvailable,
     inStock: meta.instock?.toLowerCase() !== "false" && quantityAvailable > 0,
   };
-  
 }
 
 // ─── Metafield identifiers ────────────────────────────────────
@@ -382,4 +381,162 @@ export const getCart = async (cartId) => {
   );
 
   return data.cart;
+};
+
+// ─── Customer Mutations ────────────────────────────────────────
+
+// ─── Register ─────────────────────────────────────────────────
+export const customerCreate = async ({
+  firstName,
+  lastName,
+  email,
+  password,
+}) => {
+  const { data } = await client.request(
+    `
+    mutation customerCreate($input: CustomerCreateInput!) {
+      customerCreate(input: $input) {
+        customer {
+          id
+          firstName
+          lastName
+          email
+        }
+        customerUserErrors {
+          code
+          field
+          message
+        }
+      }
+    }
+  `,
+    {
+      variables: {
+        input: { firstName, lastName, email, password },
+      },
+    },
+  );
+
+  return data.customerCreate;
+};
+
+// ─── Login ────────────────────────────────────────────────────
+export const customerAccessTokenCreate = async ({ email, password }) => {
+  const { data } = await client.request(
+    `
+    mutation customerAccessTokenCreate($input: CustomerAccessTokenCreateInput!) {
+      customerAccessTokenCreate(input: $input) {
+        customerAccessToken {
+          accessToken
+          expiresAt
+        }
+        customerUserErrors {
+          code
+          field
+          message
+        }
+      }
+    }
+  `,
+    {
+      variables: {
+        input: { email, password },
+      },
+    },
+  );
+
+  return data.customerAccessTokenCreate;
+};
+
+// ─── Logout ───────────────────────────────────────────────────
+export const customerAccessTokenDelete = async (accessToken) => {
+  const { data } = await client.request(
+    `
+    mutation customerAccessTokenDelete($customerAccessToken: String!) {
+      customerAccessTokenDelete(customerAccessToken: $customerAccessToken) {
+        deletedAccessToken
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `,
+    {
+      variables: { customerAccessToken: accessToken },
+    },
+  );
+
+  return data.customerAccessTokenDelete;
+};
+
+// ─── Get Customer ─────────────────────────────────────────────
+export const getCustomer = async (accessToken) => {
+  const { data } = await client.request(
+    `
+    query getCustomer($customerAccessToken: String!) {
+      customer(customerAccessToken: $customerAccessToken) {
+        id
+        firstName
+        lastName
+        email
+        phone
+        createdAt
+        orders(first: 10, sortKey: PROCESSED_AT, reverse: true) {
+          edges {
+            node {
+              id
+              orderNumber
+              processedAt
+              financialStatus
+              fulfillmentStatus
+              currentTotalPrice {
+                amount
+                currencyCode
+              }
+              lineItems(first: 5) {
+                edges {
+                  node {
+                    title
+                    quantity
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `,
+    {
+      variables: { customerAccessToken: accessToken },
+    },
+  );
+
+  return data.customer;
+};
+
+// ─── Delete Account ───────────────────────────────────────────
+export const customerDelete = async (customerId, accessToken) => {
+  const { data } = await client.request(
+    `
+    mutation customerDelete($id: ID!, $customerAccessToken: String!) {
+      customerDelete(id: $id, customerAccessToken: $customerAccessToken) {
+        deletedCustomerId
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `,
+    {
+      variables: {
+        id: customerId,
+        customerAccessToken: accessToken,
+      },
+    },
+  );
+
+  return data.customerDelete;
 };

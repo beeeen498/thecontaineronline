@@ -9,6 +9,7 @@ import HtmlAttributes from "@/components/shared/HtmlAttributes/HtmlAttributes";
 import ScrollToTop from "@/components/shared/ScrollToTop/ScrollToTop";
 import AnchorScroll from "@/components/shared/AnchorScroll/AnchorScroll";
 import { CartProvider } from "@/contexts/CartContext";
+import { CustomerProvider } from "@/contexts/CustomerContext";
 import LanguageGate from "@/components/selectLanguage/LanguageGate";
 import "@/styles/globals.scss";
 
@@ -87,16 +88,18 @@ export default function RootLayout({ children }) {
           <ScrollToTop />
           <AnchorScroll />
           <CartProvider>
-            <LanguageGate>
-              <div className="top-bar">
-                <Header />
-                <Nav />
-              </div>
-              <main className="main-content">{children}</main>
-              <Footer />
-              <CookieConsent />
-              <CartDrawer />
-            </LanguageGate>
+            <CustomerProvider>
+              <LanguageGate>
+                <div className="top-bar">
+                  <Header />
+                  <Nav />
+                </div>
+                <main className="main-content">{children}</main>
+                <Footer />
+                <CookieConsent />
+                <CartDrawer />
+              </LanguageGate>
+            </CustomerProvider>
           </CartProvider>
         </LanguageProvider>
       </body>

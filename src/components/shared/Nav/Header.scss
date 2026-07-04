@@ -46,6 +46,32 @@
     }
   }
 
+  // ─── Right Side — Account + Cart ──────────────────────────
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: 0 $spacing-md;
+    width: 120px;
+    justify-content: flex-end;
+  }
+
+  // ─── Account ──────────────────────────────────────────────
+  &__account-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $color-white;
+    padding: $spacing-xs;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+
   // ─── Cart ─────────────────────────────────────────────────
   &__cart {
     display: flex;
