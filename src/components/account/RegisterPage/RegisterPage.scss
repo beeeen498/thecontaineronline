@@ -1,4 +1,4 @@
-@use '@/styles/variables' as *;
+@use "@/styles/variables" as *;
 
 // ─── Register Page ────────────────────────────────────────────
 // Centered box layout — same style as login page
@@ -122,6 +122,28 @@
       &:hover {
         opacity: 0.6;
       }
+    }
+  }
+
+  // ─── Password Requirements ────────────────────────────────────
+  &__requirements {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__requirement {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: #c0392b;
+    transition: color 0.2s ease;
+
+    // ─── Met state ──────────────────────────────────────
+    &--met {
+      color: #27ae60;
     }
   }
 }

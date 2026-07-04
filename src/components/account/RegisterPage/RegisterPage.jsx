@@ -24,6 +24,13 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [passwordFocused, setPasswordFocused] = useState(false);
+  const [passwordChecks, setPasswordChecks] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+  });
 
   // ─── Submit Handler ───────────────────────────────────
   const handleSubmit = async (e) => {
@@ -115,17 +122,68 @@ export default function RegisterPage() {
               className="register-page__input"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onFocus={() => setPasswordFocused(true)}
+              onBlur={() => setPasswordFocused(false)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setPassword(val);
+                setPasswordChecks({
+                  length: val.length >= 5,
+                  uppercase: /[A-Z]/.test(val),
+                  lowercase: /[a-z]/.test(val),
+                  number: /[0-9]/.test(val),
+                });
+              }}
               autoComplete="new-password"
               required
             />
+
+            {/* ─── Password Requirements ──────────────────────── */}
+            {passwordFocused && (
+              <ul className="register-page__requirements">
+                <li
+                  className={`register-page__requirement ${passwordChecks.length ? "register-page__requirement--met" : ""}`}
+                >
+                  {passwordChecks.length ? "✓" : "✗"}{" "}
+                  {isHebrew ? "לפחות 5 תווים" : "At least 5 characters"}
+                </li>
+                <li
+                  className={`register-page__requirement ${passwordChecks.uppercase ? "register-page__requirement--met" : ""}`}
+                >
+                  {passwordChecks.uppercase ? "✓" : "✗"}{" "}
+                  {isHebrew
+                    ? "לפחות אות גדולה אחת"
+                    : "At least one uppercase letter"}
+                </li>
+                <li
+                  className={`register-page__requirement ${passwordChecks.lowercase ? "register-page__requirement--met" : ""}`}
+                >
+                  {passwordChecks.lowercase ? "✓" : "✗"}{" "}
+                  {isHebrew
+                    ? "לפחות אות קטנה אחת"
+                    : "At least one lowercase letter"}
+                </li>
+                <li
+                  className={`register-page__requirement ${passwordChecks.number ? "register-page__requirement--met" : ""}`}
+                >
+                  {passwordChecks.number ? "✓" : "✗"}{" "}
+                  {isHebrew ? "לפחות ספרה אחת" : "At least one number"}
+                </li>
+              </ul>
+            )}
           </div>
 
           {/* Submit */}
           <button
             className="register-page__submit"
             onClick={handleSubmit}
-            disabled={isLoading}
+            disabled={
+              isLoading ||
+              !passwordChecks.length ||
+              !passwordChecks.uppercase ||
+              !passwordChecks.lowercase ||
+              !passwordChecks.number
+            }
           >
             {isLoading
               ? isHebrew
