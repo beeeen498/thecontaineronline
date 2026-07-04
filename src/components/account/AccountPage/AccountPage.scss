@@ -1,0 +1,262 @@
+@use '@/styles/variables' as *;
+
+// ─── Account Page ─────────────────────────────────────────────
+// Protected page showing customer info, orders, and actions
+.account-page {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: $spacing-xl $spacing-md;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
+  min-height: calc(100vh - var(--topbar-height));
+  direction: ltr;
+
+  // ─── RTL ────────────────────────────────────────────────
+  &--rtl {
+    direction: rtl;
+  }
+
+  // ─── Loading ────────────────────────────────────────────
+  &__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - var(--topbar-height));
+    font-family: var(--font-body);
+    color: $color-text-secondary;
+  }
+
+  // ─── Greeting ───────────────────────────────────────────
+  &__greeting {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__heading {
+    font-family: var(--font-headers);
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 400;
+    margin: 0;
+  }
+
+  &__email {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  // ─── Divider ────────────────────────────────────────────
+  &__divider {
+    height: 1px;
+    background-color: $color-border;
+  }
+
+  // ─── Section ────────────────────────────────────────────
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  &__section-heading {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 400;
+    margin: 0;
+    color: $color-text-secondary;
+  }
+
+  // ─── Empty State ────────────────────────────────────────
+  &__empty {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  // ─── Orders List ────────────────────────────────────────
+  &__orders {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  // ─── Single Order ────────────────────────────────────────
+  &__order {
+    border: 1px solid $color-border;
+    padding: $spacing-md;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__order-number {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  &__order-date {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    color: $color-text-secondary;
+  }
+
+  &__order-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__order-status {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $color-text-secondary;
+  }
+
+  &__order-total {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  &__order-items {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border-top: 0.5px solid $color-border;
+    padding-top: $spacing-sm;
+  }
+
+  &__order-item {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  // ─── Actions ────────────────────────────────────────────
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    align-items: flex-start;
+  }
+
+  // ─── Logout Button ──────────────────────────────────────
+  &__logout {
+    background-color: $color-black;
+    color: $color-white;
+    border: none;
+    padding: $spacing-sm $spacing-xl;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+
+    &:hover:not(:disabled) {
+      opacity: 0.8;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+
+  // ─── Delete Button ──────────────────────────────────────
+  &__delete {
+    background: none;
+    border: none;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: $color-text-secondary;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #c0392b;
+    }
+  }
+
+  // ─── Delete Confirmation ─────────────────────────────────
+  &__confirm {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    border: 1px solid $color-border;
+    padding: $spacing-md;
+    width: 100%;
+  }
+
+  &__confirm-text {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    margin: 0;
+  }
+
+  &__error {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: #c0392b;
+    margin: 0;
+  }
+
+  &__confirm-buttons {
+    display: flex;
+    gap: $spacing-md;
+    flex-wrap: wrap;
+  }
+
+  &__confirm-yes {
+    background-color: #c0392b;
+    color: $color-white;
+    border: none;
+    padding: $spacing-sm $spacing-md;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+
+    &:hover:not(:disabled) {
+      opacity: 0.8;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+
+  &__confirm-no {
+    background: none;
+    border: 1px solid $color-black;
+    padding: $spacing-sm $spacing-md;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    &:hover {
+      background-color: $color-black;
+      color: $color-white;
+    }
+  }
+}

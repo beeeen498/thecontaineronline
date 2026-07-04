@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useCustomer } from '@/contexts/CustomerContext';
-import { useLanguage } from '@/contexts/LanguageContext';
-import './LoginPage.scss';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCustomer } from "@/contexts/CustomerContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import "./LoginPage.scss";
 
 // ─── LoginPage ────────────────────────────────────────────────
 // Handles customer login
@@ -13,51 +13,54 @@ import './LoginPage.scss';
 // Shows error message on failure
 
 export default function LoginPage() {
-  const { login, isLoading } = useCustomer();
+  const { login, isLoading, isLoggedIn } = useCustomer();
   const { language } = useLanguage();
-  const isHebrew = language === 'Hebrew';
+  const isHebrew = language === "Hebrew";
   const router = useRouter();
 
   // ─── Form State ───────────────────────────────────────
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   // ─── Submit Handler ───────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     const result = await login({ email, password });
 
     if (result.success) {
-      router.push('/account');
+      router.push("/account");
     } else {
-      setError(result.error || (isHebrew ? 'שגיאה בהתחברות' : 'Login failed'));
+      setError(result.error || (isHebrew ? "שגיאה בהתחברות" : "Login failed"));
     }
   };
 
-  return (
-    <div className={`login-page ${isHebrew ? 'login-page--rtl' : ''}`}>
-      <div className="login-page__box">
+  // ─── Redirect if already logged in ───────────────────
+  useEffect(() => {
+    if (!isLoading && isLoggedIn) {
+      router.push("/account");
+    }
+  }, [isLoggedIn, isLoading, router]);
 
+  return (
+    <div className={`login-page ${isHebrew ? "login-page--rtl" : ""}`}>
+      <div className="login-page__box">
         {/* ─── Heading ──────────────────────────────────── */}
         <h1 className="login-page__heading">
-          {isHebrew ? 'התחברות' : 'Login'}
+          {isHebrew ? "התחברות" : "Login"}
         </h1>
 
         {/* ─── Error Message ────────────────────────────── */}
-        {error && (
-          <p className="login-page__error">{error}</p>
-        )}
+        {error && <p className="login-page__error">{error}</p>}
 
         {/* ─── Form ─────────────────────────────────────── */}
         <div className="login-page__form">
-
           {/* Email */}
           <div className="login-page__field">
             <label className="login-page__label">
-              {isHebrew ? 'אימייל' : 'Email'}
+              {isHebrew ? "אימייל" : "Email"}
             </label>
             <input
               className="login-page__input"
@@ -72,7 +75,7 @@ export default function LoginPage() {
           {/* Password */}
           <div className="login-page__field">
             <label className="login-page__label">
-              {isHebrew ? 'סיסמה' : 'Password'}
+              {isHebrew ? "סיסמה" : "Password"}
             </label>
             <input
               className="login-page__input"
@@ -91,21 +94,22 @@ export default function LoginPage() {
             disabled={isLoading}
           >
             {isLoading
-              ? (isHebrew ? 'מתחבר...' : 'Logging in...')
-              : (isHebrew ? 'התחברות' : 'Login')
-            }
+              ? isHebrew
+                ? "מתחבר..."
+                : "Logging in..."
+              : isHebrew
+                ? "התחברות"
+                : "Login"}
           </button>
-
         </div>
 
         {/* ─── Register Link ────────────────────────────── */}
         <p className="login-page__register">
-          {isHebrew ? 'אין לך חשבון?' : "Don't have an account?"}{' '}
+          {isHebrew ? "אין לך חשבון?" : "Don't have an account?"}{" "}
           <Link href="/account/register">
-            {isHebrew ? 'הירשם' : 'Register'}
+            {isHebrew ? "הירשם" : "Register"}
           </Link>
         </p>
-
       </div>
     </div>
   );

@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useCustomer } from '@/contexts/CustomerContext';
-import { useLanguage } from '@/contexts/LanguageContext';
-import './RegisterPage.scss';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCustomer } from "@/contexts/CustomerContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import "./RegisterPage.scss";
 
 // ─── RegisterPage ─────────────────────────────────────────────
 // Handles new customer registration
@@ -13,53 +13,58 @@ import './RegisterPage.scss';
 // Redirects to /account on success
 
 export default function RegisterPage() {
-  const { register, isLoading } = useCustomer();
+  const { register, isLoading, isLoggedIn } = useCustomer();
   const { language } = useLanguage();
-  const isHebrew = language === 'Hebrew';
+  const isHebrew = language === "Hebrew";
   const router = useRouter();
 
   // ─── Form State ───────────────────────────────────────
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   // ─── Submit Handler ───────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     const result = await register({ firstName, lastName, email, password });
 
     if (result.success) {
-      router.push('/account');
+      router.push("/account");
     } else {
-      setError(result.error || (isHebrew ? 'שגיאה בהרשמה' : 'Registration failed'));
+      setError(
+        result.error || (isHebrew ? "שגיאה בהרשמה" : "Registration failed"),
+      );
     }
   };
 
-  return (
-    <div className={`register-page ${isHebrew ? 'register-page--rtl' : ''}`}>
-      <div className="register-page__box">
+  // ─── Redirect if already logged in ───────────────────
+  useEffect(() => {
+    if (!isLoading && isLoggedIn) {
+      router.push("/account");
+    }
+  }, [isLoggedIn, isLoading, router]);
 
+  return (
+    <div className={`register-page ${isHebrew ? "register-page--rtl" : ""}`}>
+      <div className="register-page__box">
         {/* ─── Heading ──────────────────────────────────── */}
         <h1 className="register-page__heading">
-          {isHebrew ? 'הרשמה' : 'Register'}
+          {isHebrew ? "הרשמה" : "Register"}
         </h1>
 
         {/* ─── Error Message ────────────────────────────── */}
-        {error && (
-          <p className="register-page__error">{error}</p>
-        )}
+        {error && <p className="register-page__error">{error}</p>}
 
         {/* ─── Form ─────────────────────────────────────── */}
         <div className="register-page__form">
-
           {/* First Name */}
           <div className="register-page__field">
             <label className="register-page__label">
-              {isHebrew ? 'שם פרטי' : 'First Name'}
+              {isHebrew ? "שם פרטי" : "First Name"}
             </label>
             <input
               className="register-page__input"
@@ -74,7 +79,7 @@ export default function RegisterPage() {
           {/* Last Name */}
           <div className="register-page__field">
             <label className="register-page__label">
-              {isHebrew ? 'שם משפחה' : 'Last Name'}
+              {isHebrew ? "שם משפחה" : "Last Name"}
             </label>
             <input
               className="register-page__input"
@@ -89,7 +94,7 @@ export default function RegisterPage() {
           {/* Email */}
           <div className="register-page__field">
             <label className="register-page__label">
-              {isHebrew ? 'אימייל' : 'Email'}
+              {isHebrew ? "אימייל" : "Email"}
             </label>
             <input
               className="register-page__input"
@@ -104,7 +109,7 @@ export default function RegisterPage() {
           {/* Password */}
           <div className="register-page__field">
             <label className="register-page__label">
-              {isHebrew ? 'סיסמה' : 'Password'}
+              {isHebrew ? "סיסמה" : "Password"}
             </label>
             <input
               className="register-page__input"
@@ -123,21 +128,20 @@ export default function RegisterPage() {
             disabled={isLoading}
           >
             {isLoading
-              ? (isHebrew ? 'נרשם...' : 'Registering...')
-              : (isHebrew ? 'הרשמה' : 'Register')
-            }
+              ? isHebrew
+                ? "נרשם..."
+                : "Registering..."
+              : isHebrew
+                ? "הרשמה"
+                : "Register"}
           </button>
-
         </div>
 
         {/* ─── Login Link ───────────────────────────────── */}
         <p className="register-page__login">
-          {isHebrew ? 'כבר יש לך חשבון?' : 'Already have an account?'}{' '}
-          <Link href="/account/login">
-            {isHebrew ? 'התחברות' : 'Login'}
-          </Link>
+          {isHebrew ? "כבר יש לך חשבון?" : "Already have an account?"}{" "}
+          <Link href="/account/login">{isHebrew ? "התחברות" : "Login"}</Link>
         </p>
-
       </div>
     </div>
   );
