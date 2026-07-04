@@ -29,9 +29,12 @@ export default function CartDrawer() {
   const currencyCode = cart?.cost?.totalAmount?.currencyCode;
 
   const handleCheckout = () => {
-    if (cart?.checkoutUrl) {
-      window.location.href = cart.checkoutUrl;
-    }
+    if (!cart?.checkoutUrl) return;
+
+    const checkoutUrl = new URL(cart.checkoutUrl);
+    checkoutUrl.searchParams.set("locale", language === "Hebrew" ? "he" : "en");
+
+    window.location.href = checkoutUrl.toString();
   };
 
   const handleIncrease = async (lineId, newQuantity) => {

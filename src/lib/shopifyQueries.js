@@ -62,6 +62,7 @@ function buildProduct(node, meta) {
     quantityAvailable,
     inStock: meta.instock?.toLowerCase() !== "false" && quantityAvailable > 0,
   };
+  
 }
 
 // ─── Metafield identifiers ────────────────────────────────────
