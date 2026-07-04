@@ -1,0 +1,150 @@
+@use '@/styles/variables' as *;
+
+// ─── Reset Page ───────────────────────────────────────────────
+// Centered box layout — same style as login and register pages
+.reset-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - var(--topbar-height));
+  padding: $spacing-xl $spacing-md;
+  direction: ltr;
+
+  // ─── RTL ──────────────────────────────────────────────────
+  &--rtl {
+    direction: rtl;
+  }
+
+  // ─── Box ──────────────────────────────────────────────────
+  &__box {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  // ─── Heading ──────────────────────────────────────────────
+  &__heading {
+    font-family: var(--font-headers);
+    font-size: 2rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+    text-align: center;
+  }
+
+  // ─── Description ──────────────────────────────────────────
+  &__description {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: $color-text-secondary;
+    margin: 0;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  // ─── Error ────────────────────────────────────────────────
+  &__error {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: #c0392b;
+    text-align: center;
+    margin: 0;
+  }
+
+  // ─── Success ──────────────────────────────────────────────
+  &__success {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+    align-items: center;
+    text-align: center;
+
+    p {
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      color: $color-text-secondary;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+
+  // ─── Form ─────────────────────────────────────────────────
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  // ─── Field ────────────────────────────────────────────────
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  // ─── Label ────────────────────────────────────────────────
+  &__label {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $color-text-secondary;
+  }
+
+  // ─── Input ────────────────────────────────────────────────
+  &__input {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    border: 1px solid $color-border;
+    padding: $spacing-sm $spacing-md;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      border-color: $color-black;
+    }
+  }
+
+  // ─── Submit Button ────────────────────────────────────────
+  &__submit {
+    background-color: $color-black;
+    color: $color-white;
+    border: none;
+    padding: $spacing-md;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    margin-top: $spacing-sm;
+
+    &:hover:not(:disabled) {
+      opacity: 0.8;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+
+  // ─── Back Link ────────────────────────────────────────────
+  &__back {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: $color-text-secondary;
+    text-align: center;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $color-black;
+    }
+  }
+}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCustomer } from "@/contexts/CustomerContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
@@ -18,12 +18,14 @@ export default function LoginPage() {
   const { language } = useLanguage();
   const isHebrew = language === "Hebrew";
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // ─── Form State ───────────────────────────────────────
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const resetSuccess = searchParams?.get("reset") === "success";
 
   // ─── Submit Handler ───────────────────────────────────
   const handleSubmit = async (e) => {
@@ -66,10 +68,17 @@ export default function LoginPage() {
         <h1 className="login-page__heading">
           {isHebrew ? "התחברות" : "Login"}
         </h1>
-
         {/* ─── Error Message ────────────────────────────── */}
         {error && <p className="login-page__error">{displayError}</p>}
-
+        
+        {/* ─── Success Message ────────────────────────────────────────── */}
+        {resetSuccess && (
+          <p className="login-page__success">
+            {isHebrew
+              ? "הסיסמה אופסה בהצלחה. התחבר עם הסיסמה החדשה שלך."
+              : "Password reset successfully. Login with your new password."}
+          </p>
+        )}
         {/* ─── Form ─────────────────────────────────────── */}
         <div className="login-page__form">
           {/* Email */}
@@ -112,6 +121,11 @@ export default function LoginPage() {
             </div>
           </div>
 
+          {/* ─── Forgot Password ──────────────────────────────── */}
+          <Link href="/account/reset" className="login-page__forgot">
+            {isHebrew ? "שכחת סיסמה?" : "Forgot password?"}
+          </Link>
+
           {/* Submit */}
           <button
             className="login-page__submit"
@@ -127,7 +141,6 @@ export default function LoginPage() {
                 : "Login"}
           </button>
         </div>
-
         {/* ─── Register Link ────────────────────────────── */}
         <p className="login-page__register">
           {isHebrew ? "אין לך חשבון?" : "Don't have an account?"}{" "}

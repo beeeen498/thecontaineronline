@@ -540,3 +540,57 @@ export const customerDelete = async (customerId, accessToken) => {
 
   return data.customerDelete;
 };
+
+// ─── Recover Password ─────────────────────────────────────────
+// Sends a password reset email to the customer
+export const customerRecover = async (email) => {
+  const { data } = await client.request(
+    `
+    mutation customerRecover($email: String!) {
+      customerRecover(email: $email) {
+        customerUserErrors {
+          code
+          field
+          message
+        }
+      }
+    }
+  `,
+    {
+      variables: { email },
+    },
+  );
+
+  return data.customerRecover;
+};
+
+// ─── Reset Password By URL ────────────────────────────────────
+// Resets the customer's password using the reset URL from the email
+export const customerResetByUrl = async (resetUrl, password) => {
+  const { data } = await client.request(
+    `
+    mutation customerResetByUrl($resetUrl: URL!, $password: String!) {
+      customerResetByUrl(resetUrl: $resetUrl, password: $password) {
+        customer {
+          id
+          email
+        }
+        customerAccessToken {
+          accessToken
+          expiresAt
+        }
+        customerUserErrors {
+          code
+          field
+          message
+        }
+      }
+    }
+  `,
+    {
+      variables: { resetUrl, password },
+    },
+  );
+
+  return data.customerResetByUrl;
+};
