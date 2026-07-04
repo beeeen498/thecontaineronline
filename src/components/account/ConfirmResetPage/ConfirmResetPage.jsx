@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { customerResetByUrl } from '@/lib/shopifyQueries';
+import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import './ConfirmResetPage.scss';
 
 // ─── ConfirmResetPage ─────────────────────────────────────────
@@ -141,7 +142,7 @@ export default function ConfirmResetPage() {
                 onClick={() => setShowPassword(prev => !prev)}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
-                {showPassword ? '🙈' : '👁️'}
+                {showPassword ? <FaEye size={16} /> : <FaEyeSlash size={16} />}
               </button>
             </div>
 
