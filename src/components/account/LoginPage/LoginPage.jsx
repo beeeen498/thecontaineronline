@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCustomer } from "@/contexts/CustomerContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import "./LoginPage.scss";
 
 // ─── LoginPage ────────────────────────────────────────────────
@@ -22,6 +23,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // ─── Submit Handler ───────────────────────────────────
   const handleSubmit = async (e) => {
@@ -90,14 +92,24 @@ export default function LoginPage() {
             <label className="login-page__label">
               {isHebrew ? "סיסמה" : "Password"}
             </label>
-            <input
-              className="login-page__input"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              required
-            />
+            <div className="login-page__input-wrapper">
+              <input
+                className="login-page__input"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+              />
+              <button
+                type="button"
+                className="login-page__password-toggle"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <FaEye size={16} /> : <FaEyeSlash size={16} />}
+              </button>
+            </div>
           </div>
 
           {/* Submit */}

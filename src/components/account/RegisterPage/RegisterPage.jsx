@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCustomer } from "@/contexts/CustomerContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import "./RegisterPage.scss";
 
 // ─── RegisterPage ─────────────────────────────────────────────
@@ -31,6 +32,7 @@ export default function RegisterPage() {
     lowercase: false,
     number: false,
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   // ─── Submit Handler ───────────────────────────────────
   const handleSubmit = async (e) => {
@@ -131,25 +133,35 @@ export default function RegisterPage() {
             <label className="register-page__label">
               {isHebrew ? "סיסמה" : "Password"}
             </label>
-            <input
-              className="register-page__input"
-              type="password"
-              value={password}
-              onFocus={() => setPasswordFocused(true)}
-              onBlur={() => setPasswordFocused(false)}
-              onChange={(e) => {
-                const val = e.target.value;
-                setPassword(val);
-                setPasswordChecks({
-                  length: val.length >= 5,
-                  uppercase: /[A-Z]/.test(val),
-                  lowercase: /[a-z]/.test(val),
-                  number: /[0-9]/.test(val),
-                });
-              }}
-              autoComplete="new-password"
-              required
-            />
+            <div className="register-page__input-wrapper">
+              <input
+                className="register-page__input"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onFocus={() => setPasswordFocused(true)}
+                onBlur={() => setPasswordFocused(false)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setPassword(val);
+                  setPasswordChecks({
+                    length: val.length >= 5,
+                    uppercase: /[A-Z]/.test(val),
+                    lowercase: /[a-z]/.test(val),
+                    number: /[0-9]/.test(val),
+                  });
+                }}
+                autoComplete="new-password"
+                required
+              />
+              <button
+                type="button"
+                className="register-page__password-toggle"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+              </button>
+            </div>
 
             {/* ─── Password Requirements ──────────────────────── */}
             {passwordFocused && (

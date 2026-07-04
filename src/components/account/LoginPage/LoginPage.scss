@@ -1,4 +1,4 @@
-@use '@/styles/variables' as *;
+@use "@/styles/variables" as *;
 
 // ─── Login Page ───────────────────────────────────────────────
 // Centered box layout — clean and minimal
@@ -77,9 +77,50 @@
     width: 100%;
     box-sizing: border-box;
     transition: border-color 0.2s ease;
+    padding-right: $spacing-xl;
+
+    // ─── RTL — padding on left side ─────────────────────
+    [dir="rtl"] & {
+      padding-right: $spacing-sm;
+      padding-left: $spacing-xl;
+    }
 
     &:focus {
       border-color: $color-black;
+    }
+  }
+
+  // ─── Input Wrapper ────────────────────────────────────────────
+  &__input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    // ─── RTL — move toggle to left side ─────────────────
+    [dir="rtl"] & {
+      .login-page__password-toggle,
+      .register-page__password-toggle {
+        right: auto;
+        left: $spacing-sm;
+      }
+    }
+  }
+
+  // ─── Password Toggle ──────────────────────────────────────────
+  &__password-toggle {
+    position: absolute;
+    right: $spacing-sm;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $color-text-secondary;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $color-black;
     }
   }
 
