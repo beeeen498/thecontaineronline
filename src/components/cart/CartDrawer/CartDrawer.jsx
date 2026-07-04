@@ -9,9 +9,15 @@ import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import "./CartDrawer.scss";
 
+// ─── CartDrawer ───────────────────────────────────────────────
+// Slide-in panel showing cart contents
+// Cross-references cart lines against our product list
+// to show correct Hebrew names and global/local prices
+
 export default function CartDrawer() {
   const {
     cart,
+    products,
     isDrawerOpen,
     closeDrawer,
     updateQuantity,
@@ -20,30 +26,36 @@ export default function CartDrawer() {
   } = useCart();
   const { language } = useLanguage();
   const isHebrew = language === "Hebrew";
+  const isEnglish = !isHebrew;
 
   // ─── Track which lines hit their stock limit ──────────
   const [maxedOutLines, setMaxedOutLines] = useState({});
 
   const lines = cart?.lines?.edges || [];
-  const totalAmount = cart?.cost?.totalAmount?.amount;
-  const currencyCode = cart?.cost?.totalAmount?.currencyCode;
 
+  // ─── Calculate total from our own product data ────────
+  const total = lines.reduce((sum, { node: line }) => {
+    const matched = products.find((p) => p.variantId === line.merchandise.id);
+    const price = isEnglish ? matched?.globalPrice : matched?.israelPrice;
+    return sum + (price || 0) * line.quantity;
+  }, 0);
+
+  // ─── Checkout handler — appends locale to URL ─────────
   const handleCheckout = () => {
     if (!cart?.checkoutUrl) return;
-
     const checkoutUrl = new URL(cart.checkoutUrl);
-    checkoutUrl.searchParams.set("locale", language === "Hebrew" ? "he" : "en");
-
+    checkoutUrl.searchParams.set("locale", isHebrew ? "he" : "en");
     window.location.href = checkoutUrl.toString();
   };
 
+  // ─── Quantity handlers ────────────────────────────────
   const handleIncrease = async (lineId, newQuantity) => {
     const result = await updateQuantity(lineId, newQuantity);
-    const maxedOut = result?.maxedOut || false;
-
-    setMaxedOutLines((prev) => ({ ...prev, [lineId]: maxedOut }));
-
-    if (maxedOut) {
+    setMaxedOutLines((prev) => ({
+      ...prev,
+      [lineId]: result?.maxedOut || false,
+    }));
+    if (result?.maxedOut) {
       setTimeout(() => {
         setMaxedOutLines((prev) => ({ ...prev, [lineId]: false }));
       }, 5000);
@@ -51,7 +63,7 @@ export default function CartDrawer() {
   };
 
   const handleDecrease = async (lineId, newQuantity) => {
-    const result = await updateQuantity(lineId, newQuantity);
+    await updateQuantity(lineId, newQuantity);
     setMaxedOutLines((prev) => ({ ...prev, [lineId]: false }));
   };
 
@@ -91,24 +103,39 @@ export default function CartDrawer() {
             {/* ─── Items ──────────────────────────────────── */}
             <div className="cart-drawer__items">
               {lines.map(({ node: line }) => {
-                const product = line.merchandise.product;
-                const image = product.images?.edges?.[0]?.node?.url;
-                const lineTotal = line.cost?.totalAmount?.amount;
-                const lineCurrency = line.cost?.totalAmount?.currencyCode;
+                // ─── Match cart line to our product data ──
+                const matched = products.find(
+                  (p) => p.variantId === line.merchandise.id,
+                );
+
+                const title = isEnglish
+                  ? matched?.englishName || line.merchandise.product.title
+                  : matched?.hebrewName || line.merchandise.product.title;
+
+                const price = isEnglish
+                  ? matched?.globalPrice
+                  : matched?.israelPrice;
+
+                const currencySymbol = isEnglish ? "$" : "₪";
+                const image =
+                  matched?.images?.[0] ||
+                  line.merchandise.product.images?.edges?.[0]?.node?.url;
+                const handle =
+                  matched?.handle || line.merchandise.product.handle;
                 const isMaxedOut = maxedOutLines[line.id];
 
                 return (
                   <div key={line.id} className="cart-drawer__item">
-                    {/* image */}
+                    {/* ─── Image ────────────────────────── */}
                     <Link
-                      href={`/item/${product.handle}`}
+                      href={`/item/${handle}`}
                       className="cart-drawer__item-image"
                       onClick={closeDrawer}
                     >
                       {image && (
                         <Image
                           src={image}
-                          alt={product.title}
+                          alt={title}
                           fill
                           sizes="80px"
                           style={{ objectFit: "cover" }}
@@ -116,22 +143,23 @@ export default function CartDrawer() {
                       )}
                     </Link>
 
-                    {/* details */}
+                    {/* ─── Details ──────────────────────── */}
                     <div className="cart-drawer__item-details">
                       <Link
-                        href={`/item/${product.handle}`}
+                        href={`/item/${handle}`}
                         className="cart-drawer__item-name"
                         onClick={closeDrawer}
                       >
-                        {product.title}
+                        {title}
                       </Link>
 
                       <p className="cart-drawer__item-price">
-                        {lineCurrency === "ILS" ? "₪" : "$"}
-                        {Math.round(lineTotal)}
+                        {price
+                          ? `${currencySymbol}${Math.round(price * line.quantity)}`
+                          : ""}
                       </p>
 
-                      {/* quantity controls */}
+                      {/* ─── Quantity Controls ─────────── */}
                       <div className="cart-drawer__quantity">
                         <button
                           onClick={() =>
@@ -154,6 +182,7 @@ export default function CartDrawer() {
                         </button>
                       </div>
 
+                      {/* ─── Max Stock Message ─────────── */}
                       {isMaxedOut && (
                         <p className="cart-drawer__max-stock">
                           {isHebrew ? "אין יותר במלאי" : "No more in stock"}
@@ -161,7 +190,7 @@ export default function CartDrawer() {
                       )}
                     </div>
 
-                    {/* remove */}
+                    {/* ─── Remove Button ────────────────── */}
                     <button
                       className="cart-drawer__item-remove"
                       onClick={() => removeItem(line.id)}
@@ -180,8 +209,8 @@ export default function CartDrawer() {
               <div className="cart-drawer__subtotal">
                 <span>{isHebrew ? 'סה"כ' : "Subtotal"}</span>
                 <span>
-                  {currencyCode === "ILS" ? "₪" : "$"}
-                  {Math.round(totalAmount)}
+                  {isEnglish ? "$" : "₪"}
+                  {Math.round(total)}
                 </span>
               </div>
 

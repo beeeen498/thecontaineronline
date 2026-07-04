@@ -14,6 +14,7 @@ import {
   removeCartLine,
   getCart,
 } from "@/lib/shopifyQueries";
+import { getAllProducts } from "@/lib/shopifyQueries";
 
 // ─── Cart Context ───────────────────────────────────────────────
 const CartContext = createContext();
@@ -24,9 +25,13 @@ export function CartProvider({ children }) {
   const [cart, setCart] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [products, setProducts] = useState([]);
 
   // ─── Load existing cart from localStorage on mount ────
   useEffect(() => {
+    // ─── Fetch all products for cart display ──────────────
+    getAllProducts().then(setProducts).catch(console.error);
+
     const savedCartId = localStorage.getItem(CART_ID_KEY);
     if (!savedCartId) return;
 
@@ -122,6 +127,7 @@ export function CartProvider({ children }) {
     <CartContext.Provider
       value={{
         cart,
+        products, 
         isLoading,
         isDrawerOpen,
         addToCart,
