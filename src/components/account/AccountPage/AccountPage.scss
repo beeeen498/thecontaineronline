@@ -1,4 +1,4 @@
-@use '@/styles/variables' as *;
+@use "@/styles/variables" as *;
 
 // ─── Account Page ─────────────────────────────────────────────
 // Two-column layout: sidebar + content
@@ -52,9 +52,10 @@
 
   // ─── Greeting ───────────────────────────────────────────
   &__greeting {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+    font-family: var(--font-body);
+    font-size: 2.9375rem;
+    color: $color-text-primary;
+    margin: 0 0 $spacing-lg 0;
 
     @media (max-width: $breakpoint-tablet) {
       flex: 1;
@@ -116,15 +117,11 @@
       text-align: right;
     }
 
-    &:hover {
-      color: $color-black;
-    }
-
     // ─── Active State ──────────────────────────────────
     &--active {
-      color: $color-black;
-      font-weight: 500;
-      border-bottom: 2px solid $color-black;
+      background-color: $color-black;
+      color: $color-white;
+      padding: $spacing-xs $spacing-sm;
     }
   }
 
@@ -237,6 +234,87 @@
     display: flex;
     flex-direction: column;
     gap: $spacing-lg;
+  }
+
+  // ─── Setting Block ───────────────────────────────────────────
+  &__setting-block {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  &__setting-block-heading {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+  }
+
+  // ─── Form Fields ─────────────────────────────────────────────
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__label {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $color-text-secondary;
+  }
+
+  &__input {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    border: 1px solid $color-border;
+    padding: $spacing-sm $spacing-md;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      border-color: $color-black;
+    }
+
+    &--readonly {
+      background-color: #f5f5f5;
+      color: $color-text-secondary;
+      cursor: default;
+    }
+  }
+
+  // ─── Password Requirements ────────────────────────────────────
+  &__requirements {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__requirement {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: #c0392b;
+    transition: color 0.2s ease;
+
+    &--met {
+      color: #27ae60;
+    }
+  }
+
+  // ─── Success Message ─────────────────────────────────────────
+  &__success {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: #27ae60;
+    margin: 0;
   }
 
   &__setting-row {

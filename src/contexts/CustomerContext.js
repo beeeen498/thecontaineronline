@@ -1,13 +1,20 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import {
   customerCreate,
   customerAccessTokenCreate,
   customerAccessTokenDelete,
   getCustomer,
   customerDelete,
-} from '@/lib/shopifyQueries';
+  customerUpdate,
+} from "@/lib/shopifyQueries";
 
 // ─── Customer Context ─────────────────────────────────────────
 // Manages customer auth state across the app
@@ -15,7 +22,7 @@ import {
 
 const CustomerContext = createContext();
 
-const TOKEN_KEY = 'shopify-customer-token';
+const TOKEN_KEY = "shopify-customer-token";
 
 export function CustomerProvider({ children }) {
   const [customer, setCustomer] = useState(null);
@@ -29,7 +36,7 @@ export function CustomerProvider({ children }) {
 
     setIsLoading(true);
     getCustomer(savedToken)
-      .then(data => {
+      .then((data) => {
         if (data) {
           setCustomer({ ...data, accessToken: savedToken });
         } else {
@@ -42,35 +49,49 @@ export function CustomerProvider({ children }) {
   }, []);
 
   // ─── Register ─────────────────────────────────────────
-  const register = useCallback(async ({ firstName, lastName, email, password }) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await customerCreate({ firstName, lastName, email, password });
+  const register = useCallback(
+    async ({ firstName, lastName, email, password }) => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const result = await customerCreate({
+          firstName,
+          lastName,
+          email,
+          password,
+        });
 
-      if (result.customerUserErrors?.length > 0) {
-        setError(result.customerUserErrors[0].message);
-        return { success: false, error: result.customerUserErrors[0].message };
+        if (result.customerUserErrors?.length > 0) {
+          setError(result.customerUserErrors[0].message);
+          return {
+            success: false,
+            error: result.customerUserErrors[0].message,
+          };
+        }
+
+        // auto-login after registration
+        const loginResult = await customerAccessTokenCreate({
+          email,
+          password,
+        });
+        if (loginResult.customerAccessToken) {
+          const { accessToken } = loginResult.customerAccessToken;
+          localStorage.setItem(TOKEN_KEY, accessToken);
+          const customerData = await getCustomer(accessToken);
+          setCustomer({ ...customerData, accessToken });
+          return { success: true };
+        }
+
+        return { success: false, error: "Registration failed" };
+      } catch (err) {
+        setError(err.message);
+        return { success: false, error: err.message };
+      } finally {
+        setIsLoading(false);
       }
-
-      // auto-login after registration
-      const loginResult = await customerAccessTokenCreate({ email, password });
-      if (loginResult.customerAccessToken) {
-        const { accessToken } = loginResult.customerAccessToken;
-        localStorage.setItem(TOKEN_KEY, accessToken);
-        const customerData = await getCustomer(accessToken);
-        setCustomer({ ...customerData, accessToken });
-        return { success: true };
-      }
-
-      return { success: false, error: 'Registration failed' };
-    } catch (err) {
-      setError(err.message);
-      return { success: false, error: err.message };
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    [],
+  );
 
   // ─── Login ────────────────────────────────────────────
   const login = useCallback(async ({ email, password }) => {
@@ -92,7 +113,7 @@ export function CustomerProvider({ children }) {
         return { success: true };
       }
 
-      return { success: false, error: 'Login failed' };
+      return { success: false, error: "Login failed" };
     } catch (err) {
       setError(err.message);
       return { success: false, error: err.message };
@@ -111,7 +132,7 @@ export function CustomerProvider({ children }) {
       localStorage.removeItem(TOKEN_KEY);
       setCustomer(null);
     } catch (err) {
-      console.error('Logout error:', err);
+      console.error("Logout error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -138,6 +159,66 @@ export function CustomerProvider({ children }) {
     }
   }, [customer]);
 
+  // ─── Update Customer ──────────────────────────────────────────
+  // Handles email and/or password updates
+  // For password updates, verifies current password first via login
+  const updateCustomer = useCallback(
+    async ({ email, currentPassword, newPassword }) => {
+      if (!customer?.accessToken || !customer?.email) return { success: false };
+      setIsLoading(true);
+      try {
+        // ─── Verify current password if changing password ──
+        if (newPassword) {
+          const verifyResult = await customerAccessTokenCreate({
+            email: customer.email,
+            password: currentPassword,
+          });
+          if (verifyResult.customerUserErrors?.length > 0) {
+            return { success: false, error: "current_password_wrong" };
+          }
+        }
+
+        // ─── Build update input ───────────────────────────
+        const input = {};
+        if (email) input.email = email;
+        if (newPassword) input.password = newPassword;
+
+        const result = await customerUpdate(customer.accessToken, input);
+
+        if (result.customerUserErrors?.length > 0) {
+          return {
+            success: false,
+            error: result.customerUserErrors[0].message,
+          };
+        }
+
+        // ─── Update local customer state ──────────────────
+        if (result.customer) {
+          setCustomer((prev) => ({ ...prev, ...result.customer }));
+        }
+
+        // ─── Update token if new one was issued ───────────
+        if (result.customerAccessToken?.accessToken) {
+          localStorage.setItem(
+            TOKEN_KEY,
+            result.customerAccessToken.accessToken,
+          );
+          setCustomer((prev) => ({
+            ...prev,
+            accessToken: result.customerAccessToken.accessToken,
+          }));
+        }
+
+        return { success: true };
+      } catch (err) {
+        return { success: false, error: err.message };
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [customer],
+  );
+
   return (
     <CustomerContext.Provider
       value={{
@@ -149,6 +230,7 @@ export function CustomerProvider({ children }) {
         logout,
         register,
         deleteAccount,
+        updateCustomer,
       }}
     >
       {children}
@@ -160,7 +242,7 @@ export function CustomerProvider({ children }) {
 export function useCustomer() {
   const context = useContext(CustomerContext);
   if (!context) {
-    throw new Error('useCustomer must be used within a CustomerProvider');
+    throw new Error("useCustomer must be used within a CustomerProvider");
   }
   return context;
 }

@@ -594,3 +594,39 @@ export const customerResetByUrl = async (resetUrl, password) => {
 
   return data.customerResetByUrl;
 };
+
+// ─── Update Customer ──────────────────────────────────────────
+// Updates customer email and/or password
+export const customerUpdate = async (accessToken, { email, password }) => {
+  const { data } = await client.request(
+    `
+    mutation customerUpdate($customerAccessToken: String!, $customer: CustomerUpdateInput!) {
+      customerUpdate(customerAccessToken: $customerAccessToken, customer: $customer) {
+        customer {
+          id
+          email
+          firstName
+          lastName
+        }
+        customerAccessToken {
+          accessToken
+          expiresAt
+        }
+        customerUserErrors {
+          code
+          field
+          message
+        }
+      }
+    }
+  `,
+    {
+      variables: {
+        customerAccessToken: accessToken,
+        customer: { email, password },
+      },
+    },
+  );
+
+  return data.customerUpdate;
+};
