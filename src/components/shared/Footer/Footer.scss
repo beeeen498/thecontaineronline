@@ -7,8 +7,7 @@
   padding: $spacing-xl $spacing-lg $spacing-md;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: auto auto;
-  gap: $spacing-lg;
+  gap: $spacing-md;
   align-items: start;
 
   // ─── RTL ──────────────────────────────────────────────
@@ -68,6 +67,27 @@
     font-size: 0.875rem;
     color: $color-silver;
     margin: 0;
+    text-align: center;
+  }
+
+  // ─── Contact Info (inside brand column) ───────────────
+  &__contact-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-xs;
+    margin-top: $spacing-sm;
+  }
+
+  &__contact-link {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    color: $color-silver;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $color-white;
+    }
   }
 
   // ─── Socials ──────────────────────────────────────────
@@ -109,11 +129,15 @@
     text-align: center;
     border-top: 0.5px solid $color-silver;
     padding-top: $spacing-md;
-    direction: ltr;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: $spacing-lg;
+    direction: ltr;
+
+    .footer--rtl & {
+      direction: rtl;
+    }
 
     p {
       font-family: var(--font-body);
@@ -137,6 +161,29 @@
   // ─── Mobile ───────────────────────────────────────────
   @media (max-width: $breakpoint-tablet) {
     grid-template-columns: 1fr;
+    gap: $spacing-lg;
+    text-align: center;
+
+    &__brand {
+      grid-column: 1 / -1;
+    }
+
+    &__nav-list {
+      align-items: center;
+    }
+
+    &__socials {
+      align-items: center;
+    }
+
+    &__bottom {
+      flex-direction: column;
+      gap: $spacing-sm;
+    }
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    grid-template-columns: 1fr;
     text-align: center;
 
     &__socials {
@@ -144,6 +191,10 @@
     }
 
     &__nav-list {
+      align-items: center;
+    }
+
+    &__contact-list {
       align-items: center;
     }
   }

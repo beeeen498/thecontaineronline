@@ -5,11 +5,12 @@ import { AiFillInstagram, AiFillFacebook } from "react-icons/ai";
 import { IoLogoWhatsapp } from "react-icons/io";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslations } from "@/hooks/useTranslations";
-import PrivacyPolicy from "@/components/privacy/PrivacyPolicy";
 import "./Footer.scss";
 
 // ─── Constants ────────────────────────────────────────────────
-const WHATSAPP_NUMBER = "+972553000357";
+const WHATSAPP_NUMBER = "0553000357";
+const PHONE_NUMBER = "0553000357";
+const ADDRESS = (isHebrew) => (isHebrew ? "ישראל" : "Israel");
 
 // ─── Footer ───────────────────────────────────────────────────
 export default function Footer() {
@@ -18,7 +19,6 @@ export default function Footer() {
   const isHebrew = language === "Hebrew";
   const currentYear = new Date().getFullYear();
 
-  // ─── Nav Links ──────────────────────────────────────────
   const navLinks = [
     { label: t.nav.home, href: "/" },
     { label: t.nav.art, href: "/art" },
@@ -50,12 +50,20 @@ export default function Footer() {
         </ul>
       </div>
 
-      {/* ─── Brand ──────────────────────────────────────── */}
+      {/* ─── Brand ──────────────────────────────────────────── */}
       <div className="footer__brand">
         <Link href="/" className="footer__logo">
           the container
         </Link>
         <p className="footer__tagline">{t.footer.tagline}</p>
+        <div className="footer__contact-info">
+          <a href={`tel:${PHONE_NUMBER}`} className="footer__contact-link">
+            {PHONE_NUMBER}
+          </a>
+          <span className="footer__contact-link">
+            {isHebrew ? "המוריה 61, מושב תנובות" : "Hamoria st., Tnuvot, Israel"}
+          </span>
+        </div>
       </div>
 
       {/* ─── Socials ────────────────────────────────────── */}
@@ -90,13 +98,16 @@ export default function Footer() {
         </ul>
       </div>
 
-      {/* ─── Copyright ──────────────────────────────────── */}
+      {/* ─── Bottom ─────────────────────────────────────── */}
       <div className="footer__bottom">
         <p>
           © {currentYear} {t.footer.copyright}
         </p>
         <Link href="/privacy" className="footer__privacy">
           {isHebrew ? "מדיניות פרטיות" : "Privacy Policy"}
+        </Link>
+        <Link href="/terms" className="footer__privacy">
+          {isHebrew ? "תקנון" : "Terms of Service"}
         </Link>
       </div>
     </footer>
