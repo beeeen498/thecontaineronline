@@ -105,4 +105,21 @@
       }
     }
   }
+
+  // ─── Subsection ──────────────────────────────────────────────
+  &__subsection {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    padding-top: $spacing-sm;
+  }
+
+  // ─── Note ────────────────────────────────────────────────────
+  &__note {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: $color-text-secondary;
+    font-style: italic;
+    margin: 0;
+  }
 }

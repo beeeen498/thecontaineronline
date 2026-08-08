@@ -1,10 +1,11 @@
-@use '@/styles/variables' as *;
+@use "@/styles/variables" as *;
 
 // ─── Privacy Policy ───────────────────────────────────────────
 .privacy-policy {
   display: flex;
   justify-content: center;
   padding: $spacing-xl $spacing-md;
+  direction: ltr;
 
   &--rtl {
     direction: rtl;
@@ -16,7 +17,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: $spacing-lg;
+    gap: $spacing-xl;
   }
 
   // ─── Title ──────────────────────────────────────────────
@@ -34,21 +35,77 @@
     margin: 0;
   }
 
-  // ─── Content ────────────────────────────────────────────
-  &__content {
+  // ─── Section ────────────────────────────────────────────
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  // ─── Heading ────────────────────────────────────────────
+  &__heading {
     font-family: var(--font-body);
     font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+    border-bottom: 1px solid $color-border;
+    padding-bottom: $spacing-sm;
+  }
+
+  // ─── Subheading ─────────────────────────────────────────
+  &__subheading {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  // ─── Subsection ─────────────────────────────────────────
+  &__subsection {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    padding-top: $spacing-sm;
+  }
+
+  // ─── Text ───────────────────────────────────────────────
+  p {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
     line-height: 1.8;
-    color: $color-text-primary;
+    color: $color-text-secondary;
+    margin: 0;
+  }
 
-    p {
-      margin: 0 0 $spacing-md;
+  // ─── List ───────────────────────────────────────────────
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    padding-right: $spacing-lg;
+    margin: 0;
+
+    .privacy-policy--rtl & {
+      padding-right: 0;
+      padding-left: $spacing-lg;
     }
 
-    h2 {
-      font-size: 1.25rem;
-      font-weight: 500;
-      margin: $spacing-lg 0 $spacing-sm;
+    li {
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      line-height: 1.8;
+      color: $color-text-secondary;
     }
+  }
+
+  // ─── Note ────────────────────────────────────────────────
+  &__note {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: $color-text-secondary;
+    font-style: italic;
+    margin: 0;
   }
 }
