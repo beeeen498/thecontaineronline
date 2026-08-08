@@ -1,0 +1,108 @@
+@use "@/styles/variables" as *;
+
+// ─── Terms Page ───────────────────────────────────────────────
+.terms-page {
+  display: flex;
+  justify-content: center;
+  padding: $spacing-xl $spacing-md;
+  direction: ltr;
+
+  &--rtl {
+    direction: rtl;
+  }
+
+  // ─── Inner ──────────────────────────────────────────────
+  &__inner {
+    max-width: 800px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+  }
+
+  // ─── Title ──────────────────────────────────────────────
+  &__title {
+    font-family: var(--font-headers);
+    font-size: 2rem;
+    font-weight: 400;
+    margin: 0;
+  }
+
+  // ─── Updated ────────────────────────────────────────────
+  &__updated {
+    font-size: 0.875rem;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  // ─── Section ────────────────────────────────────────────
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  // ─── Heading ────────────────────────────────────────────
+  &__heading {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+    border-bottom: 1px solid $color-border;
+    padding-bottom: $spacing-sm;
+  }
+
+  // ─── Subheading ─────────────────────────────────────────
+  &__subheading {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  // ─── Text ───────────────────────────────────────────────
+  p {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  // ─── List ───────────────────────────────────────────────
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    padding-right: $spacing-lg;
+    margin: 0;
+
+    .terms-page--rtl & {
+      padding-right: 0;
+      padding-left: $spacing-lg;
+    }
+
+    li {
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      line-height: 1.8;
+      color: $color-text-secondary;
+
+      a {
+        color: $color-black;
+        text-decoration: underline;
+
+        &:hover {
+          opacity: 0.6;
+        }
+      }
+
+      strong {
+        color: $color-black;
+        font-weight: 600;
+      }
+    }
+  }
+}
