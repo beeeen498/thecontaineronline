@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { IoMdClose } from "react-icons/io";
@@ -27,6 +28,7 @@ export default function CartDrawer() {
   const { language } = useLanguage();
   const isHebrew = language === "Hebrew";
   const isEnglish = !isHebrew;
+  const router = useRouter();
 
   // ─── Track which lines hit their stock limit ──────────
   const [maxedOutLines, setMaxedOutLines] = useState({});
@@ -42,10 +44,8 @@ export default function CartDrawer() {
 
   // ─── Checkout handler — appends locale to URL ─────────
   const handleCheckout = () => {
-    if (!cart?.checkoutUrl) return;
-    const checkoutUrl = new URL(cart.checkoutUrl);
-    checkoutUrl.searchParams.set("locale", isHebrew ? "he" : "en");
-    window.location.href = checkoutUrl.toString();
+    closeDrawer();
+    router.push("/checkout");
   };
 
   // ─── Quantity handlers ────────────────────────────────
