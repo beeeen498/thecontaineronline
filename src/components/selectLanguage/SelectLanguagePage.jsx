@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { useLanguage } from '@/contexts/LanguageContext';
-import './SelectLanguagePage.scss';
+import Image from "next/image";
+import { useLanguage } from "@/contexts/LanguageContext";
+import "./SelectLanguagePage.scss";
 
 // ─── SelectLanguagePage ───────────────────────────────────────
 // Full screen overlay shown on first visit
@@ -13,7 +13,6 @@ export default function SelectLanguagePage() {
 
   return (
     <div className="select-language">
-
       {/* ─── Logo ───────────────────────────────────────── */}
       <h1 className="select-language__logo">the container</h1>
 
@@ -25,17 +24,16 @@ export default function SelectLanguagePage() {
 
       {/* ─── Language Buttons ───────────────────────────── */}
       <div className="select-language__buttons">
-
         <button
           className="select-language__btn"
-          onClick={() => setLanguage('English')}
+          onClick={() => setLanguage("English")}
         >
           <div className="select-language__flag-wrapper">
             <Image
-              src="/assets/images/england-flag.png"
+              src="/assets/images/language-selector/england-flag.png"
               alt="English"
               fill
-              style={{ objectFit: 'cover' }}
+              style={{ objectFit: "cover" }}
             />
           </div>
           <span>English</span>
@@ -45,21 +43,19 @@ export default function SelectLanguagePage() {
 
         <button
           className="select-language__btn"
-          onClick={() => setLanguage('Hebrew')}
+          onClick={() => setLanguage("Hebrew")}
         >
           <div className="select-language__flag-wrapper">
             <Image
-              src="/assets/images/israel-flag.webp"
+              src="/assets/images/language-selector/israel-flag.webp"
               alt="עברית"
               fill
-              style={{ objectFit: 'cover' }}
+              style={{ objectFit: "cover" }}
             />
           </div>
           <span>עברית</span>
         </button>
-
       </div>
-
     </div>
   );
 }

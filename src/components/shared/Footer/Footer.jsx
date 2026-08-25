@@ -61,7 +61,9 @@ export default function Footer() {
             {PHONE_NUMBER}
           </a>
           <span className="footer__contact-link">
-            {isHebrew ? "המוריה 61, מושב תנובות" : "Hamoria st., Tnuvot, Israel"}
+            {isHebrew
+              ? "המוריה 61, מושב תנובות"
+              : "Hamoria st., Tnuvot, Israel"}
           </span>
         </div>
       </div>
@@ -109,6 +111,21 @@ export default function Footer() {
         <Link href="/terms" className="footer__privacy">
           {isHebrew ? "תקנון" : "Terms of Service"}
         </Link>
+      </div>
+
+      {/* ─── Credits ────────────────────────────────────── */}
+      <div className="footer__credits">
+        <p>
+          {isHebrew ? "נבנה על ידי " : "Created by "}
+          <a
+            href="https://www.linkedin.com/in/ben-kedem/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer__credits-link"
+          >
+            {isHebrew ? "בן קדם" : "Ben Kedem"}
+          </a>
+        </p>
       </div>
     </footer>
   );

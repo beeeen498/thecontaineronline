@@ -158,6 +158,30 @@
     }
   }
 
+  // ─── Credits ──────────────────────────────────────────────
+  &__credits {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding-top: $spacing-sm;
+
+    p {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      color: $color-silver;
+      margin: 0;
+    }
+  }
+
+  &__credits-link {
+    color: $color-silver;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $color-white;
+    }
+  }
+
   // ─── Mobile ───────────────────────────────────────────
   @media (max-width: $breakpoint-tablet) {
     grid-template-columns: 1fr;
