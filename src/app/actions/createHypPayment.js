@@ -33,10 +33,6 @@ export async function createHypPayment({
       Coin: isHebrew ? "1" : "2", // 1=ILS, 2=USD
       Order: orderId,
       PageLang: isHebrew ? "HEB" : "ENG",
-      ClientName: customerName,
-      ClientLName: customerLastName,
-      email: customerEmail,
-      cell: customerPhone,
       sendemail: "True",
       tmp: "2",
       SuccessUrl: "https://thecontaineronline.com/checkout/success",

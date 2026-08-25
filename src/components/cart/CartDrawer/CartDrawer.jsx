@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { createHypPayment } from "@/app/actions/createHypPayment";
 import Image from "next/image";
 import Link from "next/link";
 import { IoMdClose } from "react-icons/io";
@@ -28,7 +28,6 @@ export default function CartDrawer() {
   const { language } = useLanguage();
   const isHebrew = language === "Hebrew";
   const isEnglish = !isHebrew;
-  const router = useRouter();
 
   // ─── Track which lines hit their stock limit ──────────
   const [maxedOutLines, setMaxedOutLines] = useState({});
@@ -43,9 +42,36 @@ export default function CartDrawer() {
   }, 0);
 
   // ─── Checkout handler — appends locale to URL ─────────
-  const handleCheckout = () => {
-    closeDrawer();
-    router.push("/checkout");
+  const handleCheckout = async () => {
+    if (!cart?.lines?.edges?.length) return;
+    setIsLoading(true);
+
+    // ─── Calculate total in ILS (always charge in ILS) ────
+    const total = cart.lines.edges.reduce((sum, { node: line }) => {
+      const matched = products.find((p) => p.variantId === line.merchandise.id);
+      return sum + (matched?.israelPrice || 0) * line.quantity;
+    }, 0);
+
+    // ─── Store cart lines for success page ────────────────
+    const cartLines = cart.lines.edges.map(({ node: line }) => ({
+      variantId: line.merchandise.id,
+      quantity: line.quantity,
+    }));
+    sessionStorage.setItem("hyp-cart-lines", JSON.stringify(cartLines));
+
+    // ─── Create Hyp Pay payment session ───────────────────
+    const result = await createHypPayment({
+      amount: total,
+      orderId: `TC-${Date.now()}`,
+      language,
+    });
+
+    if (result.success) {
+      window.location.href = result.paymentUrl;
+    } else {
+      console.error("Payment error:", result.error);
+      setIsLoading(false);
+    }
   };
 
   // ─── Quantity handlers ────────────────────────────────

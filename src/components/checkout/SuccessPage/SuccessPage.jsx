@@ -1,59 +1,69 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
-  validateHypPayment,
+  verifyHypPayment,
   updateInventoryAfterPayment,
 } from "@/app/actions/handlePaymentSuccess";
 import "./SuccessPage.scss";
 
 // ─── SuccessPage ──────────────────────────────────────────────
 // Handles Hyp Pay redirect after payment
-// Validates transaction, updates inventory, clears cart
+// Verifies transaction, updates inventory, clears cart
 
 export default function SuccessPage() {
   const { language } = useLanguage();
   const isHebrew = language === "Hebrew";
   const searchParams = useSearchParams();
   const { clearCart } = useCart();
-  const router = useRouter();
 
-  const [status, setStatus] = useState("loading"); // loading | success | failed
+  const [status, setStatus] = useState("loading");
 
   useEffect(() => {
     const processPayment = async () => {
       const cCode = searchParams.get("CCode");
-      const orderId = searchParams.get("Order");
 
-      // ─── Payment failed ────────────────────────────────
+      // ─── Payment failed ──────────────────────────────
       if (cCode !== "0") {
         setStatus("failed");
         return;
       }
 
       try {
-        // ─── Get cart lines from sessionStorage ───────────
+        // ─── Build params object from URL ────────────────
+        const paramsObj = {};
+        searchParams.forEach((value, key) => {
+          paramsObj[key] = value;
+        });
+
+        // ─── Verify with Hyp Pay ──────────────────────────
+        const isValid = await verifyHypPayment(paramsObj);
+
+        if (!isValid) {
+          setStatus("failed");
+          return;
+        }
+
+        // ─── Update Shopify inventory ──────────────────────
         const cartLinesRaw = sessionStorage.getItem("hyp-cart-lines");
         const cartLines = cartLinesRaw ? JSON.parse(cartLinesRaw) : [];
 
-        // ─── Update Shopify inventory ──────────────────────
         if (cartLines.length > 0) {
           await updateInventoryAfterPayment(cartLines);
         }
 
         // ─── Clear cart and sessionStorage ────────────────
         sessionStorage.removeItem("hyp-cart-lines");
-        sessionStorage.removeItem("hyp-order-id");
         clearCart();
 
         setStatus("success");
       } catch (error) {
-        console.error("Error processing payment success:", error);
-        setStatus("success"); // still show success even if inventory update fails
+        console.error("Error processing payment:", error);
+        setStatus("success"); // show success even if inventory update fails
       }
     };
 
@@ -102,8 +112,8 @@ export default function SuccessPage() {
                 ? "אירעה שגיאה בעיבוד התשלום. נסה שנית."
                 : "There was an error processing your payment. Please try again."}
             </p>
-            <Link href="/checkout" className="success-page__btn">
-              {isHebrew ? "נסה שנית" : "Try Again"}
+            <Link href="/" className="success-page__btn">
+              {isHebrew ? "חזרה לחנות" : "Back to Store"}
             </Link>
           </>
         )}
