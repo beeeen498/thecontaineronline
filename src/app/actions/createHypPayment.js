@@ -9,15 +9,8 @@ const TERMINAL = process.env.HYP_TERMINAL_NUMBER;
 const API_KEY = process.env.HYP_API_KEY;
 const PASS_P = process.env.HYP_PASS_P;
 
-export async function createHypPayment({
-  amount,
-  orderId,
-  customerName,
-  customerLastName,
-  customerEmail,
-  customerPhone,
-  language,
-}) {
+export async function createHypPayment({ amount, orderId, language }) {
+  console.log("createHypPayment called:", { amount, orderId, language });
   const isHebrew = language === "Hebrew";
 
   try {
@@ -40,7 +33,9 @@ export async function createHypPayment({
     });
 
     // ─── Call Hyp Pay APISign endpoint ────────────────────
-    const response = await fetch(`${HYP_BASE_URL}?${params.toString()}`);
+    const response = await fetch(`${HYP_BASE_URL}?${params.toString()}`, {
+      signal: AbortSignal.timeout(10000), // 10 second timeout
+    });
     const responseText = await response.text();
     console.log("Hyp response:", responseText);
 
