@@ -1,10 +1,10 @@
-'use server';
+"use server";
 
 // ─── Create Hyp Pay Payment Session ──────────────────────────
 // Server-side only — never expose API credentials to client
 // Calls Hyp Pay APISign endpoint and returns the payment page URL
 
-const HYP_BASE_URL = 'https://pay.hyp.co.il/p/';
+const HYP_BASE_URL = "https://pay.hyp.co.il/p/";
 const TERMINAL = process.env.HYP_TERMINAL_NUMBER;
 const API_KEY = process.env.HYP_API_KEY;
 const PASS_P = process.env.HYP_PASS_P;
@@ -18,24 +18,29 @@ export async function createHypPayment({
   customerPhone,
   language,
 }) {
+  const isHebrew = language === "Hebrew";
+
   try {
     // ─── Build APISign request URL ────────────────────────
     const params = new URLSearchParams({
-      action: 'APISign',
-      What: 'SIGN',
-      Sign: 'True',
+      action: "APISign",
+      What: "SIGN",
+      Sign: "True",
       Masof: TERMINAL,
       KEY: API_KEY,
       PassP: PASS_P,
       Amount: amount.toString(),
+      Coin: isHebrew ? "1" : "2", // 1=ILS, 2=USD
       Order: orderId,
-      PageLang: language === 'Hebrew' ? 'HEB' : 'ENG',
+      PageLang: isHebrew ? "HEB" : "ENG",
       ClientName: customerName,
       ClientLName: customerLastName,
       email: customerEmail,
       cell: customerPhone,
-      sendemail: 'True',
-      tmp: '2',
+      sendemail: "True",
+      tmp: "2",
+      SuccessUrl: "https://thecontaineronline.com/checkout/success",
+      ErrorUrl: "https://thecontaineronline.com/checkout/success",
     });
 
     // ─── Call Hyp Pay APISign endpoint ────────────────────
@@ -43,7 +48,7 @@ export async function createHypPayment({
     const responseText = await response.text();
 
     if (!response.ok) {
-      return { success: false, error: 'Failed to create payment session' };
+      return { success: false, error: "Failed to create payment session" };
     }
 
     // ─── Build payment page URL from response ─────────────
@@ -52,7 +57,7 @@ export async function createHypPayment({
 
     return { success: true, paymentUrl };
   } catch (error) {
-    console.error('Hyp Pay error:', error);
+    console.error("Hyp Pay error:", error);
     return { success: false, error: error.message };
   }
 }

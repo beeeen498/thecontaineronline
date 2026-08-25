@@ -119,6 +119,12 @@ export function CartProvider({ children }) {
     [cart],
   );
 
+  // ─── Clear cart ───────────────────────────────────────────────
+  const clearCart = useCallback(() => {
+    setCart(null);
+    localStorage.removeItem(CART_ID_KEY);
+  }, []);
+
   // ─── Drawer controls ────────────────────────────────────
   const openDrawer = useCallback(() => setIsDrawerOpen(true), []);
   const closeDrawer = useCallback(() => setIsDrawerOpen(false), []);
@@ -127,7 +133,7 @@ export function CartProvider({ children }) {
     <CartContext.Provider
       value={{
         cart,
-        products, 
+        products,
         isLoading,
         isDrawerOpen,
         addToCart,
@@ -135,6 +141,7 @@ export function CartProvider({ children }) {
         removeItem,
         openDrawer,
         closeDrawer,
+        clearCart,
       }}
     >
       {children}

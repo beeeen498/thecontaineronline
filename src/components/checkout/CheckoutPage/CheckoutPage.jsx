@@ -56,7 +56,7 @@ export default function CheckoutPage() {
 
     try {
       const result = await createHypPayment({
-        amount: total,
+        amount: total, // total is already calculated based on language
         orderId,
         customerName: firstName,
         customerLastName: lastName,
