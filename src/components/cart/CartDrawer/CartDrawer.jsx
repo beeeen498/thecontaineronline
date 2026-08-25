@@ -28,6 +28,7 @@ export default function CartDrawer() {
   const { language } = useLanguage();
   const isHebrew = language === "Hebrew";
   const isEnglish = !isHebrew;
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   // ─── Track which lines hit their stock limit ──────────
   const [maxedOutLines, setMaxedOutLines] = useState({});
@@ -44,22 +45,19 @@ export default function CartDrawer() {
   // ─── Checkout handler — appends locale to URL ─────────
   const handleCheckout = async () => {
     if (!cart?.lines?.edges?.length) return;
-    setIsLoading(true);
+    setIsCheckingOut(true);
 
-    // ─── Calculate total in ILS (always charge in ILS) ────
     const total = cart.lines.edges.reduce((sum, { node: line }) => {
       const matched = products.find((p) => p.variantId === line.merchandise.id);
       return sum + (matched?.israelPrice || 0) * line.quantity;
     }, 0);
 
-    // ─── Store cart lines for success page ────────────────
     const cartLines = cart.lines.edges.map(({ node: line }) => ({
       variantId: line.merchandise.id,
       quantity: line.quantity,
     }));
     sessionStorage.setItem("hyp-cart-lines", JSON.stringify(cartLines));
 
-    // ─── Create Hyp Pay payment session ───────────────────
     const result = await createHypPayment({
       amount: total,
       orderId: `TC-${Date.now()}`,
@@ -70,7 +68,7 @@ export default function CartDrawer() {
       window.location.href = result.paymentUrl;
     } else {
       console.error("Payment error:", result.error);
-      setIsLoading(false);
+      setIsCheckingOut(false);
     }
   };
 
@@ -243,9 +241,15 @@ export default function CartDrawer() {
               <button
                 className="cart-drawer__checkout"
                 onClick={handleCheckout}
-                disabled={isLoading}
+                disabled={isLoading || isCheckingOut}
               >
-                {isHebrew ? "לתשלום" : "Checkout"}
+                {isCheckingOut
+                  ? isHebrew
+                    ? "מעבד..."
+                    : "Processing..."
+                  : isHebrew
+                    ? "לתשלום"
+                    : "Checkout"}
               </button>
             </div>
           </>
