@@ -46,6 +46,7 @@ export async function createHypPayment({
     // ─── Call Hyp Pay APISign endpoint ────────────────────
     const response = await fetch(`${HYP_BASE_URL}?${params.toString()}`);
     const responseText = await response.text();
+    console.log("Hyp response:", responseText);
 
     if (!response.ok) {
       return { success: false, error: "Failed to create payment session" };
