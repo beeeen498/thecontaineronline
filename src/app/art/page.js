@@ -1,4 +1,4 @@
-import { getAllProducts } from "@/lib/shopifyQueries";
+import { getArtProducts } from "@/lib/shopifyQueries";
 import ArtStorePage from "@/components/store/ArtStorePage/ArtStorePage";
 
 // ─── Revalidate ───────────────────────────────────────────────
@@ -22,8 +22,6 @@ export const metadata = {
 // Passes them to the client ArtStorePage for filtering
 
 export default async function ArtRoute() {
-  const allProducts = await getAllProducts();
-  const artProducts = allProducts.filter((p) => p.typeOfItem === "art");
+  const artProducts = await getArtProducts();
   return <ArtStorePage products={artProducts} />;
 }
-

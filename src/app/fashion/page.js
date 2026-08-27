@@ -1,4 +1,4 @@
-import { getAllProducts } from "@/lib/shopifyQueries";
+import { getFashionProducts } from "@/lib/shopifyQueries";
 import FashionStorePage from "@/components/store/FashionStorePage/FashionStorePage";
 
 // ─── Revalidate ───────────────────────────────────────────────
@@ -19,7 +19,6 @@ export const metadata = {
 
 // ─── Fashion Route ────────────────────────────────────────────
 export default async function FashionRoute() {
-  const allProducts = await getAllProducts();
-  const fashionProducts = allProducts.filter((p) => p.typeOfItem === "fashion");
+  const fashionProducts = await getFashionProducts();
   return <FashionStorePage products={fashionProducts} />;
 }

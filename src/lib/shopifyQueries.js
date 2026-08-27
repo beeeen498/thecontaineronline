@@ -102,47 +102,53 @@ const VARIANTS_QUERY = `
   }
 `;
 
-// ─── getAllProducts ───────────────────────────────────────────
-export const getAllProducts = async () => {
+// ─── Collection IDs ───────────────────────────────────────────
+const ART_COLLECTION_ID = "gid://shopify/Collection/508658417698";
+const FASHION_COLLECTION_ID = "gid://shopify/Collection/508658450466";
+
+// ─── Helper — fetch products from a collection ────────────────
+async function getCollectionProducts(collectionId) {
   let allProducts = [];
   let hasNextPage = true;
   let cursor = null;
 
   while (hasNextPage) {
     const { data } = await client.request(`{
-      products(first: 50${cursor ? `, after: "${cursor}"` : ""}) {
-        pageInfo {
-          hasNextPage
-          endCursor
-        }
-        edges {
-          node {
-            id
-            handle
-            title
-            productType
-            vendor
-            description
-            priceRange {
-              minVariantPrice {
-                amount
-              }
-            }
-            images(first: 10) {
-              edges {
-                node {
-                  url
+      collection(id: "${collectionId}") {
+        products(first: 50${cursor ? `, after: "${cursor}"` : ""}, sortKey: MANUAL) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          edges {
+            node {
+              id
+              handle
+              title
+              productType
+              vendor
+              description
+              priceRange {
+                minVariantPrice {
+                  amount
                 }
               }
+              images(first: 10) {
+                edges {
+                  node {
+                    url
+                  }
+                }
+              }
+              ${METAFIELD_IDENTIFIERS}
+              ${VARIANTS_QUERY}
             }
-            ${METAFIELD_IDENTIFIERS}
-            ${VARIANTS_QUERY}
           }
         }
       }
     }`);
 
-    const { edges, pageInfo } = data.products;
+    const { edges, pageInfo } = data.collection.products;
     edges.forEach(({ node }) => {
       const meta = parseMeta(node.metafields);
       allProducts.push(buildProduct(node, meta));
@@ -153,18 +159,26 @@ export const getAllProducts = async () => {
   }
 
   return allProducts;
+}
+
+// ─── getAllProducts ───────────────────────────────────────────
+// Fetches all products from both collections
+export const getAllProducts = async () => {
+  const [artProducts, fashionProducts] = await Promise.all([
+    getCollectionProducts(ART_COLLECTION_ID),
+    getCollectionProducts(FASHION_COLLECTION_ID),
+  ]);
+  return [...artProducts, ...fashionProducts];
 };
 
 // ─── getArtProducts ───────────────────────────────────────────
 export const getArtProducts = async () => {
-  const allProducts = await getAllProducts();
-  return allProducts.filter((item) => item.typeOfItem === "art");
+  return getCollectionProducts(ART_COLLECTION_ID);
 };
 
 // ─── getFashionProducts ───────────────────────────────────────
 export const getFashionProducts = async () => {
-  const allProducts = await getAllProducts();
-  return allProducts.filter((item) => item.typeOfItem === "fashion");
+  return getCollectionProducts(FASHION_COLLECTION_ID);
 };
 
 // ─── getProductByHandle ───────────────────────────────────────
