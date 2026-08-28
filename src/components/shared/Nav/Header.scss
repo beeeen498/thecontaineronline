@@ -1,9 +1,6 @@
 @use "@/styles/variables" as *;
 
 // ─── Header ───────────────────────────────────────────────────
-// Top bar — black background, logo centered, language left, cart right
-// Fixed position, sits above the Nav
-
 .header {
   display: flex;
   align-items: center;
@@ -12,31 +9,17 @@
   color: $color-white;
   width: 100%;
   height: 75px;
+  padding: 0 $spacing-lg;
+  box-sizing: border-box;
   direction: ltr;
-  flex-wrap: nowrap;
 
-  // ─── Language ─────────────────────────────────────────────
-  &__language {
-    display: flex;
-    align-items: center;
-    padding: 0 $spacing-md;
-    width: 100px;
+  // ─── RTL — flip logo and icons ──────────────────────────
+  &--rtl {
+    direction: rtl;
   }
 
   // ─── Logo ─────────────────────────────────────────────────
   &__logo {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    // white-space: nowrap;
-
-    @media (max-width: $breakpoint-mobile) {
-      position: static;
-      transform: none;
-      flex: 1;
-      text-align: center;
-    }
-
     a {
       font-family: var(--font-headers);
       font-size: 1.875rem;
@@ -46,18 +29,16 @@
     }
   }
 
-  // ─── Right Side — Account + Cart ──────────────────────────
-  &__right {
+  // ─── Icons group ──────────────────────────────────────────
+  &__icons {
     display: flex;
     align-items: center;
     gap: $spacing-sm;
-    padding: 0 $spacing-md;
-    width: 120px;
-    justify-content: flex-end;
   }
 
-  // ─── Account ──────────────────────────────────────────────
-  &__account-button {
+  // ─── Icon button ──────────────────────────────────────────
+  &__icon-btn {
+    position: relative;
     background: none;
     border: none;
     cursor: pointer;
@@ -70,30 +51,6 @@
     &:hover {
       opacity: 0.7;
     }
-  }
-
-  // ─── Cart ─────────────────────────────────────────────────
-  &__cart {
-    display: flex;
-    align-items: center;
-    padding: 0 $spacing-md;
-    width: 100px;
-    justify-content: flex-end;
-  }
-
-  &__cart-button {
-    position: relative;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.2rem;
-    color: $color-white;
-    padding: $spacing-xs;
-
-    &:hover {
-      opacity: 0.7;
-      transition: opacity 0.3s ease;
-    }
 
     &--bounce {
       animation: cartBounce 0.4s ease;
@@ -102,18 +59,19 @@
     &--loading {
       opacity: 0.5;
     }
+
+    // ─── Hamburger — hidden on desktop ─────────────────
+    &--hamburger {
+      display: none;
+      z-index: 100;
+
+      @media (max-width: $breakpoint-mobile) {
+        display: flex;
+      }
+    }
   }
 
-  @keyframes cartBounce {
-    0%,
-    100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.2);
-    }
-  }
-
+  // ─── Cart count badge ──────────────────────────────────────
   &__cart-count {
     position: absolute;
     top: -2px;
@@ -129,5 +87,28 @@
     border-radius: 50%;
     font-family: var(--font-body);
     line-height: 1;
+  }
+
+  // ─── Mobile — smaller icons & logo, tighter edge margins ──────
+  @media (max-width: $breakpoint-mobile) {
+    padding: 0 $spacing-sm; 
+
+    &__logo a {
+      font-size: 1.25rem; // was 1.875rem
+    }
+
+    &__icons {
+      gap: $spacing-xs; // a bit tighter between icons
+    }
+  }
+}
+
+@keyframes cartBounce {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
   }
 }

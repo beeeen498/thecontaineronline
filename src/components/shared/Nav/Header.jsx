@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageButton from "./LanguageButton";
 import { BsHandbag } from "react-icons/bs";
+import { IoMdMenu, IoMdClose } from "react-icons/io";
 import { useCart } from "@/contexts/CartContext";
 import { FaRegUser, FaUser } from "react-icons/fa6";
 import { useCustomer } from "@/contexts/CustomerContext";
 import { useRouter } from "next/navigation";
 import "./Header.scss";
 
-export default function Header() {
+export default function Header({ isMenuOpen, onToggleMenu }) {
   const { language } = useLanguage();
   const isHebrew = language === "Hebrew";
   const { cart, openDrawer, isLoading } = useCart();
@@ -32,37 +33,46 @@ export default function Header() {
   }, [itemCount]);
 
   return (
-    <header className={`header ${isHebrew ? "rtl" : ""}`}>
-      <div className="header__language">
-        <LanguageButton />
-      </div>
-
+    <header className={`header ${isHebrew ? "header--rtl" : ""}`}>
+      {/* ─── Logo ─────────────────────────────────────────── */}
       <div className="header__logo">
         <Link href="/">the container</Link>
       </div>
 
-      {/* ─── Right Side — Account + Cart ─────────────────── */}
-      <div className="header__right">
+      {/* ─── Icons ────────────────────────────────────────── */}
+      <div className="header__icons">
+        {/* Language */}
+        <LanguageButton />
+
+        {/* Account */}
         <button
-          className="header__account-button"
+          className="header__icon-btn"
           onClick={handleAccountClick}
           aria-label={isLoggedIn ? "My Account" : "Login"}
         >
           {isLoggedIn ? <FaUser size={20} /> : <FaRegUser size={20} />}
         </button>
 
-        <div className="header__cart">
-          <button
-            className={`header__cart-button ${isBouncing ? "header__cart-button--bounce" : ""} ${isLoading ? "header__cart-button--loading" : ""}`}
-            onClick={openDrawer}
-            aria-label="Cart"
-          >
-            <BsHandbag size={22} />
-            {itemCount > 0 && (
-              <span className="header__cart-count">{itemCount}</span>
-            )}
-          </button>
-        </div>
+        {/* Cart */}
+        <button
+          className={`header__icon-btn ${isBouncing ? "header__icon-btn--bounce" : ""} ${isLoading ? "header__icon-btn--loading" : ""}`}
+          onClick={openDrawer}
+          aria-label="Cart"
+        >
+          <BsHandbag size={22} />
+          {itemCount > 0 && (
+            <span className="header__cart-count">{itemCount}</span>
+          )}
+        </button>
+
+        {/* Hamburger — mobile only */}
+        <button
+          className="header__icon-btn header__icon-btn--hamburger"
+          onClick={onToggleMenu}
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+        >
+          {isMenuOpen ? <IoMdClose size={28} /> : <IoMdMenu size={28} />}
+        </button>
       </div>
     </header>
   );

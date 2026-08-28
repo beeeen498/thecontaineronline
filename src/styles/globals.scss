@@ -11,7 +11,7 @@
 
 // ─── Top Bar ──────────────────────────────────────────────────
 $topbar-height-desktop: 107.5px;
-$topbar-height-mobile: 60px; // header only, no nav row on mobile
+$topbar-height-mobile: 75px; // header only, no nav row on mobile
 
 :root {
   --topbar-height: #{$topbar-height-desktop};

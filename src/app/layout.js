@@ -1,7 +1,5 @@
 import { Belleza, Assistant, Titillium_Web } from "next/font/google";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import Header from "@/components/shared/Nav/Header";
-import Nav from "@/components/shared/Nav/Nav";
 import Footer from "@/components/shared/Footer/Footer";
 import CookieConsent from "@/components/shared/CookieConsent/CookieConsent";
 import CartDrawer from "@/components/cart/CartDrawer/CartDrawer";
@@ -11,6 +9,7 @@ import AnchorScroll from "@/components/shared/AnchorScroll/AnchorScroll";
 import { CartProvider } from "@/contexts/CartContext";
 import { CustomerProvider } from "@/contexts/CustomerContext";
 import LanguageGate from "@/components/selectLanguage/LanguageGate";
+import TopBar from "@/components/shared/Nav/TopBar";
 import "@/styles/globals.scss";
 
 // ─── Font Setup ───────────────────────────────────────────────
@@ -90,10 +89,7 @@ export default function RootLayout({ children }) {
           <CartProvider>
             <CustomerProvider>
               <LanguageGate>
-                <div className="top-bar">
-                  <Header />
-                  <Nav />
-                </div>
+                <TopBar />
                 <main className="main-content">{children}</main>
                 <Footer />
                 <CookieConsent />

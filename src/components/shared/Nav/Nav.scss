@@ -8,7 +8,6 @@
   justify-content: center;
   border-bottom: 0.5px solid $color-white;
 
-  // ─── List ───────────────────────────────────────────────
   &__list {
     display: flex;
     justify-content: space-between;
@@ -19,7 +18,6 @@
     height: 100%;
   }
 
-  // ─── Item ───────────────────────────────────────────────
   &__item {
     position: relative;
     font-family: var(--font-nav);
@@ -32,7 +30,6 @@
       color: $color-white;
     }
 
-    // underline hover effect
     &::after {
       content: "";
       position: absolute;
@@ -49,58 +46,22 @@
       width: 100%;
     }
 
-    // ─── Active ─────────────────────────────────────────
     &--active::after {
       width: 100%;
     }
   }
 
-  // ─── RTL ────────────────────────────────────────────────
   &--rtl {
     direction: rtl;
   }
 
-  // ─── Hide on mobile ─────────────────────────────────────
   @media (max-width: $breakpoint-mobile) {
     display: none;
   }
 }
 
-// ─── Mobile Nav ───────────────────────────────────────────────
+// ─── Mobile Nav Menu ──────────────────────────────────────────
 .mobile-nav {
-  display: none;
-  background-color: $color-black;
-  border-bottom: 0.5px solid $color-white;
-
-  @media (max-width: $breakpoint-mobile) {
-    display: block;
-  }
-
-  // ─── Toggle button ──────────────────────────────────────
-  &__toggle {
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
-    background: none;
-    border: none;
-    color: $color-white;
-    padding: $spacing-sm $spacing-md;
-    cursor: pointer;
-    position: relative;
-    z-index: 100;
-    outline: none;
-
-    &:focus-visible {
-      outline: none;
-    }
-
-    &:hover {
-      transform: scale(1.1);
-      transition: transform 0.5s;
-    }
-  }
-
-  // ─── Full screen sliding menu ───────────────────────────
   &__menu {
     position: fixed;
     top: 0;
@@ -120,7 +81,6 @@
     }
   }
 
-  // ─── Mobile nav list ────────────────────────────────────
   &__list {
     display: flex;
     flex-direction: column;
@@ -130,11 +90,6 @@
     padding: 0;
     margin: 0;
 
-    &--rtl {
-      direction: rtl;
-    }
-
-    // reuse nav__item styles for mobile items
     .nav__item {
       font-size: 2.5rem;
 
