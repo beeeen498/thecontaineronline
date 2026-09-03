@@ -56,9 +56,92 @@ export default function ItemPage({ product, relatedProducts }) {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const { cart, addToCart, isLoading } = useCart();
 
+  // ─── Variant Options ────────────────────────────────────
+  const hasVariants = product.variants?.length > 1;
+
+  // Extract unique option names and values (e.g. { Colors: ["Jet Black", ...], Size: ["S", ...] })
+  const optionGroups = {};
+  if (hasVariants) {
+    product.variants.forEach((v) => {
+      v.selectedOptions.forEach(({ name, value }) => {
+        if (!optionGroups[name]) optionGroups[name] = [];
+        if (!optionGroups[name].includes(value)) optionGroups[name].push(value);
+      });
+    });
+  }
+
+  // Ensure Colors always appears before Size
+  const optionNames = Object.keys(optionGroups).sort((a, b) => {
+    if (a === "Colors") return -1;
+    if (b === "Colors") return 1;
+    return 0;
+  });
+
+  // Start with nothing selected — user must pick before adding to cart
+  const [selectedOptions, setSelectedOptions] = useState({});
+
+  // Find the variant that matches all selected options
+  const selectedVariant = hasVariants
+    ? product.variants.find((v) =>
+        v.selectedOptions.every(
+          ({ name, value }) => selectedOptions[name] === value,
+        ),
+      )
+    : product.variants?.[0] || null;
+
+  // Check if a specific option value is available (has stock for at least one combination)
+  // If other options aren't selected yet, ignore them
+  const isOptionAvailable = (optionName, optionValue) => {
+    return product.variants.some((v) => {
+      const matchesThis = v.selectedOptions.some(
+        (o) => o.name === optionName && o.value === optionValue,
+      );
+      const matchesOthers = v.selectedOptions.every((o) => {
+        if (o.name === optionName) return true;
+        if (!selectedOptions[o.name]) return true; // no selection yet — don't filter
+        return selectedOptions[o.name] === o.value;
+      });
+      return matchesThis && matchesOthers && v.quantityAvailable > 0;
+    });
+  };
+
+  // Handle option selection — clicking the same value again unselects it
+  const handleOptionSelect = (optionName, optionValue) => {
+    setSelectedOptions((prev) => {
+      const updated = { ...prev };
+      if (updated[optionName] === optionValue) {
+        delete updated[optionName];
+      } else {
+        updated[optionName] = optionValue;
+      }
+      return updated;
+    });
+  };
+
   // ─── Image State ──────────────────────────────────────
+  // Show images for selected color, or all product images if no color picked
+  const variantImages =
+    hasVariants && selectedOptions["Colors"]
+      ? [
+          ...new Set(
+            product.variants
+              .filter((v) =>
+                v.selectedOptions.some(
+                  (o) =>
+                    o.name === "Colors" &&
+                    o.value === selectedOptions["Colors"],
+                ),
+              )
+              .map((v) => v.image)
+              .filter(Boolean),
+          ),
+        ]
+      : [];
+
+  // Use variant images if available, otherwise fall back to product images
+  const images =
+    variantImages.length > 0 ? variantImages : product.images || [];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const images = product.images || [];
   const mainImage = images[currentImageIndex] || "";
 
   const handleCarousel = (dir) => {
@@ -85,6 +168,11 @@ export default function ItemPage({ product, relatedProducts }) {
       img.src = images[idx];
     });
   }, [currentImageIndex, images]);
+
+  // ─── Reset image index when color changes ──────────────
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [selectedOptions["Colors"]]);
 
   // ─── Product Data ─────────────────────────────────────
   const name = isEnglish ? product.englishName : product.hebrewName;
@@ -142,16 +230,21 @@ export default function ItemPage({ product, relatedProducts }) {
 
   // ─── Add to Cart ──────────────────────────────────────
   const handleAddToCart = () => {
-    if (!product.variantId) return;
-    addToCart(product.variantId, 1);
+    const variantId = hasVariants ? selectedVariant?.id : product.variantId;
+    if (!variantId) return;
+    addToCart(variantId, 1);
   };
 
   // ─── Check current cart quantity for this item ────────
+  const activeVariantId = hasVariants ? selectedVariant?.id : product.variantId;
+  const activeStock = hasVariants
+    ? (selectedVariant?.quantityAvailable ?? 0)
+    : product.quantityAvailable;
   const cartLine = cart?.lines?.edges?.find(
-    ({ node }) => node.merchandise.id === product.variantId,
+    ({ node }) => node.merchandise.id === activeVariantId,
   );
   const quantityInCart = cartLine?.node?.quantity || 0;
-  const isMaxedOut = quantityInCart >= product.quantityAvailable;
+  const isMaxedOut = quantityInCart >= activeStock;
 
   return (
     <div className={`item-page ${isHebrew ? "item-page--rtl" : ""}`}>
@@ -253,6 +346,45 @@ export default function ItemPage({ product, relatedProducts }) {
 
             {/* price */}
             <p className="item-page__price">{price}</p>
+
+            {/* ─── Variant Selectors ───────────────────────── */}
+            {hasVariants &&
+              optionNames.map((optionName) => (
+                <div key={optionName} className="item-page__option-group">
+                  <span className="item-page__option-label">
+                    {isHebrew
+                      ? optionName === "Colors"
+                        ? "צבע"
+                        : optionName === "Size"
+                          ? "מידה"
+                          : optionName
+                      : optionName}
+                    {selectedOptions[optionName] && (
+                      <>
+                        : <strong>{selectedOptions[optionName]}</strong>
+                      </>
+                    )}
+                  </span>
+
+                  <div className="item-page__option-buttons">
+                    {optionGroups[optionName].map((value) => {
+                      const available = isOptionAvailable(optionName, value);
+                      const isSelected = selectedOptions[optionName] === value;
+
+                      return (
+                        <button
+                          key={value}
+                          className={`item-page__option-btn${isSelected ? " item-page__option-btn--selected" : ""}${!available ? " item-page__option-btn--unavailable" : ""}`}
+                          onClick={() => handleOptionSelect(optionName, value)}
+                          disabled={!available}
+                        >
+                          {value}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
 
             <div className="item-page__divider" />
 
@@ -366,19 +498,25 @@ export default function ItemPage({ product, relatedProducts }) {
               <button
                 className="item-page__cta"
                 onClick={handleAddToCart}
-                disabled={isLoading || isMaxedOut}
+                disabled={
+                  isLoading || isMaxedOut || (hasVariants && !selectedVariant)
+                }
               >
                 {isLoading
                   ? isHebrew
                     ? "מוסיף..."
                     : "Adding..."
-                  : isMaxedOut
+                  : hasVariants && !selectedVariant
                     ? isHebrew
-                      ? "בעגלה"
-                      : "In Cart"
-                    : isHebrew
-                      ? "הוסף לעגלה"
-                      : "Add to Cart"}
+                      ? "בחר אפשרויות"
+                      : "Select Options"
+                    : isMaxedOut
+                      ? isHebrew
+                        ? "בעגלה"
+                        : "In Cart"
+                      : isHebrew
+                        ? "הוסף לעגלה"
+                        : "Add to Cart"}
               </button>
             ) : (
               <button className="item-page__cta" onClick={handleWhatsapp}>

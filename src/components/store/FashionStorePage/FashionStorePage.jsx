@@ -157,7 +157,9 @@ export default function FashionStorePage({ products = [] }) {
 
   if (selectedCategory !== "all") {
     filtered = filtered.filter(
-      (item) => item.categoryEnglish?.trim() === selectedCategory,
+      (item) =>
+        item.categoryEnglish?.trim().toLowerCase() ===
+        selectedCategory.toLowerCase(),
     );
   }
 

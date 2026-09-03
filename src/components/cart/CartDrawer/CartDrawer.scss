@@ -127,6 +127,13 @@
     }
   }
 
+  // ─── Variant info (color / size) ──────────────
+  &__item-variant {
+    font-size: 0.75rem;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
   &__item-price {
     font-family: var(--font-body);
     font-size: 0.875rem;

@@ -12,7 +12,18 @@ function parseMeta(metafields) {
 
 // ─── Helper — build product object from node + meta ───────────
 function buildProduct(node, meta) {
-  const variants = node.variants?.edges?.map(({ node }) => node) || [];
+  // ─── Parse all variants with their options, stock, and images ───
+  const variants =
+    node.variants?.edges?.map(({ node: v }) => ({
+      id: v.id,
+      title: v.title,
+      quantityAvailable: v.quantityAvailable ?? 0,
+      price: parseFloat(v.price?.amount || 0),
+      selectedOptions: v.selectedOptions || [],
+      image: v.image?.url || null,
+      imageAlt: v.image?.altText || null,
+    })) || [];
+
   const firstVariant = variants[0];
   const firstVariantId = firstVariant?.id || null;
   const quantityAvailable = firstVariant?.quantityAvailable ?? 0;
@@ -59,8 +70,11 @@ function buildProduct(node, meta) {
     images: node.images.edges.map(({ node }) => node.url),
     brand: meta.brand || node.vendor,
     variantId: firstVariantId,
+    variants,
     quantityAvailable,
-    inStock: meta.instock?.toLowerCase() !== "false" && quantityAvailable > 0,
+    inStock:
+      meta.instock?.toLowerCase() !== "false" &&
+      variants.some((v) => v.quantityAvailable > 0),
   };
 }
 
@@ -91,12 +105,26 @@ const METAFIELD_IDENTIFIERS = `
 `;
 
 // ─── Variants query ─────────────────────────────────────────────
+// Fetches all variants with options (size, color), price, stock, and image
 const VARIANTS_QUERY = `
-  variants(first: 1) {
+  variants(first: 100) {
     edges {
       node {
         id
+        title
         quantityAvailable
+        price {
+          amount
+          currencyCode
+        }
+        selectedOptions {
+          name
+          value
+        }
+        image {
+          url
+          altText
+        }
       }
     }
   }

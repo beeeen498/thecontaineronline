@@ -37,7 +37,9 @@ export default function CartDrawer() {
 
   // ─── Calculate total from our own product data ────────
   const total = lines.reduce((sum, { node: line }) => {
-    const matched = products.find((p) => p.variantId === line.merchandise.id);
+    const matched = products.find((p) =>
+      p.variants?.some((v) => v.id === line.merchandise.id),
+    );
     const price = isEnglish ? matched?.globalPrice : matched?.israelPrice;
     return sum + (price || 0) * line.quantity;
   }, 0);
@@ -48,7 +50,9 @@ export default function CartDrawer() {
     setIsCheckingOut(true);
 
     const total = cart.lines.edges.reduce((sum, { node: line }) => {
-      const matched = products.find((p) => p.variantId === line.merchandise.id);
+      const matched = products.find((p) =>
+        p.variants?.some((v) => v.id === line.merchandise.id),
+      );
       return sum + (matched?.israelPrice || 0) * line.quantity;
     }, 0);
 
@@ -128,8 +132,8 @@ export default function CartDrawer() {
             <div className="cart-drawer__items">
               {lines.map(({ node: line }) => {
                 // ─── Match cart line to our product data ──
-                const matched = products.find(
-                  (p) => p.variantId === line.merchandise.id,
+                const matched = products.find((p) =>
+                  p.variants?.some((v) => v.id === line.merchandise.id),
                 );
 
                 const title = isEnglish
@@ -176,6 +180,13 @@ export default function CartDrawer() {
                       >
                         {title}
                       </Link>
+
+                      {/* ─── Variant info (color/size) ───── */}
+                      {line.merchandise.title !== "Default Title" && (
+                        <p className="cart-drawer__item-variant">
+                          {line.merchandise.title}
+                        </p>
+                      )}
 
                       <p className="cart-drawer__item-price">
                         {price

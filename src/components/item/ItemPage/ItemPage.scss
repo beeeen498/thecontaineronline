@@ -161,6 +161,68 @@
     line-height: 1.2;
   }
 
+  // ─── Variant Option Selectors ───────────────────────────
+  &__option-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__option-label {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $color-text-secondary;
+
+    strong {
+      color: $color-black;
+      font-weight: 500;
+    }
+  }
+
+  &__option-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+  }
+
+  &__option-btn {
+    all: unset;
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    padding: $spacing-xs $spacing-md;
+    border: 1px solid $color-border;
+    cursor: pointer;
+    text-align: center;
+    transition:
+      border-color 0.2s ease,
+      opacity 0.2s ease;
+    box-sizing: border-box;
+
+    &:hover {
+      border-color: $color-black;
+    }
+
+    // ─── Selected state ──────────────────────────
+    &--selected {
+      border-color: $color-black;
+      background-color: $color-black;
+      color: $color-white;
+    }
+
+    // ─── Out of stock — greyed out ───────────────
+    &--unavailable {
+      opacity: 0.3;
+      cursor: not-allowed;
+      text-decoration: line-through;
+
+      &:hover {
+        border-color: $color-border;
+      }
+    }
+  }
+
   // ─── Price ──────────────────────────────────────────────
   &__price {
     font-size: 1.125rem;

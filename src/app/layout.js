@@ -63,10 +63,6 @@ export const metadata = {
   },
   alternates: {
     canonical: "https://thecontaineronline.com",
-    languages: {
-      en: "https://thecontaineronline.com",
-      he: "https://thecontaineronline.com",
-    },
   },
   robots: {
     index: true,
