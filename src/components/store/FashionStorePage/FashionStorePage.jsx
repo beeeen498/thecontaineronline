@@ -15,10 +15,10 @@ function formatItem(item, isEnglish) {
 
   const price = isEnglish
     ? globalPrice && !isNaN(globalPrice) && globalPrice > 0
-      ? `$${Math.round(globalPrice)}`
+      ? `$${Math.round(globalPrice).toLocaleString()}`
       : ""
     : israelPrice && !isNaN(israelPrice)
-      ? `₪${Math.round(israelPrice)}`
+      ? `₪${Math.round(israelPrice).toLocaleString()}`
       : "";
 
   return {

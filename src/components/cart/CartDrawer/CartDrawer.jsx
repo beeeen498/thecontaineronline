@@ -190,7 +190,7 @@ export default function CartDrawer() {
 
                       <p className="cart-drawer__item-price">
                         {price
-                          ? `${currencySymbol}${Math.round(price * line.quantity)}`
+                          ? `${currencySymbol}${Math.round(price * line.quantity).toLocaleString()}`
                           : ""}
                       </p>
 
@@ -245,7 +245,7 @@ export default function CartDrawer() {
                 <span>{isHebrew ? 'סה"כ' : "Subtotal"}</span>
                 <span>
                   {isEnglish ? "$" : "₪"}
-                  {Math.round(total)}
+                  {Math.round(total).toLocaleString()}
                 </span>
               </div>
 
