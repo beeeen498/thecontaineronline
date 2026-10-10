@@ -10,6 +10,8 @@ import { CartProvider } from "@/contexts/CartContext";
 import { CustomerProvider } from "@/contexts/CustomerContext";
 import LanguageGate from "@/components/selectLanguage/LanguageGate";
 import TopBar from "@/components/shared/Nav/TopBar";
+import { Analytics } from "@vercel/analytics/next";
+import Script from "next/script"; // accessibility
 import "@/styles/globals.scss";
 
 // ─── Font Setup ───────────────────────────────────────────────
@@ -94,6 +96,11 @@ export default function RootLayout({ children }) {
             </CustomerProvider>
           </CartProvider>
         </LanguageProvider>
+        <Analytics />
+        <Script
+          src={`https://negishot.co.il/cdn/widget.php?code=${process.env.NEXT_PUBLIC_NEGISHOT_CODE}`}
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
