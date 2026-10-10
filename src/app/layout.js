@@ -98,7 +98,7 @@ export default function RootLayout({ children }) {
         </LanguageProvider>
         <Analytics />
         <Script
-          src={`https://negishot.co.il/cdn/widget.php?code=${process.env.NEXT_PUBLIC_NEGISHOT_CODE}`}
+          src="https://negishot.co.il/cdn/widget.php?code=NGS_BED41AC79FEC"
           strategy="afterInteractive"
         />
       </body>
