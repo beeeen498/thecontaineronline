@@ -26,6 +26,8 @@ export function CartProvider({ children }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [products, setProducts] = useState([]);
+  // true once the saved cart (if any) has been loaded
+  const [isRestored, setIsRestored] = useState(false);
 
   // ─── Load existing cart from localStorage on mount ────
   // ─── Product details (Hebrew names, prices) for cart lines only ──
@@ -51,6 +53,10 @@ export function CartProvider({ children }) {
 
   // ─── Restore saved cart on mount ──────────────────────
   const restoreCart = useCallback(async (savedCartId) => {
+    if (!savedCartId) {
+      setIsRestored(true);
+      return;
+    }
     setIsLoading(true);
     try {
       const fetchedCart = await getCart(savedCartId);
@@ -63,6 +69,7 @@ export function CartProvider({ children }) {
       localStorage.removeItem(CART_ID_KEY);
     } finally {
       setIsLoading(false);
+      setIsRestored(true);
     }
   }, []);
 
@@ -75,7 +82,7 @@ export function CartProvider({ children }) {
     // stays disabled until the saved cart is back (otherwise a click in
     // that moment would start a new, empty cart).
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (savedCartId) restoreCart(savedCartId);
+    restoreCart(savedCartId);
   }, [restoreCart]);
 
   // ─── Add item to cart ──────────────────────────────────
@@ -165,6 +172,7 @@ export function CartProvider({ children }) {
         cart,
         products,
         isLoading,
+        isRestored,
         isDrawerOpen,
         addToCart,
         updateQuantity,

@@ -3,13 +3,17 @@
 Working branch: `security-fixes` · Full details for each item are in [upgrade.md](upgrade.md).
 
 ## Before merging `security-fixes` into `main`
+- [ ] **Check Hyp's dashboard first:** where are the success / error return pages set? (Hyp's docs say it's a terminal setting, so our `SuccessUrl` might be ignored and Hyp might always return to the live site.)
 - [ ] **Full checkout test** (`pnpm dev`, with `SITE_URL=http://localhost:3000` added to `.env.local` so Hyp returns to your machine)
+  - [ ] Cart → Checkout opens the shipping form; fill it in (use a **Hebrew name** in one test) → Hyp page shows your details pre-filled
+  - [ ] Logged in: the form is pre-filled with your account details
   - [ ] Hebrew: add an item → Checkout → Hyp page shows the right ₪ amount
   - [ ] English: add an item → Checkout → Hyp page shows the right $ amount
   - [ ] Shopify Admin → Orders → Drafts shows a `hyp-pending` draft order with the right items
   - [ ] Pay for a cheap item (then refund in Hyp), or use a Hyp test terminal if available
   - [ ] Success page shows "Payment Successful" and the cart is cleared
   - [ ] Shopify shows a real order tagged `hyp-paid`, with the Hyp transaction in the note, and stock went down
+  - [ ] The order has the shipping address, email, phone, "Free shipping", and total = amount paid
   - [ ] Refresh the success page → still success, no duplicate order
   - [ ] Cancel on the Hyp page → "Payment Failed" page, no order created
 - [ ] Merge into `main` and deploy
@@ -25,13 +29,15 @@ Working branch: `security-fixes` · Full details for each item are in [upgrade.m
 - [ ] Optional: move to Shopify Customer Account API (newer login system, Shopify-hosted login page)
 
 ## Open questions / follow-ups
-- [ ] Shipping address isn't collected anywhere: decide how to get it (checkout form, Hyp fields, or contact the customer)
+- [ ] **Ask your accountant:** orders are created tax-exempt so the total matches the price paid. Alternative: Shopify Settings → Taxes → "All prices include tax" (orders then show VAT inside the price). See report.md.
+- [ ] English (USD) orders are recorded in Shopify in ₪ at the Israel price; the real amount paid in $ is in the order's `hyp_amount` / `hyp_currency` attributes
 - [ ] Abandoned checkouts leave open draft orders in Shopify: delete them from time to time, or automate it
 - [ ] Products with several variants at different prices are charged the lowest price: confirm this is OK
 - [ ] Two buyers paying for the same one-of-a-kind item at the same moment could both succeed: add rate limiting + a short stock hold later (see report.md)
 - [ ] Optional: Shopify's suggestions for Inventory Manager (IP restrictions, expiring access tokens)
 
 ## Done
+- [x] Shipping details at checkout: new `/checkout` page (address form + order summary), saved on the Shopify order, pre-fills Hyp's page; free shipping, Israel + worldwide, guest checkout (live-tested, report.md)
 - [x] Upgrade Next.js 16.4.6 / React 19.3.1, `pnpm audit` clean (#5)
 - [x] Remove logs that exposed Hyp keys (#4): key rotation not needed, no sales were made
 - [x] Server-side checkout with Shopify draft orders (#1, #2, #3, #6, #7, #13, #14, #15)

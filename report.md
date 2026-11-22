@@ -1,3 +1,45 @@
+# Test Report — Shipping details at checkout
+_2026-11-22 · branch `security-fixes`_
+
+## Result: ✅ 39/39 checks pass (live: real Shopify store + Hyp signing, no payment made, all test data deleted)
+
+### Validation (same rules in the form and on the server)
+| Check | Result |
+|---|---|
+| Required fields flagged; apartment and postal code optional | ✅ |
+| State/region required only for countries that use it (US, CA, AU, …) | ✅ |
+| Bad email / phone / unknown country / too long / non-text values refused | ✅ |
+| `#` refused (it would cut off Hyp's redirect back to the site) | ✅ |
+| Server refuses bad or missing details, and creates **no** draft order | ✅ |
+
+### Checkout (live)
+| Check | Result |
+|---|---|
+| Hebrew / Israel: draft order has the full address, email and phone | ✅ |
+| Draft total stays ₪89: no VAT added on top (`taxExempt`) | ✅ |
+| "Free shipping" line on the order | ✅ |
+| Amounts unchanged: ₪89 (Hebrew), $31 (English) | ✅ |
+| Hyp gets name, email, phone, street, city; **Hyp's page shows them pre-filled**, Hebrew included | ✅ |
+| US address with state "NY" → Shopify stores the state code | ✅ |
+| Canada with region typed as "Ontario" → kept on the city line + saved as an order attribute | ✅ |
+| Logged-in customer → order linked to their account | ✅ |
+| `/checkout` page loads in Hebrew (RTL) and English, not indexed | ✅ |
+| Lint 0 problems, build passes | ✅ |
+| Cleanup: no test drafts or test customers left | ✅ |
+
+### Found while testing (fixed)
+- **Shopify added 18% VAT on top of the price** once an Israeli address was set (₪89 → ₪105.02), because store prices are set as "not including tax". Hyp charges ₪89, so the order would have looked underpaid. Orders are now created tax-exempt, so the total equals what the customer paid. **Ask your accountant** whether you'd rather switch Shopify to "prices include tax" (Settings → Taxes and duties) so orders show the VAT inside the ₪89.
+- **Shopify refused Israeli phone numbers** like `050-1234567` in the order's phone field (it needs international format). The phone is now stored on the shipping address, which accepts any format.
+- **Unknown state codes are silently dropped by Shopify.** A region that isn't a 2–3 letter code is added to the city line, and the typed region is always saved as an order attribute.
+- **Hebrew on Hyp's page:** the page uses the older `windows-1255` encoding. `UTF8=True` makes Hyp convert our text, so Hebrew shows correctly (this also fixes the "×" in the order description). `UTF8out=True` should keep Hebrew intact in the redirect back. **This last part can only be confirmed by the real paid test.**
+- **Shopify creates a customer record from a guest's email.** That's normal, but the test had to delete one extra test customer (done).
+
+### Not tested yet (needs the paid test)
+- The full payment and the redirect back with Hebrew names (signature check with `UTF8out`).
+- Whether Hyp uses our `SuccessUrl`, or the return address set in the terminal settings (Hyp's docs list it as a terminal setting).
+
+---
+
 # Test Report — "Delete account" fix
 _2026-11-22 · branch `security-fixes`_
 

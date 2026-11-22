@@ -10,12 +10,11 @@ import {
 } from "@/lib/shopifyQueries";
 import { deleteCustomer } from "@/lib/shopifyAdmin";
 import { sendShopEmail } from "@/lib/email";
+import { CUSTOMER_COOKIE as COOKIE } from "@/lib/session";
 
 // ─── Customer session (server only) ───────────────────────────
 // The Shopify customer access token lives in an httpOnly cookie, so
 // page scripts (including third-party widgets) can never read it.
-
-const COOKIE = "customer_token";
 
 async function setTokenCookie({ accessToken, expiresAt }) {
   (await cookies()).set(COOKIE, accessToken, {

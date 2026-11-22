@@ -625,6 +625,17 @@ export const getCustomer = async (accessToken) => {
         email
         phone
         createdAt
+        defaultAddress {
+          firstName
+          lastName
+          address1
+          address2
+          city
+          provinceCode
+          zip
+          countryCodeV2
+          phone
+        }
         orders(first: 10, sortKey: PROCESSED_AT, reverse: true) {
           edges {
             node {

@@ -1,0 +1,254 @@
+@use "@/styles/variables" as *;
+
+// ─── Checkout Page ────────────────────────────────────────────
+// Shipping form + order summary, then on to Hyp's payment page.
+.checkout {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: $spacing-xl $spacing-lg;
+  direction: ltr;
+  font-family: var(--font-body);
+  box-sizing: border-box;
+  width: 100%;
+
+  @media (max-width: $breakpoint-tablet) {
+    padding: $spacing-lg $spacing-md;
+  }
+
+  &--rtl {
+    direction: rtl;
+  }
+
+  // ─── Title ──────────────────────────────────────────────
+  &__title {
+    font-family: var(--font-headers);
+    font-weight: 400;
+    font-size: 2.5rem;
+    text-align: center;
+    margin: 0 0 $spacing-lg;
+  }
+
+  &__heading {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 0 $spacing-md;
+  }
+
+  // ─── Status / empty ─────────────────────────────────────
+  &__status {
+    text-align: center;
+    color: $color-text-secondary;
+    margin: $spacing-xl 0 $spacing-md;
+  }
+
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  // ─── Layout ─────────────────────────────────────────────
+  &__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: $spacing-xl;
+    align-items: start;
+
+    @media (max-width: $breakpoint-tablet) {
+      grid-template-columns: minmax(0, 1fr);
+      gap: $spacing-lg;
+    }
+  }
+
+  // ─── Form ───────────────────────────────────────────────
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $spacing-md;
+
+    @media (max-width: $breakpoint-mobile) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+
+    &--wide {
+      grid-column: 1 / -1;
+    }
+  }
+
+  &__label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $color-text-secondary;
+  }
+
+  &__input {
+    font-family: var(--font-body);
+    font-size: 1rem; // 16px+ stops iOS zooming in on focus
+    border: 1px solid $color-border;
+    border-radius: 0;
+    padding: $spacing-sm $spacing-md;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #fff;
+    color: $color-text-primary;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      border-color: $color-black;
+    }
+
+    &--error {
+      border-color: $color-error;
+    }
+  }
+
+  // Inputs marked dir="ltr" (email, phone, zip) still align with the page
+  &--rtl input[dir="ltr"] {
+    text-align: right;
+  }
+
+  &__error {
+    color: $color-error;
+    font-size: 0.75rem;
+  }
+
+  &__form-error {
+    color: $color-error;
+    font-size: 0.875rem;
+    margin: 0;
+  }
+
+  &__note {
+    font-size: 0.8125rem;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  // ─── Buttons ────────────────────────────────────────────
+  &__btn {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: $spacing-md $spacing-lg;
+    cursor: pointer;
+    border: none;
+    text-align: center;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    &--primary {
+      background-color: $color-black;
+      color: $color-white;
+
+      &:hover:not(:disabled) {
+        opacity: 0.8;
+      }
+    }
+
+    &--secondary {
+      background: none;
+      border: 1px solid $color-black;
+      color: $color-black;
+
+      &:hover {
+        background-color: $color-black;
+        color: $color-white;
+      }
+    }
+  }
+
+  // ─── Summary ────────────────────────────────────────────
+  &__summary {
+    border: 1px solid $color-border;
+    padding: $spacing-lg;
+
+    @media (max-width: $breakpoint-tablet) {
+      order: -1; // show what's being bought above the form on phones
+      padding: $spacing-md;
+    }
+  }
+
+  &__items {
+    list-style: none;
+    margin: 0 0 $spacing-md;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  &__item-image {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    background-color: $color-white;
+  }
+
+  &__item-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__item-name {
+    font-size: 0.9375rem;
+    overflow-wrap: anywhere;
+  }
+
+  &__item-variant,
+  &__item-qty {
+    font-size: 0.8125rem;
+    color: $color-text-secondary;
+  }
+
+  &__item-price {
+    font-size: 0.9375rem;
+    white-space: nowrap;
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    padding: $spacing-sm 0;
+    border-top: 1px solid $color-border;
+    font-size: 0.9375rem;
+
+    &--total {
+      font-weight: 600;
+      font-size: 1.0625rem;
+    }
+  }
+}

@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { createHypPayment } from "@/app/actions/createHypPayment";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { IoMdClose } from "react-icons/io";
 import { FiMinus, FiPlus, FiTrash2 } from "react-icons/fi";
 import { useCart } from "@/contexts/CartContext";
@@ -28,7 +28,7 @@ export default function CartDrawer() {
   const { language } = useLanguage();
   const isHebrew = language === "Hebrew";
   const isEnglish = !isHebrew;
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const router = useRouter();
 
   // ─── Track which lines hit their stock limit ──────────
   const [maxedOutLines, setMaxedOutLines] = useState({});
@@ -44,27 +44,11 @@ export default function CartDrawer() {
     return sum + (price || 0) * line.quantity;
   }, 0);
 
-  // ─── Checkout handler ─────────────────────────────────
-  // Only the cart ID is sent — the server prices the cart itself.
-  const [checkoutError, setCheckoutError] = useState(false);
-
-  const handleCheckout = async () => {
-    if (!cart?.id || !cart?.lines?.edges?.length) return;
-    setIsCheckingOut(true);
-    setCheckoutError(false);
-
-    try {
-      const result = await createHypPayment({ cartId: cart.id, language });
-      if (result.success) {
-        window.location.href = result.paymentUrl;
-        return;
-      }
-      console.error("Payment error:", result.error);
-    } catch (error) {
-      console.error("Payment error:", error);
-    }
-    setCheckoutError(true);
-    setIsCheckingOut(false);
+  // ─── Checkout: go to the shipping details page ────────
+  const handleCheckout = () => {
+    if (!cart?.lines?.edges?.length) return;
+    closeDrawer();
+    router.push("/checkout");
   };
 
   // ─── Quantity handlers ────────────────────────────────
@@ -243,24 +227,10 @@ export default function CartDrawer() {
               <button
                 className="cart-drawer__checkout"
                 onClick={handleCheckout}
-                disabled={isLoading || isCheckingOut}
+                disabled={isLoading}
               >
-                {isCheckingOut
-                  ? isHebrew
-                    ? "מעבד..."
-                    : "Processing..."
-                  : isHebrew
-                    ? "לתשלום"
-                    : "Checkout"}
+                {isHebrew ? "לתשלום" : "Checkout"}
               </button>
-
-              {checkoutError && (
-                <p className="cart-drawer__max-stock" role="alert">
-                  {isHebrew
-                    ? "לא ניתן להתחיל את התשלום כרגע. נסו שוב או צרו קשר."
-                    : "Couldn't start checkout. Please try again or contact us."}
-                </p>
-              )}
             </div>
           </>
         )}

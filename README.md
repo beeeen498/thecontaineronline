@@ -35,7 +35,7 @@ Put these in `.env.local` (never commit it), and in Vercel → Project → Setti
 ## How checkout works
 
 1. The cart is a Shopify cart; its ID is kept in the browser.
-2. **Checkout:** the browser sends only the cart ID. The server prices the cart (₪ for Hebrew, $ for English), creates a Shopify **draft order** (tag `hyp-pending`), and redirects to Hyp's payment page. See `src/app/actions/createHypPayment.js`.
+2. **Checkout:** the cart's Checkout button opens `/checkout`, where the customer enters shipping details (free shipping, Israel + worldwide, guests allowed). The browser sends the cart ID and those details. The server validates them, prices the cart (₪ for Hebrew, $ for English), creates a Shopify **draft order** with the address (tag `hyp-pending`), and redirects to Hyp's payment page with the customer's details pre-filled. See `src/app/actions/createHypPayment.js`.
 3. **After payment:** Hyp redirects to `/checkout/success`. The server verifies the payment with Hyp and checks the amount against the draft order. It then completes the draft order, so Shopify creates the real order (tag `hyp-paid`) and lowers stock. See `src/app/actions/handlePaymentSuccess.js`.
 4. Abandoned checkouts leave open draft orders in Shopify Admin → Orders → Drafts. Those can be deleted.
 

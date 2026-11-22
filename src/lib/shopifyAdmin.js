@@ -53,9 +53,54 @@ function throwOnUserErrors(userErrors) {
 // ─── Create a pending draft order for a checkout ──────────────
 // lines: [{ variantId, quantity }]
 // attributes: [{ key, value }] — stored on the draft order
+// details: validated checkout details (see src/lib/checkoutDetails.js)
+// customerId: Shopify customer GID when the shopper is logged in
 // Inventory is NOT reserved: anyone can start a checkout, so reserving
 // would let visitors make items look sold out without paying.
-export async function createDraftOrder({ lines, attributes, note }) {
+export async function createDraftOrder({ lines, attributes, note, details, customerId }) {
+  const input = {
+    lineItems: lines.map(({ variantId, quantity }) => ({
+      variantId,
+      quantity,
+    })),
+    customAttributes: attributes,
+    note,
+    tags: ["hyp-pending"],
+    // Shop prices don't include tax, and Shopify would add VAT on top
+    // once an address is set. The customer pays exactly the listed
+    // price through Hyp, so the order total must match it.
+    taxExempt: true,
+    shippingLine: {
+      title: "Free shipping",
+      priceWithCurrency: { amount: "0", currencyCode: "ILS" },
+    },
+  };
+
+  if (details) {
+    // A state/region that looks like a code (NY, ON, NSW) goes in
+    // provinceCode; Shopify silently drops codes it doesn't know, so
+    // anything else is added to the city line to keep it on the label.
+    const regionIsCode = /^[A-Za-z]{2,3}$/.test(details.region);
+    input.email = details.email;
+    input.shippingAddress = {
+      firstName: details.firstName,
+      lastName: details.lastName,
+      address1: details.address1,
+      address2: details.address2 || undefined,
+      city:
+        details.region && !regionIsCode
+          ? `${details.city}, ${details.region}`
+          : details.city,
+      provinceCode: regionIsCode ? details.region.toUpperCase() : undefined,
+      zip: details.zip || undefined,
+      countryCode: details.country,
+      // Phone goes on the address only: the order-level phone field
+      // rejects local formats like 050-1234567.
+      phone: details.phone,
+    };
+  }
+  if (customerId) input.purchasingEntity = { customerId };
+
   const data = await adminRequest(
     `mutation draftOrderCreate($input: DraftOrderInput!) {
       draftOrderCreate(input: $input) {
@@ -63,17 +108,7 @@ export async function createDraftOrder({ lines, attributes, note }) {
         userErrors { field message }
       }
     }`,
-    {
-      input: {
-        lineItems: lines.map(({ variantId, quantity }) => ({
-          variantId,
-          quantity,
-        })),
-        customAttributes: attributes,
-        note,
-        tags: ["hyp-pending"],
-      },
-    },
+    { input },
   );
 
   throwOnUserErrors(data.draftOrderCreate.userErrors);

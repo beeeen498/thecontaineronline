@@ -18,6 +18,8 @@ _Last updated: 2026-11-22_
   5. `9a144e0`: progress.md
   6. `9f76bda`: step 5: httpOnly login cookie, lint clean, CI, cleanup
   7. `1e603ca`: Delete account via Admin API; email/password change keeps the customer logged in
+  8. `8661a3b`: progress.md commit list
+  9. _(next commit)_: shipping details at checkout
 - To undo everything: `git checkout main`. To return to a step: `git reset --hard <hash>`.
 
 ## Plan (from upgrade.md "Suggested order of work")
@@ -28,6 +30,7 @@ _Last updated: 2026-11-22_
 | 3 | Contact form (#8), security headers / CSP (#10 #11) | ✅ done · ⏳ user tasks (Resend domain, CSP console check) |
 | 4 | SEO language rendering (#9), caching + cart catalog (#17 #18) | ✅ done · ⏳ browser check |
 | 5 | Auth token → httpOnly cookie (#12); CI, remove `package-lock.json`, README, lint errors (#19–24); "Delete account" fix | ✅ done, live-tested · ⏳ GitHub secrets, browser look check |
+| + | Shipping details at checkout | ✅ done, live-tested · ⏳ paid test |
 
 ## What changed, by area
 
@@ -79,11 +82,21 @@ Flow now:
 - `package-lock.json` removed; `"packageManager": "pnpm@11.5.0"`; README rewritten; `.github/workflows/ci.yml` (install, audit high, lint, build; needs 2 GitHub secrets); `.github/dependabot.yml`.
 - **Lint baseline is now 0.** Any lint problem is new.
 
+### Shipping details at checkout
+- Cart drawer "Checkout" now goes to **`/checkout`** (`src/app/checkout/page.js`, `src/components/checkout/CheckoutPage/`): shipping form + order summary. Hebrew → Israel preselected; logged-in customers pre-filled from their account (`defaultAddress` added to `getCustomer`). Pre-fill and defaults are set during render, not in effects (lint).
+- `src/lib/checkoutDetails.js`: one validation used by the form and the server. `src/lib/countries.js`: Shopify's country codes; names via `Intl.DisplayNames`; `REGION_COUNTRIES` need a state field.
+- `createHypPayment({ cartId, language, details })` validates details (`invalid_details` + `fields`), links the logged-in customer (cookie name now in `src/lib/session.js`), passes `details` to `createDraftOrder`, and pre-fills Hyp with `ClientName`, `ClientLName`, `email`, `cell`, `street`, `city`. If Hyp refuses to sign, it retries once without those fields.
+- Hyp: `UTF8=True` (Hyp's page is windows-1255; Hyp converts) and `UTF8out=True` (redirect back in UTF-8). Hyp has **no zip/country fields**; the full address lives in Shopify.
+- `createDraftOrder`: `email`, `shippingAddress` (phone goes here: the order-level `phone` rejects local formats), `shippingLine` "Free shipping" ₪0, **`taxExempt: true`** (store prices exclude tax; otherwise Shopify adds 18% VAT and the total ≠ amount paid), `purchasingEntity.customerId` when logged in. A region that isn't a 2–3 letter code goes on the city line; the region is also saved as attribute `region`.
+- `CartContext` exposes `isRestored` (saved cart finished loading), so `/checkout` doesn't flash "empty cart".
+- Shopify creates a customer record from a guest's email when a draft order is created; tests delete it.
+
 ## Decisions made by the user
 - Fix work happens on branch `security-fixes`; commit after each step.
 - No Hyp key rotation (no sales ever made).
 - Keep the product loading screen (noindex instead of a real 404).
 - Keep track of remaining work in `todo.md`; report test results in `report.md`.
+- Shipping: own form before Hyp (details pre-filled on Hyp's page), **free shipping**, **Israel + worldwide**, **guest checkout allowed**.
 
 ## How to test (reusable)
 - `pnpm audit --prod`, `pnpm build`, `pnpm lint`. Lint baseline: **0 problems** (since step 5).
@@ -91,11 +104,13 @@ Flow now:
 - Live checkout tests ran node scripts against the real store, using an alias loader for `@/` imports. They created draft orders and deleted them afterwards (`draftOrderDelete`). Never complete a draft order in tests: that creates a real order and lowers stock.
 - Contact-form tests stubbed `resend` and `next/headers` so no email is sent.
 - Login tests stub `next/headers` cookies with an in-memory jar. The live account test registers a throwaway `delete-test-<time>@example.com` customer and deletes it (the Admin `customerDelete` cleanup runs in `finally`). Afterwards, check that no `email:delete-test*` customers are left.
+- Shipping test (`shipping-test.mjs` in the scratchpad) also deletes guest customers Shopify creates from test emails (`buyer@example.com`).
+- Hyp's payment page is windows-1255: decode it with `TextDecoder("windows-1255")` when checking pre-filled values. Signing alone (APISign What=SIGN) never charges anything.
 - Product used in tests: Dor Jug `gid://shopify/ProductVariant/45347877388322` (stock 1, ₪89 / $31).
 
 ## Open items needing the user
 See `todo.md`. Main ones:
-1. Full paid checkout test (needs `SITE_URL=http://localhost:3000` in `.env.local`).
+1. Check where Hyp's return pages are configured, then the full paid checkout test (needs `SITE_URL=http://localhost:3000` in `.env.local`), including a Hebrew name.
 2. Verify the domain in Resend and set `CONTACT_FROM_EMAIL`.
 3. Check the browser console for CSP report-only warnings; if none, enforce the CSP.
 4. Browser check of the language picker and language switching.
