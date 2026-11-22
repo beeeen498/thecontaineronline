@@ -5,10 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import {
-  verifyHypPayment,
-  updateInventoryAfterPayment,
-} from "@/app/actions/handlePaymentSuccess";
+import { confirmHypPayment } from "@/app/actions/handlePaymentSuccess";
 import "./SuccessPage.scss";
 
 // ─── SuccessPage ──────────────────────────────────────────────
@@ -40,30 +37,19 @@ export default function SuccessPage() {
           paramsObj[key] = value;
         });
 
-        // ─── Verify with Hyp Pay ──────────────────────────
-        const isValid = await verifyHypPayment(paramsObj);
+        // ─── Verify payment + record order (server) ───────
+        const { success } = await confirmHypPayment(paramsObj);
 
-        if (!isValid) {
+        if (!success) {
           setStatus("failed");
           return;
         }
 
-        // ─── Update Shopify inventory ──────────────────────
-        const cartLinesRaw = sessionStorage.getItem("hyp-cart-lines");
-        const cartLines = cartLinesRaw ? JSON.parse(cartLinesRaw) : [];
-
-        if (cartLines.length > 0) {
-          await updateInventoryAfterPayment(cartLines);
-        }
-
-        // ─── Clear cart and sessionStorage ────────────────
-        sessionStorage.removeItem("hyp-cart-lines");
         clearCart();
-
         setStatus("success");
       } catch (error) {
         console.error("Error processing payment:", error);
-        setStatus("success"); // show success even if inventory update fails
+        setStatus("failed");
       }
     };
 

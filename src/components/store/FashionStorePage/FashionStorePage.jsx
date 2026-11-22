@@ -182,12 +182,6 @@ export default function FashionStorePage({ products = [] }) {
     currentPage * ITEMS_PER_PAGE,
   );
 
-  console.log(
-    "first product colors:",
-    products[0]?.colorsEnglish,
-    products[0]?.colorsHebrew,
-  );
-
   return (
     <StoreLayout
       filters={filters}

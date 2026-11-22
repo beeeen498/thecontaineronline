@@ -10,6 +10,25 @@ function parseMeta(metafields) {
   return meta;
 }
 
+// ─── Helper — price rules (shared by display and checkout) ────
+// globalPrice: USD price from the "globalprice" metafield (money JSON or number)
+// israelPrice: ILS price = product's lowest variant price
+export function parseGlobalPrice(value) {
+  if (!value) return null;
+  try {
+    const parsed = JSON.parse(value);
+    const amount = typeof parsed === "object" ? parsed?.amount : parsed;
+    return amount ? Math.round(parseFloat(amount)) : null;
+  } catch {
+    const amount = Math.round(parseFloat(value));
+    return Number.isFinite(amount) ? amount : null;
+  }
+}
+
+export function parseIsraelPrice(minVariantPriceAmount) {
+  return Math.round(parseFloat(minVariantPriceAmount));
+}
+
 // ─── Helper — build product object from node + meta ───────────
 function buildProduct(node, meta) {
   // ─── Parse all variants with their options, stock, and images ───
@@ -35,17 +54,8 @@ function buildProduct(node, meta) {
     hebrewName: meta.hebrewname,
     englishDescription: meta.englishdescription || node.description,
     hebrewDescription: meta.hebrewdescription,
-    globalPrice: (() => {
-      try {
-        const parsed = JSON.parse(meta.globalprice);
-        return parsed?.amount ? Math.round(parseFloat(parsed.amount)) : null;
-      } catch {
-        return meta.globalprice
-          ? Math.round(parseFloat(meta.globalprice))
-          : null;
-      }
-    })(),
-    israelPrice: Math.round(parseFloat(node.priceRange.minVariantPrice.amount)),
+    globalPrice: parseGlobalPrice(meta.globalprice),
+    israelPrice: parseIsraelPrice(node.priceRange.minVariantPrice.amount),
     categoryEnglish: meta.subcategoryenglish || meta.productcategory,
     categoryHebrew: meta.subcategoryhebrew || meta.productcategory,
     typeOfItem:
@@ -211,8 +221,9 @@ export const getFashionProducts = async () => {
 
 // ─── getProductByHandle ───────────────────────────────────────
 export const getProductByHandle = async (handle) => {
-  const { data } = await client.request(`{
-    productByHandle(handle: "${handle}") {
+  const { data } = await client.request(
+    `query productByHandle($handle: String!) {
+    productByHandle(handle: $handle) {
       id
       handle
       title
@@ -234,7 +245,9 @@ export const getProductByHandle = async (handle) => {
       ${METAFIELD_IDENTIFIERS}
       ${VARIANTS_QUERY}
     }
-  }`);
+  }`,
+    { variables: { handle } },
+  );
 
   if (!data.productByHandle) return null;
 
@@ -423,6 +436,47 @@ export const getCart = async (cartId) => {
   );
 
   return data.cart;
+};
+
+// ─── Checkout pricing ─────────────────────────────────────────
+// Returns { [variantId]: { israelPrice, globalPrice, title } } using the
+// same price rules as the storefront display. Used server-side only.
+export const getVariantPricing = async (variantIds) => {
+  const { data } = await client.request(
+    `
+    query variantPricing($ids: [ID!]!) {
+      nodes(ids: $ids) {
+        ... on ProductVariant {
+          id
+          title
+          product {
+            title
+            priceRange {
+              minVariantPrice {
+                amount
+              }
+            }
+            globalprice: metafield(namespace: "custom", key: "globalprice") {
+              value
+            }
+          }
+        }
+      }
+    }
+  `,
+    { variables: { ids: variantIds } },
+  );
+
+  const pricing = {};
+  data.nodes?.forEach((node) => {
+    if (!node?.id || !node.product) return;
+    pricing[node.id] = {
+      title: `${node.product.title}${node.title !== "Default Title" ? ` — ${node.title}` : ""}`,
+      israelPrice: parseIsraelPrice(node.product.priceRange.minVariantPrice.amount),
+      globalPrice: parseGlobalPrice(node.product.globalprice?.value),
+    };
+  });
+  return pricing;
 };
 
 // ─── Customer Mutations ────────────────────────────────────────

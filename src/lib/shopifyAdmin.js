@@ -1,118 +1,124 @@
 // ─── Shopify Admin API ────────────────────────────────────────
-// Server-side only — never import this in client components
-// Uses Admin API token to update inventory after payment
+// Server-side only — never import this in client components.
+// Used by checkout to record orders as Shopify draft orders.
+// Completing a draft order creates a real Shopify order and lets
+// Shopify decrease inventory itself.
+//
+// Required Admin API scopes: read_draft_orders, write_draft_orders
 
 const SHOPIFY_STORE = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
 const ADMIN_TOKEN = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
+const ADMIN_API_VERSION = "2026-01";
 
-// ─── Decrease inventory by quantity ───────────────────────────
-// variantId: Shopify variant gid (e.g. gid://shopify/ProductVariant/123)
-// quantity: how many to decrease (usually 1)
-export async function decreaseInventory(variantId, quantity = 1) {
-  // ─── Step 1: Get inventory item ID from variant ──────────
-  const variantResponse = await fetch(
-    `https://${SHOPIFY_STORE}/admin/api/2025-10/graphql.json`,
+// ─── Low-level request helper ─────────────────────────────────
+// Throws on HTTP errors and top-level GraphQL errors so failures
+// are never silently ignored.
+async function adminRequest(query, variables = {}) {
+  if (!SHOPIFY_STORE || !ADMIN_TOKEN) {
+    throw new Error("Shopify Admin API is not configured");
+  }
+
+  const response = await fetch(
+    `https://${SHOPIFY_STORE}/admin/api/${ADMIN_API_VERSION}/graphql.json`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'X-Shopify-Access-Token': ADMIN_TOKEN,
+        "Content-Type": "application/json",
+        "X-Shopify-Access-Token": ADMIN_TOKEN,
       },
-      body: JSON.stringify({
-        query: `{
-          productVariant(id: "${variantId}") {
-            inventoryItem {
-              id
-              inventoryLevels(first: 1) {
-                edges {
-                  node {
-                    id
-                    location {
-                      id
-                    }
-                    quantities(names: ["available"]) {
-                      name
-                      quantity
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }`,
-      }),
-    }
+      body: JSON.stringify({ query, variables }),
+      signal: AbortSignal.timeout(15000),
+      cache: "no-store",
+    },
   );
 
-  const variantData = await variantResponse.json();
-  const inventoryItem = variantData.data?.productVariant?.inventoryItem;
-  const inventoryLevel = inventoryItem?.inventoryLevels?.edges?.[0]?.node;
-
-  if (!inventoryLevel) {
-    console.error('Could not find inventory level for variant:', variantId);
-    return { success: false, error: 'Inventory level not found' };
+  if (!response.ok) {
+    throw new Error(`Shopify Admin API HTTP ${response.status}`);
   }
 
-  const inventoryItemId = inventoryItem.id;
-  const locationId = inventoryLevel.location.id;
-  const currentQuantity = inventoryLevel.quantities?.[0]?.quantity ?? 0;
-
-  if (currentQuantity <= 0) {
-    return { success: false, error: 'Item already out of stock' };
+  const json = await response.json();
+  if (json.errors?.length) {
+    throw new Error(`Shopify Admin API: ${json.errors[0].message}`);
   }
+  return json.data;
+}
 
-  // ─── Step 2: Adjust inventory quantity ───────────────────
-  const adjustResponse = await fetch(
-    `https://${SHOPIFY_STORE}/admin/api/2025-10/graphql.json`,
+function throwOnUserErrors(userErrors) {
+  if (userErrors?.length) {
+    throw new Error(`Shopify Admin API: ${userErrors[0].message}`);
+  }
+}
+
+// ─── Create a pending draft order for a checkout ──────────────
+// lines: [{ variantId, quantity }]
+// attributes: [{ key, value }] — stored on the draft order
+// Inventory is reserved for 30 minutes while the customer pays.
+export async function createDraftOrder({ lines, attributes, note }) {
+  const reserveUntil = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+
+  const data = await adminRequest(
+    `mutation draftOrderCreate($input: DraftOrderInput!) {
+      draftOrderCreate(input: $input) {
+        draftOrder { id }
+        userErrors { field message }
+      }
+    }`,
     {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Shopify-Access-Token': ADMIN_TOKEN,
+      input: {
+        lineItems: lines.map(({ variantId, quantity }) => ({
+          variantId,
+          quantity,
+        })),
+        customAttributes: attributes,
+        note,
+        tags: ["hyp-pending"],
+        reserveInventoryUntil: reserveUntil,
       },
-      body: JSON.stringify({
-        query: `
-          mutation inventoryAdjustQuantities($input: InventoryAdjustQuantitiesInput!) {
-            inventoryAdjustQuantities(input: $input) {
-              userErrors {
-                field
-                message
-              }
-              inventoryAdjustmentGroup {
-                createdAt
-                reason
-                changes {
-                  name
-                  delta
-                }
-              }
-            }
-          }
-        `,
-        variables: {
-          input: {
-            reason: 'correction',
-            name: 'available',
-            changes: [
-              {
-                inventoryItemId,
-                locationId,
-                delta: -quantity,
-              },
-            ],
-          },
-        },
-      }),
-    }
+    },
   );
 
-  const adjustData = await adjustResponse.json();
-  const userErrors = adjustData.data?.inventoryAdjustQuantities?.userErrors;
+  throwOnUserErrors(data.draftOrderCreate.userErrors);
+  return data.draftOrderCreate.draftOrder;
+}
 
-  if (userErrors?.length > 0) {
-    console.error('Inventory adjust errors:', userErrors);
-    return { success: false, error: userErrors[0].message };
-  }
+// ─── Fetch a draft order ──────────────────────────────────────
+export async function getDraftOrder(id) {
+  const data = await adminRequest(
+    `query draftOrder($id: ID!) {
+      draftOrder(id: $id) {
+        id
+        status
+        customAttributes { key value }
+      }
+    }`,
+    { id },
+  );
+  return data.draftOrder;
+}
 
-  return { success: true };
+// ─── Mark a draft order as paid and turn it into an order ─────
+export async function completeDraftOrder(id, { note }) {
+  const updated = await adminRequest(
+    `mutation draftOrderUpdate($id: ID!, $input: DraftOrderInput!) {
+      draftOrderUpdate(id: $id, input: $input) {
+        draftOrder { id }
+        userErrors { field message }
+      }
+    }`,
+    { id, input: { note, tags: ["hyp-paid"] } },
+  );
+  throwOnUserErrors(updated.draftOrderUpdate.userErrors);
+
+  const data = await adminRequest(
+    `mutation draftOrderComplete($id: ID!) {
+      draftOrderComplete(id: $id) {
+        draftOrder { id status order { id name } }
+        userErrors { field message }
+      }
+    }`,
+    { id },
+  );
+
+  throwOnUserErrors(data.draftOrderComplete.userErrors);
+  return data.draftOrderComplete.draftOrder;
 }

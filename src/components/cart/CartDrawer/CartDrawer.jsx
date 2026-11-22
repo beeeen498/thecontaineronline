@@ -44,36 +44,27 @@ export default function CartDrawer() {
     return sum + (price || 0) * line.quantity;
   }, 0);
 
-  // ─── Checkout handler — appends locale to URL ─────────
+  // ─── Checkout handler ─────────────────────────────────
+  // Only the cart ID is sent — the server prices the cart itself.
+  const [checkoutError, setCheckoutError] = useState(false);
+
   const handleCheckout = async () => {
-    if (!cart?.lines?.edges?.length) return;
+    if (!cart?.id || !cart?.lines?.edges?.length) return;
     setIsCheckingOut(true);
+    setCheckoutError(false);
 
-    const total = cart.lines.edges.reduce((sum, { node: line }) => {
-      const matched = products.find((p) =>
-        p.variants?.some((v) => v.id === line.merchandise.id),
-      );
-      return sum + (matched?.israelPrice || 0) * line.quantity;
-    }, 0);
-
-    const cartLines = cart.lines.edges.map(({ node: line }) => ({
-      variantId: line.merchandise.id,
-      quantity: line.quantity,
-    }));
-    sessionStorage.setItem("hyp-cart-lines", JSON.stringify(cartLines));
-
-    const result = await createHypPayment({
-      amount: total,
-      orderId: `TC-${Date.now()}`,
-      language,
-    });
-
-    if (result.success) {
-      window.location.href = result.paymentUrl;
-    } else {
+    try {
+      const result = await createHypPayment({ cartId: cart.id, language });
+      if (result.success) {
+        window.location.href = result.paymentUrl;
+        return;
+      }
       console.error("Payment error:", result.error);
-      setIsCheckingOut(false);
+    } catch (error) {
+      console.error("Payment error:", error);
     }
+    setCheckoutError(true);
+    setIsCheckingOut(false);
   };
 
   // ─── Quantity handlers ────────────────────────────────
@@ -262,6 +253,14 @@ export default function CartDrawer() {
                     ? "לתשלום"
                     : "Checkout"}
               </button>
+
+              {checkoutError && (
+                <p className="cart-drawer__max-stock" role="alert">
+                  {isHebrew
+                    ? "לא ניתן להתחיל את התשלום כרגע. נסו שוב או צרו קשר."
+                    : "Couldn't start checkout. Please try again or contact us."}
+                </p>
+              )}
             </div>
           </>
         )}
