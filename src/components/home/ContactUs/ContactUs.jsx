@@ -26,9 +26,11 @@ export default function ContactUs() {
     phone: '',
     email: '',
     message: '',
+    website: '', // honeypot — hidden from real visitors
   });
 
   const [errors, setErrors] = useState({});
+  const [sendError, setSendError] = useState(null);
   const [isSent, setIsSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -48,7 +50,11 @@ export default function ContactUs() {
     const newErrors = {};
 
     if (!formData.fullName.trim()) newErrors.fullName = 'fullName';
-    if (!formData.phone.trim()) newErrors.phone = 'phone';
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'phone';
+    } else if (!/^[0-9+\-()\s]{6,30}$/.test(formData.phone.trim())) {
+      newErrors.phone = 'phoneInvalid';
+    }
     if (!formData.email.trim()) {
       newErrors.email = 'email';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -66,12 +72,20 @@ export default function ContactUs() {
     if (!validate()) return;
 
     setIsLoading(true);
-    const result = await sendContactEmail(formData);
+    setSendError(null);
+    let result;
+    try {
+      result = await sendContactEmail(formData);
+    } catch {
+      result = { success: false };
+    }
     setIsLoading(false);
 
     if (result.success) {
       setIsSent(true);
-      setFormData({ fullName: '', phone: '', email: '', message: '' });
+      setFormData({ fullName: '', phone: '', email: '', message: '', website: '' });
+    } else {
+      setSendError(result.error === 'rate_limited' ? 'rateLimited' : 'sendFailed');
     }
   };
 
@@ -96,6 +110,7 @@ export default function ContactUs() {
             type="text"
             name="fullName"
             placeholder={t.contact.fullName}
+            maxLength={100}
             value={formData.fullName}
             onChange={handleChange}
             dir={isHebrew ? 'rtl' : 'ltr'}
@@ -109,6 +124,7 @@ export default function ContactUs() {
             type="tel"
             name="phone"
             placeholder={t.contact.phone}
+            maxLength={30}
             value={formData.phone}
             onChange={handleChange}
             dir={isHebrew ? 'rtl' : 'ltr'}
@@ -122,6 +138,7 @@ export default function ContactUs() {
             type="email"
             name="email"
             placeholder={t.contact.email}
+            maxLength={200}
             value={formData.email}
             onChange={handleChange}
             dir={isHebrew ? 'rtl' : 'ltr'}
@@ -134,12 +151,29 @@ export default function ContactUs() {
           <textarea
             name="message"
             placeholder={t.contact.message}
+            maxLength={5000}
             value={formData.message}
             onChange={handleChange}
             dir={isHebrew ? 'rtl' : 'ltr'}
           />
           {errors.message && (
             <span className="contact__error">{t.contact.errors[errors.message]}</span>
+          )}
+
+          {/* honeypot — hidden from people and screen readers, bots fill it */}
+          <input
+            type="text"
+            name="website"
+            value={formData.website}
+            onChange={handleChange}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            style={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clipPath: 'inset(50%)', opacity: 0, pointerEvents: 'none' }}
+          />
+
+          {sendError && (
+            <span className="contact__error" role="alert">{t.contact.errors[sendError]}</span>
           )}
 
           {/* submit */}

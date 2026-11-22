@@ -56,7 +56,10 @@ export const translations = {
         phone: "Phone number is required.",
         email: "Email is required.",
         emailInvalid: "Email is invalid.",
+        phoneInvalid: "Phone number is invalid.",
         message: "Message is required.",
+        sendFailed: "Message could not be sent. Please try again or contact us on WhatsApp.",
+        rateLimited: "Too many messages. Please try again in a few minutes.",
       },
     },
 
@@ -162,7 +165,10 @@ export const translations = {
         phone: "שדה טלפון חובה.",
         email: "שדה אימייל חובה.",
         emailInvalid: "כתובת אימייל אינה חוקית.",
+        phoneInvalid: "מספר הטלפון אינו תקין.",
         message: "שדה הודעה חובה.",
+        sendFailed: "לא ניתן לשלוח את ההודעה. נסו שוב או פנו אלינו בוואטסאפ.",
+        rateLimited: "נשלחו יותר מדי הודעות. נסו שוב בעוד כמה דקות.",
       },
     },
 

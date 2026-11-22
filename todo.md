@@ -15,9 +15,11 @@ Working branch: `security-fixes` · Full details for each item are in [upgrade.m
 - [ ] Merge into `main` and deploy
 
 ## Next steps (from upgrade.md)
-- [ ] **Step 3:** contact form: escape HTML, validate on the server, spam protection, verify own sending domain in Resend (#8)
-- [ ] **Step 3:** security headers / CSP in `next.config.mjs` (#10, #11)
+- [ ] **Step 3 (your part):** verify your domain in Resend, then add `CONTACT_FROM_EMAIL="The Container <contact@thecontaineronline.com>"` to `.env.local` and Vercel
+- [ ] **Step 3 (your part):** open the site, use the cart + Negishot widget, check the browser console for `Content-Security-Policy` warnings; if none → switch the CSP to enforced (see `next.config.mjs`)
+- [ ] Optional: stronger contact-form spam protection (Vercel KV/Upstash rate limit or Cloudflare Turnstile)
 - [ ] **Step 4:** render real content for search engines instead of only the language picker (#9)
+- [ ] **Step 4:** missing product pages (`/item/doesnotexist`) return 200 instead of 404
 - [ ] **Step 4:** caching (`revalidate`) + stop loading the whole catalog in the browser (#17, #18)
 - [ ] **Step 5:** customer login token → httpOnly cookie / Customer Account API (#12)
 - [ ] **Step 5:** CI, remove `package-lock.json`, rewrite README, fix existing lint errors (#19–24)
@@ -35,3 +37,6 @@ Working branch: `security-fixes` · Full details for each item are in [upgrade.m
 - [x] Server-side checkout with Shopify draft orders (#1, #2, #3, #6, #7, #13, #14, #15)
 - [x] Add draft order permissions to the Inventory Manager app
 - [x] Quick test: create/read/delete a draft order through the site's code
+- [x] Retest steps 1–2, fixed the stock-hold bug and made the Hyp return address configurable (report.md)
+- [x] Step 3: contact form hardened (escaping, server validation, honeypot, rate limit, error message) (#8)
+- [x] Step 3: security headers; full CSP in report-only mode (#10, #11)

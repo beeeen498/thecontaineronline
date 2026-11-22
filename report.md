@@ -1,3 +1,36 @@
+# Test Report — Step 3
+_2026-11-22 · branch `security-fixes`_
+
+## Result: ✅ all checks pass
+
+| Area | Check | Result |
+|---|---|---|
+| Build / lint | `pnpm build`, `pnpm lint` | ✅ builds · ⚠️ same 11 lint issues as before, none in changed files |
+| Contact form | Hidden anti-bot field filled → nothing sent | ✅ |
+| Contact form | Missing name / bad email / bad phone / garbage input rejected on the server | ✅ |
+| Contact form | HTML and links typed into the form are shown as plain text in the email | ✅ |
+| Contact form | Line breaks kept, subject can't inject extra email headers | ✅ |
+| Contact form | Reply-To = sender's email (just press Reply) | ✅ |
+| Contact form | Long input trimmed (message max 5000 characters) | ✅ |
+| Contact form | 4th message from the same visitor within 10 minutes blocked | ✅ |
+| Contact form | Resend errors now shown as failures | ✅ (bug found, see below) |
+| Headers | All security headers present on every page | ✅ |
+| Pages | `/`, `/art`, `/fashion`, `/info`, `/privacy`, `/checkout/success`, `/account/login`, `/sitemap.xml` load | ✅ |
+
+The contact tests used a fake email sender, so no real emails were sent.
+
+## Bug found in the old code (fixed)
+- **The contact form showed "Sent!" even when the email failed.** Resend reports problems (e.g. an unverified domain) by returning an error, not by throwing one, and the old code never checked for it. Messages could be lost without anyone knowing. The form now shows an error and suggests WhatsApp.
+
+## Found, not fixed yet (added to todo.md)
+- A product page that doesn't exist (`/item/doesnotexist`) answers with status 200 instead of 404. This existed before. It's caused by the product page's loading screen and affects SEO, so it's part of step 4.
+
+## Notes
+- **Rate limiting is basic.** It's kept in the server's memory, so it resets on restart and each Vercel instance counts separately. It stops casual scripted spam; for stronger protection, add Vercel KV/Upstash or Cloudflare Turnstile later.
+- **The full Content Security Policy is in report-only mode.** The browser only logs what it *would* block, so nothing can break yet. Before enforcing it, open the site, use the cart and the Negishot accessibility widget, and check the browser console for `Content-Security-Policy` messages.
+
+---
+
 # Test Report — Steps 1 & 2
 _2026-11-22 · branch `security-fixes`_
 
