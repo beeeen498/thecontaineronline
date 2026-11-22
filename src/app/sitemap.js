@@ -1,5 +1,8 @@
-import { getAllProducts } from "@/lib/shopifyQueries";
+import { getAllProducts } from "@/lib/catalog";
 import articlesData from "@/data/articlesData";
+
+// Rebuild the sitemap at most once an hour so new products appear
+export const revalidate = 3600;
 
 // ─── Sitemap ──────────────────────────────────────────────────
 // Tells Google all the pages on the site

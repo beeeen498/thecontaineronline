@@ -438,6 +438,53 @@ export const getCart = async (cartId) => {
   return data.cart;
 };
 
+// ─── getProductsForVariants ───────────────────────────────────
+// Fetches only the products behind the given variant IDs (used by
+// the cart drawer instead of downloading the whole catalog).
+export const getProductsForVariants = async (variantIds) => {
+  if (!variantIds?.length) return [];
+  const { data } = await client.request(
+    `query productsForVariants($ids: [ID!]!) {
+      nodes(ids: $ids) {
+        ... on ProductVariant {
+          product {
+            id
+            handle
+            title
+            productType
+            vendor
+            description
+            priceRange {
+              minVariantPrice {
+                amount
+              }
+            }
+            images(first: 1) {
+              edges {
+                node {
+                  url
+                }
+              }
+            }
+            ${METAFIELD_IDENTIFIERS}
+            ${VARIANTS_QUERY}
+          }
+        }
+      }
+    }`,
+    { variables: { ids: variantIds } },
+  );
+
+  const byId = new Map();
+  data.nodes?.forEach((node) => {
+    const product = node?.product;
+    if (product && !byId.has(product.id)) {
+      byId.set(product.id, buildProduct(product, parseMeta(product.metafields)));
+    }
+  });
+  return [...byId.values()];
+};
+
 // ─── Checkout pricing ─────────────────────────────────────────
 // Returns { [variantId]: { israelPrice, globalPrice, title } } using the
 // same price rules as the storefront display. Used server-side only.

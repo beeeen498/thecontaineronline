@@ -1,9 +1,5 @@
-import { getFashionProducts } from "@/lib/shopifyQueries";
+import { getFashionProducts } from "@/lib/catalog";
 import FashionStorePage from "@/components/store/FashionStorePage/FashionStorePage";
-
-// ─── Revalidate ───────────────────────────────────────────────
-// Always fetch fresh data from Shopify, never cache
-export const revalidate = 0;
 
 // ─── Metadata ─────────────────────────────────────────────────
 export const metadata = {

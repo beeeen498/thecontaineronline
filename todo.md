@@ -18,9 +18,8 @@ Working branch: `security-fixes` · Full details for each item are in [upgrade.m
 - [ ] **Step 3 (your part):** verify your domain in Resend, then add `CONTACT_FROM_EMAIL="The Container <contact@thecontaineronline.com>"` to `.env.local` and Vercel
 - [ ] **Step 3 (your part):** open the site, use the cart + Negishot widget, check the browser console for `Content-Security-Policy` warnings; if none → switch the CSP to enforced (see `next.config.mjs`)
 - [ ] Optional: stronger contact-form spam protection (Vercel KV/Upstash rate limit or Cloudflare Turnstile)
-- [ ] **Step 4:** render real content for search engines instead of only the language picker (#9)
-- [ ] **Step 4:** missing product pages (`/item/doesnotexist`) return 200 instead of 404
-- [ ] **Step 4:** caching (`revalidate`) + stop loading the whole catalog in the browser (#17, #18)
+- [ ] **Step 4 (browser check):** in a private window: picker appears → choose Hebrew → reload → page loads in Hebrew with no picker; switch language with the nav button → reload → stays switched
+- [ ] Optional: instant updates when you edit a product in Shopify (webhook → clear the `products` cache); right now changes show within 60 seconds
 - [ ] **Step 5:** customer login token → httpOnly cookie / Customer Account API (#12)
 - [ ] **Step 5:** CI, remove `package-lock.json`, rewrite README, fix existing lint errors (#19–24)
 
@@ -40,3 +39,6 @@ Working branch: `security-fixes` · Full details for each item are in [upgrade.m
 - [x] Retest steps 1–2, fixed the stock-hold bug and made the Hyp return address configurable (report.md)
 - [x] Step 3: contact form hardened (escaping, server validation, honeypot, rate limit, error message) (#8)
 - [x] Step 3: security headers; full CSP in report-only mode (#10, #11)
+- [x] Step 4: pages rendered on the server in the visitor's language (language cookie) (#9)
+- [x] Step 4: 60-second product cache, sitemap refreshes, cart loads only its own products (#17, #18)
+- [x] Step 4: missing product pages: kept loading screen, `noindex` instead of 404 (decided)

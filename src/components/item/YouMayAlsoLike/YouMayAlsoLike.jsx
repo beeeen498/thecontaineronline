@@ -10,7 +10,7 @@ import './YouMayAlsoLike.scss';
 
 export default function YouMayAlsoLike({ products = [], currentHandle }) {
   const { language } = useLanguage();
-  const isEnglish = language.toLowerCase() === 'english';
+  const isEnglish = language !== 'Hebrew';
   const isHebrew = language === 'Hebrew';
 
   const filtered = products

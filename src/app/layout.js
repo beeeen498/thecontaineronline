@@ -1,5 +1,7 @@
 import { Belleza, Assistant, Titillium_Web } from "next/font/google";
+import { cookies } from "next/headers";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { LANGUAGES, LANGUAGE_COOKIE } from "@/lib/language";
 import Footer from "@/components/shared/Footer/Footer";
 import CookieConsent from "@/components/shared/CookieConsent/CookieConsent";
 import CartDrawer from "@/components/cart/CartDrawer/CartDrawer";
@@ -73,14 +75,21 @@ export const metadata = {
 };
 
 // ─── Root Layout ──────────────────────────────────────────────
-export default function RootLayout({ children }) {
+// Language comes from the cookie so the first HTML is already in the
+// visitor's language and direction. No cookie → English + picker.
+export default async function RootLayout({ children }) {
+  const saved = (await cookies()).get(LANGUAGE_COOKIE)?.value;
+  const initialLanguage = LANGUAGES.includes(saved) ? saved : null;
+  const isHebrew = initialLanguage === "Hebrew";
+
   return (
     <html
-      lang="en"
+      lang={isHebrew ? "he" : "en"}
+      dir={isHebrew ? "rtl" : "ltr"}
       className={`${belleza.variable} ${assistant.variable} ${titilliumWeb.variable}`}
     >
       <body>
-        <LanguageProvider>
+        <LanguageProvider initialLanguage={initialLanguage}>
           <HtmlAttributes />
           <ScrollToTop />
           <AnchorScroll />

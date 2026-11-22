@@ -37,7 +37,7 @@ function formatItem(item, isEnglish) {
 export default function ArtStorePage({ products = [] }) {
   const { language } = useLanguage();
   const t = useTranslations();
-  const isEnglish = language.toLowerCase() === "english";
+  const isEnglish = language !== "Hebrew";
   const router = useRouter();
   const searchParams = useSearchParams();
 

@@ -61,7 +61,7 @@ function FeaturedRow({ heading, text, buttonText, href, items, reversed }) {
 export default function FeaturedItemsClient({ artProducts, fashionProducts }) {
   const { language } = useLanguage();
   const t = useTranslations();
-  const isEnglish = language.toLowerCase() === "english";
+  const isEnglish = language !== "Hebrew";
 
   const featuredArt = artProducts.map((item) => formatItem(item, isEnglish));
   const featuredFashion = fashionProducts.map((item) =>

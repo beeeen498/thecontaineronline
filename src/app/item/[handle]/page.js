@@ -1,18 +1,16 @@
-import { getProductByHandle, getAllProducts } from '@/lib/shopifyQueries';
+import { getProductByHandle, getAllProducts } from '@/lib/catalog';
 import ItemPage from '@/components/item/ItemPage/ItemPage';
 import { notFound } from 'next/navigation';
 import Script from 'next/script';
-
-// ─── Revalidate ───────────────────────────────────────────────
-// Always fetch fresh data from Shopify, never cache
-export const revalidate = 0;
 
 // ─── Dynamic Metadata ─────────────────────────────────────────
 export async function generateMetadata({ params }) {
   const { handle } = await params;
   const product = await getProductByHandle(handle);
 
-  if (!product) return { title: 'Product Not Found' };
+  // notFound() here (before the page starts streaming) makes missing
+  // products return a real 404 status instead of 200
+  if (!product) notFound();
 
   return {
     title: product.englishName,

@@ -1,3 +1,38 @@
+# Test Report — Step 4
+_2026-11-22 · branch `security-fixes`_
+
+## Result: ✅ all checks pass
+
+| Area | Check | Result |
+|---|---|---|
+| Build / lint | `pnpm build`, `pnpm lint` | ✅ builds · ⚠️ same 11 lint issues as before |
+| SEO | Visitor/crawler with no language chosen gets real page content (e.g. products on `/art`) | ✅ (before: **empty page**) |
+| SEO | No language chosen → English, `lang="en" dir="ltr"`; picker appears after load | ✅ |
+| Language | Hebrew cookie → server sends Hebrew page with `lang="he" dir="rtl"` (no flash) | ✅ |
+| Language | English cookie → English page | ✅ |
+| Language | Invalid cookie value ignored | ✅ |
+| Pages | `/`, `/art`, `/fashion`, `/info`, `/privacy`, `/terms`, `/account/login`, `/checkout/success`, articles, a real product | ✅ 200 |
+| 404 | Missing product → `noindex` (Google won't index it) | ✅ (status stays 200, see below) |
+| Sitemap | Includes products, now refreshes automatically | ✅ 101 URLs |
+| Caching | Repeat visits to `/fashion` served from cache | ✅ ~13 ms |
+| Cart | Cart loads only its own products; same names/prices/images as before | ✅ 4 KB instead of 206 KB (94 products) per visit |
+
+## Bugs found and fixed
+- **The server sent an empty page.** `LanguageContext` rendered nothing until the browser had loaded, so Google and link previews (WhatsApp, Facebook) saw a blank page on every URL. The page is now rendered on the server in the visitor's language.
+- **The sitemap never updated.** It was generated once at build time, so new products didn't appear until the next deploy. It now refreshes automatically.
+- **Pages would crash with no language chosen** (`FeaturedItemsClient`, `YouMayAlsoLike`, `ArtStorePage`, `FashionStorePage` called `language.toLowerCase()`). This didn't happen before because nothing rendered without a language, but the new SEO rendering would have exposed it. Fixed.
+- **New lint issue in my cart change.** Found and fixed before testing.
+
+## Decision
+- **Missing product pages keep the loading screen** (your choice). They answer 200 with `noindex` rather than a 404. Removing the loading screen gave a real 404 in testing, but at the cost of no placeholder while products load.
+
+## Not tested (needs a real browser)
+- The language picker appearing over the page for first-time visitors, and choosing a language.
+- Returning visitors who chose a language before this change (saved only in the browser): they should be switched automatically without seeing the picker.
+- Switching language with the nav button, then reloading: the page should load in the new language straight away.
+
+---
+
 # Test Report — Step 3
 _2026-11-22 · branch `security-fixes`_
 

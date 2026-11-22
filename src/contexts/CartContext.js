@@ -13,8 +13,8 @@ import {
   updateCartLine,
   removeCartLine,
   getCart,
+  getProductsForVariants,
 } from "@/lib/shopifyQueries";
-import { getAllProducts } from "@/lib/shopifyQueries";
 
 // ─── Cart Context ───────────────────────────────────────────────
 const CartContext = createContext();
@@ -28,10 +28,28 @@ export function CartProvider({ children }) {
   const [products, setProducts] = useState([]);
 
   // ─── Load existing cart from localStorage on mount ────
-  useEffect(() => {
-    // ─── Fetch all products for cart display ──────────────
-    getAllProducts().then(setProducts).catch(console.error);
+  // ─── Product details (Hebrew names, prices) for cart lines only ──
+  // Refetched only when the set of variants in the cart changes.
+  const variantKey = (cart?.lines?.edges || [])
+    .map(({ node }) => node.merchandise?.id)
+    .filter(Boolean)
+    .sort()
+    .join(",");
 
+  useEffect(() => {
+    if (!variantKey) return; // empty cart — nothing to look up
+    let cancelled = false;
+    getProductsForVariants(variantKey.split(","))
+      .then((result) => {
+        if (!cancelled) setProducts(result);
+      })
+      .catch(console.error);
+    return () => {
+      cancelled = true;
+    };
+  }, [variantKey]);
+
+  useEffect(() => {
     const savedCartId = localStorage.getItem(CART_ID_KEY);
     if (!savedCartId) return;
 

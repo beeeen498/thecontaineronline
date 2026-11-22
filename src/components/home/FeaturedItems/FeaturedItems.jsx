@@ -1,4 +1,4 @@
-import { getAllProducts } from '@/lib/shopifyQueries';
+import { getAllProducts } from '@/lib/catalog';
 import FeaturedItemsClient from './FeaturedItemsClient.jsx';
 
 // ─── Featured Items ───────────────────────────────────────────
