@@ -17,6 +17,7 @@ _Last updated: 2026-11-22_
   4. `bb43060`: step 4: server-rendered language, caching, cart lookup
   5. `9a144e0`: progress.md
   6. `9f76bda`: step 5: httpOnly login cookie, lint clean, CI, cleanup
+  7. `1e603ca`: Delete account via Admin API; email/password change keeps the customer logged in
 - To undo everything: `git checkout main`. To return to a step: `git reset --hard <hash>`.
 
 ## Plan (from upgrade.md "Suggested order of work")
