@@ -26,7 +26,7 @@ Put these in `.env.local` (never commit it), and in Vercel → Project → Setti
 |---|---|
 | `NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN` | Shopify store domain (`xxx.myshopify.com`) |
 | `NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN` | Storefront API token (public, read-only catalog + carts + customer login) |
-| `SHOPIFY_ADMIN_ACCESS_TOKEN` | Admin API token from the **Inventory Manager** app. Scopes: `read_products`, `read_inventory`, `write_inventory`, `read_draft_orders`, `write_draft_orders` |
+| `SHOPIFY_ADMIN_ACCESS_TOKEN` | Admin API token from the **Inventory Manager** app. Scopes: `read_products`, `read_inventory`, `write_inventory`, `read_draft_orders`, `write_draft_orders`, `write_customers` |
 | `HYP_TERMINAL_NUMBER`, `HYP_API_KEY`, `HYP_PASS_P` | Hyp Pay terminal credentials |
 | `RESEND_API_KEY` | Sending contact-form emails |
 | `CONTACT_FROM_EMAIL` | _Optional._ Sender for contact emails once your domain is verified in Resend |

@@ -1,3 +1,46 @@
+# Test Report — "Delete account" fix
+_2026-11-22 · branch `security-fixes`_
+
+## Result: ✅ all checks pass, including a live end-to-end test (`write_customers` added)
+
+### Live account test (real Shopify store, throwaway customer, deleted at the end)
+| Check | Result |
+|---|---|
+| Register + automatic login; cookie is httpOnly, sameSite lax, with expiry | ✅ |
+| Token never sent to the browser | ✅ |
+| Still logged in after reload | ✅ |
+| Email/password change without, or with the wrong, current password → refused | ✅ |
+| Email change → still logged in with the new email | ✅ (bug fixed, see below) |
+| Password change → still logged in; old password stops working | ✅ (bug fixed, see below) |
+| Logout clears the session; log back in works | ✅ |
+| Delete account (no orders) → deleted in Shopify, logged out | ✅ |
+| No test customers left in the store | ✅ 0 |
+
+### Bugs found by the live test (fixed)
+- **Changing email logged the customer out.** Shopify cancels the login token when the email changes and doesn't issue a new one. This bug existed before. The email form now asks for the **current password**, and the server logs the customer back in with the new email. This is also safer: a hijacked session can't change the account email.
+- **Changing the password logged the customer out (my mistake from step 5).** After checking the current password, the code revoked the "extra" token. Shopify actually returns the *same* token the customer is logged in with, so revoking it logged them out. Removed.
+
+### Tests with fakes
+
+| Check | Result |
+|---|---|
+| Customer with no orders → deleted in Shopify, logged out, no email | ✅ |
+| Customer with orders → not deleted; deletion request emailed to the shop (customer details, reply-to, "Erase personal data" instructions); customer stays logged in and sees a message | ✅ |
+| Shopify refuses to delete → falls back to an emailed request | ✅ |
+| Permission missing → plain error, no email sent | ✅ |
+| Logged out → refused, nothing called | ✅ |
+| Admin API `customerDelete` input/output match Shopify's schema (checked live, read-only) | ✅ |
+| `pnpm lint` (0 problems), `pnpm build`, earlier login tests (11) | ✅ |
+
+The fake-based tests didn't delete any real customer or send any email. The live test used one throwaway `@example.com` customer, deleted at the end.
+
+## What changed
+- `deleteCustomerAccount` (`src/app/actions/customer.js`) now uses the **Admin API** (`deleteCustomer` in `src/lib/shopifyAdmin.js`). Removed the broken Storefront `customerDelete`.
+- `src/lib/email.js`: server-only helper for emails to the shop. It isn't a server action, so the browser can't call it.
+- `AccountPage.jsx` shows a "request received" message (EN/HE) when the request is emailed. The email form now has a **Current password** field.
+
+---
+
 # Test Report — Step 5
 _2026-11-22 · branch `security-fixes`_
 
@@ -23,7 +66,7 @@ _2026-11-22 · branch `security-fixes`_
 - **CI** (`.github/workflows/ci.yml`): audit, lint and build on every push. **Dependabot** (`.github/dependabot.yml`): weekly dependency-update PRs.
 
 ## Bugs found
-- **"Delete account" has never worked (not fixed yet, needs your decision).** Shopify's Storefront API has no delete-customer action (confirmed by asking the API). The button always showed an error. Fixing it needs the Admin API permission `write_customers`. Shopify also refuses to delete customers who have orders, so for those the shop would need a "request deletion" flow instead.
+- **"Delete account" has never worked (fixed afterwards, see the section above).** Shopify's Storefront API has no delete-customer action (confirmed by asking the API). The button always showed an error. Fixing it needs the Admin API permission `write_customers`. Shopify also refuses to delete customers who have orders, so for those the shop would need a "request deletion" flow instead.
 - **Old account-page flicker (fixed).** On a fresh page load, a logged-in customer could be bounced to the login page for a moment, because the login check started as "not loading".
 - **Cookie banner crashed if browser storage was blocked (fixed).** The banner now stays hidden in that case.
 

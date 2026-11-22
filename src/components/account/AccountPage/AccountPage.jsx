@@ -35,6 +35,7 @@ export default function AccountPage() {
   const [emailSuccess, setEmailSuccess] = useState("");
   const [emailError, setEmailError] = useState("");
   const [currentEmail, setCurrentEmail] = useState("");
+  const [emailPassword, setEmailPassword] = useState("");
 
   // ─── Update Password State ────────────────────────────
   const [currentPassword, setCurrentPassword] = useState("");
@@ -68,10 +69,16 @@ export default function AccountPage() {
     const result = await deleteAccount();
     if (result.success) {
       router.push("/");
+    } else if (result.requested) {
+      // Account has orders — the shop was emailed to erase it manually
+      setDeleteError(
+        isHebrew
+          ? "קיבלנו את בקשתך. מכיוון שיש בחשבון הזמנות, נמחק את הפרטים האישיים שלך ידנית ונעדכן אותך במייל."
+          : "We've received your request. Because your account has orders, we'll erase your personal details manually and let you know by email.",
+      );
     } else {
       setDeleteError(
-        result.error ||
-          (isHebrew ? "שגיאה במחיקת החשבון" : "Failed to delete account"),
+        isHebrew ? "שגיאה במחיקת החשבון" : "Failed to delete account",
       );
     }
   };
@@ -92,7 +99,7 @@ export default function AccountPage() {
     setEmailError("");
     setEmailSuccess("");
 
-    if (!currentEmail || !newEmail) return;
+    if (!currentEmail || !newEmail || !emailPassword) return;
 
     // ─── Verify current email matches ─────────────────
     if (currentEmail !== customer.email) {
@@ -102,13 +109,21 @@ export default function AccountPage() {
       return;
     }
 
-    const result = await updateCustomer({ email: newEmail });
+    const result = await updateCustomer({
+      email: newEmail,
+      currentPassword: emailPassword,
+    });
+    setEmailPassword("");
     if (result.success) {
       setEmailSuccess(
         isHebrew ? "האימייל עודכן בהצלחה" : "Email updated successfully",
       );
       setCurrentEmail("");
       setNewEmail("");
+    } else if (result.error === "current_password_wrong") {
+      setEmailError(
+        isHebrew ? "הסיסמה הנוכחית שגויה" : "Current password is incorrect",
+      );
     } else {
       setEmailError(
         isHebrew
@@ -294,6 +309,19 @@ export default function AccountPage() {
                   />
                 </div>
 
+                <div className="account-page__field">
+                  <label className="account-page__label">
+                    {isHebrew ? "סיסמה נוכחית" : "Current Password"}
+                  </label>
+                  <input
+                    className="account-page__input"
+                    type="password"
+                    value={emailPassword}
+                    onChange={(e) => setEmailPassword(e.target.value)}
+                    autoComplete="current-password"
+                  />
+                </div>
+
                 {emailError && (
                   <p className="account-page__error">{emailError}</p>
                 )}
@@ -304,7 +332,7 @@ export default function AccountPage() {
                 <button
                   className="account-page__btn account-page__btn--primary"
                   onClick={handleUpdateEmail}
-                  disabled={isLoading || !currentEmail || !newEmail}
+                  disabled={isLoading || !currentEmail || !newEmail || !emailPassword}
                 >
                   {isHebrew ? "עדכן אימייל" : "Update Email"}
                 </button>

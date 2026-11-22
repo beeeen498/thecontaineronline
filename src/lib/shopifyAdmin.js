@@ -4,7 +4,8 @@
 // Completing a draft order creates a real Shopify order and lets
 // Shopify decrease inventory itself.
 //
-// Required Admin API scopes: read_draft_orders, write_draft_orders
+// Required Admin API scopes: read_draft_orders, write_draft_orders,
+// write_customers (account deletion)
 
 const SHOPIFY_STORE = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
 const ADMIN_TOKEN = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
@@ -119,4 +120,24 @@ export async function completeDraftOrder(id, { note }) {
 
   throwOnUserErrors(data.draftOrderComplete.userErrors);
   return data.draftOrderComplete.draftOrder;
+}
+
+// ─── Delete a customer ────────────────────────────────────────
+// Shopify refuses when the customer has orders; the caller then
+// falls back to a deletion request. Returns { deleted, error }.
+export async function deleteCustomer(customerId) {
+  const data = await adminRequest(
+    `mutation customerDelete($input: CustomerDeleteInput!) {
+      customerDelete(input: $input) {
+        deletedCustomerId
+        userErrors { field message }
+      }
+    }`,
+    { input: { id: customerId } },
+  );
+  const result = data.customerDelete;
+  return {
+    deleted: Boolean(result.deletedCustomerId),
+    error: result.userErrors?.[0]?.message || null,
+  };
 }

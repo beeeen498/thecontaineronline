@@ -21,8 +21,7 @@ Working branch: `security-fixes` · Full details for each item are in [upgrade.m
 - [ ] **Step 4 (browser check):** in a private window: picker appears → choose Hebrew → reload → page loads in Hebrew with no picker; switch language with the nav button → reload → stays switched
 - [ ] Optional: instant updates when you edit a product in Shopify (webhook → clear the `products` cache); right now changes show within 60 seconds
 - [ ] **Step 5 (your part):** add GitHub repository secrets `NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN` and `NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN` (Settings → Secrets and variables → Actions) so CI can build
-- [ ] **Step 5 (browser check):** log in with a real account → reload (still logged in) → change email/password → log out
-- [ ] **Decide:** fix "Delete account" (never worked): needs Admin scope `write_customers`; customers with orders can't be deleted by Shopify → "request deletion" email instead?
+- [ ] **Browser check (look & feel only, logic tested live):** Account page → email form shows the new "Current password" field correctly in Hebrew and English
 - [ ] Optional: move to Shopify Customer Account API (newer login system, Shopify-hosted login page)
 
 ## Open questions / follow-ups
@@ -46,3 +45,5 @@ Working branch: `security-fixes` · Full details for each item are in [upgrade.m
 - [x] Step 4: missing product pages: kept loading screen, `noindex` instead of 404 (decided)
 - [x] Step 5: customer token in httpOnly cookie via server actions (#12)
 - [x] Step 5: lint clean (0 problems), CI + Dependabot, removed `package-lock.json`, README rewritten (#19–24)
+- [x] "Delete account" fixed: Admin API delete; accounts with orders → emailed deletion request; `write_customers` added
+- [x] Live account test: register/login/reload/email+password change/logout/delete all pass; fixed 2 logout bugs

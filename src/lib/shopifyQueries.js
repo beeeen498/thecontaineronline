@@ -659,31 +659,6 @@ export const getCustomer = async (accessToken) => {
   return data.customer;
 };
 
-// ─── Delete Account ───────────────────────────────────────────
-export const customerDelete = async (customerId, accessToken) => {
-  const { data } = await client.request(
-    `
-    mutation customerDelete($id: ID!, $customerAccessToken: String!) {
-      customerDelete(id: $id, customerAccessToken: $customerAccessToken) {
-        deletedCustomerId
-        userErrors {
-          field
-          message
-        }
-      }
-    }
-  `,
-    {
-      variables: {
-        id: customerId,
-        customerAccessToken: accessToken,
-      },
-    },
-  );
-
-  return data.customerDelete;
-};
-
 // ─── Recover Password ─────────────────────────────────────────
 // Sends a password reset email to the customer
 export const customerRecover = async (email) => {

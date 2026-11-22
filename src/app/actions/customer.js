@@ -6,9 +6,10 @@ import {
   customerAccessTokenCreate,
   customerAccessTokenDelete,
   getCustomer,
-  customerDelete,
   customerUpdate,
 } from "@/lib/shopifyQueries";
+import { deleteCustomer } from "@/lib/shopifyAdmin";
+import { sendShopEmail } from "@/lib/email";
 
 // ─── Customer session (server only) ───────────────────────────
 // The Shopify customer access token lives in an httpOnly cookie, so
@@ -121,19 +122,52 @@ export async function logoutCustomer() {
 }
 
 // ─── Delete account ──────────────────────────────────────────
+// No orders → deleted in Shopify (Admin API) and logged out.
+// Has orders → Shopify won't delete it (and order records must be
+// kept), so the shop is emailed a deletion request instead.
+// Returns { success } or { success: false, requested: true }.
+async function requestDeletion(customer) {
+  await sendShopEmail({
+    subject: `Account deletion request: ${customer.email}`,
+    replyTo: customer.email,
+    text: [
+      "A customer asked to delete their account on the website.",
+      "",
+      `Name: ${customer.firstName || ""} ${customer.lastName || ""}`.trim(),
+      `Email: ${customer.email}`,
+      `Shopify customer ID: ${customer.id}`,
+      "",
+      "They have orders, so Shopify can't delete the account automatically.",
+      "To handle it: Shopify Admin → Customers → open this customer →",
+      "⋯ (More actions) → Erase personal data.",
+      "Orders are kept for your records; personal details are removed.",
+    ].join("\n"),
+  });
+}
+
 export async function deleteCustomerAccount() {
   const token = await readToken();
   if (!token) return { success: false };
   try {
     const customer = await getCustomer(token);
     if (!customer) return { success: false };
-    const result = await customerDelete(customer.id, token);
-    const error = firstError(result.userErrors);
-    if (error) return { success: false, error };
-    await clearTokenCookie();
-    return { success: true };
+
+    const hasOrders = (customer.orders?.edges?.length || 0) > 0;
+    if (!hasOrders) {
+      const result = await deleteCustomer(customer.id);
+      if (result.deleted) {
+        await clearTokenCookie();
+        return { success: true };
+      }
+      console.error("Customer delete refused:", result.error);
+    }
+
+    // has orders, or Shopify refused → ask the shop to handle it
+    await requestDeletion(customer);
+    return { success: false, requested: true };
   } catch (err) {
-    return { success: false, error: err.message };
+    console.error("Delete account error:", err.message);
+    return { success: false };
   }
 }
 
@@ -146,33 +180,47 @@ export async function updateCurrentCustomer({ email, currentPassword, newPasswor
     const customer = await getCustomer(token);
     if (!customer) return { success: false };
 
-    if (newPassword) {
-      if (!isString(currentPassword, 200) || !isString(newPassword, 200)) {
-        return { success: false, error: "current_password_wrong" };
-      }
-      const verify = await customerAccessTokenCreate({
-        email: customer.email,
-        password: currentPassword,
-      });
-      if (firstError(verify.customerUserErrors) || !verify.customerAccessToken) {
-        return { success: false, error: "current_password_wrong" };
-      }
-      // the verification token isn't needed — revoke it
-      try {
-        await customerAccessTokenDelete(verify.customerAccessToken.accessToken);
-      } catch {}
-    }
-
     const input = {};
-    if (isString(email, 200)) input.email = email;
-    if (newPassword) input.password = newPassword;
+    if (isString(email, 200) && email !== customer.email) input.email = email;
+    if (newPassword) {
+      if (!isString(newPassword, 200)) return { success: false };
+      input.password = newPassword;
+    }
+    if (!input.email && !input.password) return { success: false };
+
+    // ─── Changing email or password needs the current password ──
+    if (!isString(currentPassword, 200)) {
+      return { success: false, error: "current_password_wrong" };
+    }
+    const verify = await customerAccessTokenCreate({
+      email: customer.email,
+      password: currentPassword,
+    });
+    if (firstError(verify.customerUserErrors) || !verify.customerAccessToken) {
+      return { success: false, error: "current_password_wrong" };
+    }
+    // Don't revoke the verification token: Shopify returns the SAME token
+    // the customer is already logged in with, so revoking it logs them out.
 
     const result = await customerUpdate(token, input);
     const error = firstError(result.customerUserErrors);
     if (error) return { success: false, error };
 
+    // ─── Keep the customer logged in ─────────────────────────
+    // Shopify revokes the old token when the email changes and doesn't
+    // always return a new one, so log in again with the new details.
     if (result.customerAccessToken?.accessToken) {
       await setTokenCookie(result.customerAccessToken);
+    } else {
+      const relogin = await customerAccessTokenCreate({
+        email: input.email || customer.email,
+        password: input.password || currentPassword,
+      });
+      if (relogin.customerAccessToken) {
+        await setTokenCookie(relogin.customerAccessToken);
+      } else {
+        await clearTokenCookie(); // updated, but must log in again
+      }
     }
     return { success: true, customer: { ...customer, ...result.customer } };
   } catch (err) {

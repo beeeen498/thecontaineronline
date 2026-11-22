@@ -15,6 +15,8 @@ _Last updated: 2026-11-22_
   2. `766e125`: fixes from the retest: removed draft-order stock hold; `SITE_URL` for the Hyp return address
   3. `b7b481b`: step 3: contact form hardening + security headers
   4. `bb43060`: step 4: server-rendered language, caching, cart lookup
+  5. `9a144e0`: progress.md
+  6. `9f76bda`: step 5: httpOnly login cookie, lint clean, CI, cleanup
 - To undo everything: `git checkout main`. To return to a step: `git reset --hard <hash>`.
 
 ## Plan (from upgrade.md "Suggested order of work")
@@ -24,7 +26,7 @@ _Last updated: 2026-11-22_
 | 2 | Server-side checkout (#1 #2 #3 #6 #7 #13 #14 #15) | ✅ code done + tested · ⏳ full paid test pending |
 | 3 | Contact form (#8), security headers / CSP (#10 #11) | ✅ done · ⏳ user tasks (Resend domain, CSP console check) |
 | 4 | SEO language rendering (#9), caching + cart catalog (#17 #18) | ✅ done · ⏳ browser check |
-| 5 | Auth token → httpOnly cookie (#12); CI, remove `package-lock.json`, README, lint errors (#19–24) | ✅ done · ⏳ GitHub secrets, browser login check, "delete account" decision |
+| 5 | Auth token → httpOnly cookie (#12); CI, remove `package-lock.json`, README, lint errors (#19–24); "Delete account" fix | ✅ done, live-tested · ⏳ GitHub secrets, browser look check |
 
 ## What changed, by area
 
@@ -70,7 +72,8 @@ Flow now:
 - `src/app/actions/customer.js` (server actions): `getCurrentCustomer`, `adoptLegacyToken`, `loginCustomer`, `registerCustomer`, `logoutCustomer`, `deleteCustomerAccount`, `updateCurrentCustomer`. Token in cookie `customer_token` (httpOnly, secure in prod, sameSite lax, expires = Shopify `expiresAt`).
 - `CustomerContext.js` calls them; same API for pages (`login`, `register`, `logout`, `deleteAccount`, `updateCustomer`, `isLoggedIn`, `isLoading`). `isLoading` now starts `true` until the session check finishes. Old localStorage token `shopify-customer-token` is migrated once, then removed.
 - Password reset pages (`ResetPage`, `ConfirmResetPage`) still call the Storefront API from the browser (no token stored).
-- **Known bug, not fixed:** "Delete account" has never worked: the Storefront API has no `customerDelete`. Fix needs the Admin scope `write_customers`, waiting on the user's decision.
+- **"Delete account" fixed** (it never worked: the Storefront API has no `customerDelete`). It now uses the Admin `deleteCustomer` in `shopifyAdmin.js`. If the customer has orders, or Shopify refuses, the shop is emailed a deletion request through `src/lib/email.js` (server-only, not an action), and the result is `{ requested: true }`, shown as a message on AccountPage. Scope `write_customers` added by the user (Shopify adds `read_customers` with it).
+- Changing email or password now requires the **current password** (new field on AccountPage). After the update the server logs in again if Shopify returns no new token (Shopify revokes the token on email change). **Never revoke the verification token:** `customerAccessTokenCreate` returns the SAME token the customer already has.
 - Lint fixes: Nav `<a>` → `<Link>`; Header bounce and ItemPage color reset use state adjusted during render; ItemPage `images` in `useMemo`; CookieConsent and LanguageContext read localStorage via `useSyncExternalStore`; SuccessPage effect has proper deps plus a cancel guard; one commented `eslint-disable` in CartContext (restore-cart loading flag).
 - `package-lock.json` removed; `"packageManager": "pnpm@11.5.0"`; README rewritten; `.github/workflows/ci.yml` (install, audit high, lint, build; needs 2 GitHub secrets); `.github/dependabot.yml`.
 - **Lint baseline is now 0.** Any lint problem is new.
@@ -86,7 +89,7 @@ Flow now:
 - Run the site: `PORT=3123 pnpm start`, test with curl, then stop it. Don't leave servers running.
 - Live checkout tests ran node scripts against the real store, using an alias loader for `@/` imports. They created draft orders and deleted them afterwards (`draftOrderDelete`). Never complete a draft order in tests: that creates a real order and lowers stock.
 - Contact-form tests stubbed `resend` and `next/headers` so no email is sent.
-- Login tests stubbed `next/headers` cookies with an in-memory jar; they used only failing/logged-out paths (no test customer created: it couldn't be deleted).
+- Login tests stub `next/headers` cookies with an in-memory jar. The live account test registers a throwaway `delete-test-<time>@example.com` customer and deletes it (the Admin `customerDelete` cleanup runs in `finally`). Afterwards, check that no `email:delete-test*` customers are left.
 - Product used in tests: Dor Jug `gid://shopify/ProductVariant/45347877388322` (stock 1, ₪89 / $31).
 
 ## Open items needing the user
