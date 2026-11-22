@@ -4,6 +4,7 @@ import FashionStorePage from "@/components/store/FashionStorePage/FashionStorePa
 // ─── Metadata ─────────────────────────────────────────────────
 export const metadata = {
   title: "Fashion",
+  alternates: { canonical: "/fashion" },
   description:
     "Authentic luxury fashion — bags, shoes, belts, wallets, shirts and more. New and second-hand items from leading designers.",
   openGraph: {

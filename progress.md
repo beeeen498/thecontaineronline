@@ -82,6 +82,9 @@ Flow now:
 - `package-lock.json` removed; `"packageManager": "pnpm@11.5.0"`; README rewritten; `.github/workflows/ci.yml` (install, audit high, lint, build; needs 2 GitHub secrets); `.github/dependabot.yml`.
 - **Lint baseline is now 0.** Any lint problem is new.
 
+### Re-check fixes
+- SEO: the layout no longer sets `alternates.canonical` (every page inherited the home page). `metadataBase` is set in the layout; each public page sets `alternates: { canonical: "/path" }`.
+
 ### Shipping details at checkout
 - Cart drawer "Checkout" now goes to **`/checkout`** (`src/app/checkout/page.js`, `src/components/checkout/CheckoutPage/`): shipping form + order summary. Hebrew → Israel preselected; logged-in customers pre-filled from their account (`defaultAddress` added to `getCustomer`). Pre-fill and defaults are set during render, not in effects (lint).
 - `src/lib/checkoutDetails.js`: one validation used by the form and the server. `src/lib/countries.js`: Shopify's country codes; names via `Intl.DisplayNames`; `REGION_COUNTRIES` need a state field.

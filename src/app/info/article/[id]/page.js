@@ -10,6 +10,7 @@ export async function generateMetadata({ params }) {
 
   return {
     title: article.titleEnglish,
+    alternates: { canonical: `/info/article/${id}` },
     description: article.textEnglish?.slice(0, 160) || article.titleEnglish,
     openGraph: {
       title: `${article.titleEnglish} | The Container`,

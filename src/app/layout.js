@@ -40,6 +40,8 @@ const titilliumWeb = Titillium_Web({
 
 // ─── Metadata ─────────────────────────────────────────────────
 export const metadata = {
+  // Base for relative URLs (canonical links, social preview images)
+  metadataBase: new URL("https://thecontaineronline.com"),
   title: {
     default: "The Container | Art & Fashion",
     template: "%s | The Container",
@@ -64,9 +66,6 @@ export const metadata = {
     siteName: "The Container",
     locale: "en_US",
     type: "website",
-  },
-  alternates: {
-    canonical: "https://thecontaineronline.com",
   },
   robots: {
     index: true,

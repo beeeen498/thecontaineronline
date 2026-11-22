@@ -1,3 +1,29 @@
+# Test Report — Full re-check of the branch
+_2026-11-22 · branch `security-fixes`_
+
+## Result: ✅ everything passes · 1 older SEO bug found and fixed
+
+| Check | Result |
+|---|---|
+| `pnpm install --frozen-lockfile`, `pnpm audit --prod` | ✅ no vulnerabilities |
+| `pnpm lint` | ✅ 0 problems |
+| Clean production build (`.next` deleted first) | ✅ |
+| All 19 pages in English and Hebrew on the production server | ✅ 200 (unknown page → 404) |
+| Security headers present | ✅ |
+| Server log | ✅ no errors or warnings (after the fix below) |
+| Checkout test (prices, currency, forged payments rejected, no stock hold) | ✅ 22/22 |
+| Shipping test | ✅ 39/39 |
+| Live account test + login tests + delete-account tests | ✅ 16 + 11 + 6 |
+| Contact form tests | ✅ 15/15 |
+| Cart product lookup | ✅ 5/5 |
+| **New:** the "paid" update before completing an order keeps the address, free shipping, tax-exempt total and payment details (order not completed) | ✅ |
+| Store left clean (no test drafts or customers) | ✅ |
+
+### Bug found (already in `main`, now fixed)
+- **Every page told Google it was a copy of the home page.** The layout set `canonical: https://thecontaineronline.com`, and every page inherited it: art, fashion, every product, info, articles, terms. Google could leave product pages out of search results. Now each public page has its own canonical link (pages hidden from Google have none), and `metadataBase` is set, which also removed the only server warning (social preview image links).
+
+---
+
 # Test Report — Shipping details at checkout
 _2026-11-22 · branch `security-fixes`_
 

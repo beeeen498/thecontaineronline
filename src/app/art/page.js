@@ -4,6 +4,7 @@ import ArtStorePage from "@/components/store/ArtStorePage/ArtStorePage";
 // ─── Metadata ─────────────────────────────────────────────────
 export const metadata = {
   title: "Art",
+  alternates: { canonical: "/art" },
   description:
     "Handmade ceramic art — vases, cups, bowls, plates, ashtrays and more. Each piece crafted with passion and attention to detail.",
   openGraph: {

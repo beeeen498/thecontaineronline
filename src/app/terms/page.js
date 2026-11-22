@@ -3,6 +3,7 @@ import TermsPage from '@/components/terms/TermsPage';
 // ─── Metadata ─────────────────────────────────────────────────
 export const metadata = {
   title: 'Terms of Service',
+  alternates: { canonical: '/terms' },
   description: 'Terms of Service and Cancellation Policy for The Container.',
   robots: {
     index: true,

@@ -14,6 +14,7 @@ export async function generateMetadata({ params }) {
 
   return {
     title: product.englishName,
+    alternates: { canonical: `/item/${handle}` },
     description: product.englishDescription || `${product.englishName} — available at The Container.`,
     openGraph: {
       title: `${product.englishName} | The Container`,
