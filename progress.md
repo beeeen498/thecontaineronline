@@ -19,7 +19,7 @@ _Last updated: 2026-11-22_
   6. `9f76bda`: step 5: httpOnly login cookie, lint clean, CI, cleanup
   7. `1e603ca`: Delete account via Admin API; email/password change keeps the customer logged in
   8. `8661a3b`: progress.md commit list
-  9. _(next commit)_: shipping details at checkout
+  9. `2b1f607`: shipping details at checkout
 - To undo everything: `git checkout main`. To return to a step: `git reset --hard <hash>`.
 
 ## Plan (from upgrade.md "Suggested order of work")
