@@ -8,112 +8,59 @@ import {
   useCallback,
 } from "react";
 import {
-  customerCreate,
-  customerAccessTokenCreate,
-  customerAccessTokenDelete,
-  getCustomer,
-  customerDelete,
-  customerUpdate,
-} from "@/lib/shopifyQueries";
+  getCurrentCustomer,
+  adoptLegacyToken,
+  loginCustomer,
+  registerCustomer,
+  logoutCustomer,
+  deleteCustomerAccount,
+  updateCurrentCustomer,
+} from "@/app/actions/customer";
 
 // ─── Customer Context ─────────────────────────────────────────
-// Manages customer auth state across the app
-// Stores access token in localStorage for persistence
+// Manages customer auth state across the app.
+// The access token is kept in an httpOnly cookie by the server
+// actions in src/app/actions/customer.js — never in the browser.
 
 const CustomerContext = createContext();
 
-const TOKEN_KEY = "shopify-customer-token";
+// Old versions stored the token in localStorage; moved to the cookie once.
+const LEGACY_TOKEN_KEY = "shopify-customer-token";
+
+function takeLegacyToken() {
+  try {
+    const token = localStorage.getItem(LEGACY_TOKEN_KEY);
+    if (token) localStorage.removeItem(LEGACY_TOKEN_KEY);
+    return token;
+  } catch {
+    return null;
+  }
+}
 
 export function CustomerProvider({ children }) {
   const [customer, setCustomer] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ─── Load saved token on mount ────────────────────────
+  // ─── Load the logged-in customer on mount ─────────────
   useEffect(() => {
-    const savedToken = localStorage.getItem(TOKEN_KEY);
-    if (!savedToken) return;
-
-    setIsLoading(true);
-    getCustomer(savedToken)
-      .then((data) => {
-        if (data) {
-          setCustomer({ ...data, accessToken: savedToken });
-        } else {
-          // token expired or invalid
-          localStorage.removeItem(TOKEN_KEY);
-        }
-      })
-      .catch(() => localStorage.removeItem(TOKEN_KEY))
+    const legacyToken = takeLegacyToken();
+    const load = legacyToken ? adoptLegacyToken(legacyToken) : getCurrentCustomer();
+    load
+      .then((data) => setCustomer(data || null))
+      .catch(() => setCustomer(null))
       .finally(() => setIsLoading(false));
   }, []);
 
-  // ─── Register ─────────────────────────────────────────
-  const register = useCallback(
-    async ({ firstName, lastName, email, password }) => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const result = await customerCreate({
-          firstName,
-          lastName,
-          email,
-          password,
-        });
-
-        if (result.customerUserErrors?.length > 0) {
-          setError(result.customerUserErrors[0].message);
-          return {
-            success: false,
-            error: result.customerUserErrors[0].message,
-          };
-        }
-
-        // auto-login after registration
-        const loginResult = await customerAccessTokenCreate({
-          email,
-          password,
-        });
-        if (loginResult.customerAccessToken) {
-          const { accessToken } = loginResult.customerAccessToken;
-          localStorage.setItem(TOKEN_KEY, accessToken);
-          const customerData = await getCustomer(accessToken);
-          setCustomer({ ...customerData, accessToken });
-          return { success: true };
-        }
-
-        return { success: false, error: "Registration failed" };
-      } catch (err) {
-        setError(err.message);
-        return { success: false, error: err.message };
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [],
-  );
-
-  // ─── Login ────────────────────────────────────────────
-  const login = useCallback(async ({ email, password }) => {
+  // ─── Shared runner for actions that return { success, customer } ──
+  const run = useCallback(async (action, args) => {
     setIsLoading(true);
     setError(null);
     try {
-      const result = await customerAccessTokenCreate({ email, password });
-
-      if (result.customerUserErrors?.length > 0) {
-        setError(result.customerUserErrors[0].message);
-        return { success: false, error: result.customerUserErrors[0].message };
-      }
-
-      if (result.customerAccessToken) {
-        const { accessToken } = result.customerAccessToken;
-        localStorage.setItem(TOKEN_KEY, accessToken);
-        const customerData = await getCustomer(accessToken);
-        setCustomer({ ...customerData, accessToken });
-        return { success: true };
-      }
-
-      return { success: false, error: "Login failed" };
+      const result = await action(args);
+      if (result.success && result.customer) setCustomer(result.customer);
+      if (!result.success && result.error) setError(result.error);
+      return result;
     } catch (err) {
       setError(err.message);
       return { success: false, error: err.message };
@@ -122,101 +69,38 @@ export function CustomerProvider({ children }) {
     }
   }, []);
 
+  // ─── Register / Login ─────────────────────────────────
+  const register = useCallback((input) => run(registerCustomer, input), [run]);
+  const login = useCallback((input) => run(loginCustomer, input), [run]);
+
   // ─── Logout ───────────────────────────────────────────
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
-      if (customer?.accessToken) {
-        await customerAccessTokenDelete(customer.accessToken);
-      }
-      localStorage.removeItem(TOKEN_KEY);
-      setCustomer(null);
+      await logoutCustomer();
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
+      setCustomer(null);
       setIsLoading(false);
     }
-  }, [customer]);
+  }, []);
 
   // ─── Delete Account ───────────────────────────────────
   const deleteAccount = useCallback(async () => {
-    if (!customer?.id || !customer?.accessToken) return { success: false };
-    setIsLoading(true);
-    try {
-      const result = await customerDelete(customer.id, customer.accessToken);
+    if (!customer) return { success: false };
+    const result = await run(deleteCustomerAccount);
+    if (result.success) setCustomer(null);
+    return result;
+  }, [customer, run]);
 
-      if (result.userErrors?.length > 0) {
-        return { success: false, error: result.userErrors[0].message };
-      }
-
-      localStorage.removeItem(TOKEN_KEY);
-      setCustomer(null);
-      return { success: true };
-    } catch (err) {
-      return { success: false, error: err.message };
-    } finally {
-      setIsLoading(false);
-    }
-  }, [customer]);
-
-  // ─── Update Customer ──────────────────────────────────────────
-  // Handles email and/or password updates
-  // For password updates, verifies current password first via login
+  // ─── Update Customer (email and/or password) ──────────
   const updateCustomer = useCallback(
-    async ({ email, currentPassword, newPassword }) => {
-      if (!customer?.accessToken || !customer?.email) return { success: false };
-      setIsLoading(true);
-      try {
-        // ─── Verify current password if changing password ──
-        if (newPassword) {
-          const verifyResult = await customerAccessTokenCreate({
-            email: customer.email,
-            password: currentPassword,
-          });
-          if (verifyResult.customerUserErrors?.length > 0) {
-            return { success: false, error: "current_password_wrong" };
-          }
-        }
-
-        // ─── Build update input ───────────────────────────
-        const input = {};
-        if (email) input.email = email;
-        if (newPassword) input.password = newPassword;
-
-        const result = await customerUpdate(customer.accessToken, input);
-
-        if (result.customerUserErrors?.length > 0) {
-          return {
-            success: false,
-            error: result.customerUserErrors[0].message,
-          };
-        }
-
-        // ─── Update local customer state ──────────────────
-        if (result.customer) {
-          setCustomer((prev) => ({ ...prev, ...result.customer }));
-        }
-
-        // ─── Update token if new one was issued ───────────
-        if (result.customerAccessToken?.accessToken) {
-          localStorage.setItem(
-            TOKEN_KEY,
-            result.customerAccessToken.accessToken,
-          );
-          setCustomer((prev) => ({
-            ...prev,
-            accessToken: result.customerAccessToken.accessToken,
-          }));
-        }
-
-        return { success: true };
-      } catch (err) {
-        return { success: false, error: err.message };
-      } finally {
-        setIsLoading(false);
-      }
+    async (input) => {
+      if (!customer) return { success: false };
+      return run(updateCurrentCustomer, input);
     },
-    [customer],
+    [customer, run],
   );
 
   return (

@@ -1,7 +1,24 @@
 'use client';
 
-import { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+  useSyncExternalStore,
+} from 'react';
 import { LANGUAGES, LANGUAGE_COOKIE } from '@/lib/language';
+
+const subscribeNoop = () => () => {};
+
+function readStoredLanguage() {
+  try {
+    return localStorage.getItem('language');
+  } catch {
+    return null;
+  }
+}
 
 // ─── Language Context ─────────────────────────────────────────
 // Provides language state to the entire app.
@@ -26,31 +43,24 @@ export const LanguageProvider = ({ children, initialLanguage = null }) => {
 
   // ─── State ──────────────────────────────────────────────────
   // initialLanguage comes from the cookie (read on the server).
-  // null = no choice yet → the language picker is shown.
+  // `stored` = older choice saved only in localStorage; undefined
+  // until the browser has hydrated (server snapshot).
+  // language null = no choice yet → the language picker is shown.
   // `ready` = we've checked the browser for an older saved choice.
-  const [language, setLanguageState] = useState(initialLanguage);
-  const [ready, setReady] = useState(Boolean(initialLanguage));
+  const [chosen, setChosen] = useState(initialLanguage);
+  const stored = useSyncExternalStore(subscribeNoop, readStoredLanguage, () => undefined);
+  const language = chosen ?? (LANGUAGES.includes(stored) ? stored : null);
+  const ready = chosen != null || stored !== undefined;
 
-  // ─── On Mount ───────────────────────────────────────────────
-  // Visitors from before the cookie existed: move their saved
-  // localStorage choice into the cookie.
+  // ─── Move an older localStorage choice into the cookie ──────
   useEffect(() => {
-    if (initialLanguage) return;
-    let saved = null;
-    try {
-      saved = localStorage.getItem('language');
-    } catch {}
-    if (LANGUAGES.includes(saved)) {
-      setLanguageState(saved);
-      saveLanguage(saved);
-    }
-    setReady(true);
-  }, [initialLanguage]);
+    if (!chosen && LANGUAGES.includes(stored)) saveLanguage(stored);
+  }, [chosen, stored]);
 
   // ─── Setters ─────────────────────────────────────────────────
   const setLanguage = useCallback((next) => {
     if (!LANGUAGES.includes(next)) return;
-    setLanguageState(next);
+    setChosen(next);
     saveLanguage(next);
   }, []);
 

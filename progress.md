@@ -24,7 +24,7 @@ _Last updated: 2026-11-22_
 | 2 | Server-side checkout (#1 #2 #3 #6 #7 #13 #14 #15) | ✅ code done + tested · ⏳ full paid test pending |
 | 3 | Contact form (#8), security headers / CSP (#10 #11) | ✅ done · ⏳ user tasks (Resend domain, CSP console check) |
 | 4 | SEO language rendering (#9), caching + cart catalog (#17 #18) | ✅ done · ⏳ browser check |
-| 5 | Auth token → httpOnly cookie / Customer Account API (#12); CI, remove `package-lock.json`, README, lint errors (#19–24) | ⬜ not started |
+| 5 | Auth token → httpOnly cookie (#12); CI, remove `package-lock.json`, README, lint errors (#19–24) | ✅ done · ⏳ GitHub secrets, browser login check, "delete account" decision |
 
 ## What changed, by area
 
@@ -66,6 +66,15 @@ Flow now:
 - `CartContext.js`: `getProductsForVariants` (in `shopifyQueries.js`) loads only the products in the cart, instead of the whole catalog.
 - Missing product: `generateMetadata` calls `notFound()`. **User chose to keep** `item/[handle]/loading.js`, so the status is 200 with `noindex`, not 404.
 
+### Step 5: login token, lint, CI, cleanup
+- `src/app/actions/customer.js` (server actions): `getCurrentCustomer`, `adoptLegacyToken`, `loginCustomer`, `registerCustomer`, `logoutCustomer`, `deleteCustomerAccount`, `updateCurrentCustomer`. Token in cookie `customer_token` (httpOnly, secure in prod, sameSite lax, expires = Shopify `expiresAt`).
+- `CustomerContext.js` calls them; same API for pages (`login`, `register`, `logout`, `deleteAccount`, `updateCustomer`, `isLoggedIn`, `isLoading`). `isLoading` now starts `true` until the session check finishes. Old localStorage token `shopify-customer-token` is migrated once, then removed.
+- Password reset pages (`ResetPage`, `ConfirmResetPage`) still call the Storefront API from the browser (no token stored).
+- **Known bug, not fixed:** "Delete account" has never worked: the Storefront API has no `customerDelete`. Fix needs the Admin scope `write_customers`, waiting on the user's decision.
+- Lint fixes: Nav `<a>` → `<Link>`; Header bounce and ItemPage color reset use state adjusted during render; ItemPage `images` in `useMemo`; CookieConsent and LanguageContext read localStorage via `useSyncExternalStore`; SuccessPage effect has proper deps plus a cancel guard; one commented `eslint-disable` in CartContext (restore-cart loading flag).
+- `package-lock.json` removed; `"packageManager": "pnpm@11.5.0"`; README rewritten; `.github/workflows/ci.yml` (install, audit high, lint, build; needs 2 GitHub secrets); `.github/dependabot.yml`.
+- **Lint baseline is now 0.** Any lint problem is new.
+
 ## Decisions made by the user
 - Fix work happens on branch `security-fixes`; commit after each step.
 - No Hyp key rotation (no sales ever made).
@@ -73,10 +82,11 @@ Flow now:
 - Keep track of remaining work in `todo.md`; report test results in `report.md`.
 
 ## How to test (reusable)
-- `pnpm audit --prod`, `pnpm build`, `pnpm lint`. Lint baseline: **11 problems (8 errors, 3 warnings)**, all in files we didn't change (set-state-in-effect rule, `<a href="/">` in Nav.jsx). Anything above 11 is new.
+- `pnpm audit --prod`, `pnpm build`, `pnpm lint`. Lint baseline: **0 problems** (since step 5).
 - Run the site: `PORT=3123 pnpm start`, test with curl, then stop it. Don't leave servers running.
 - Live checkout tests ran node scripts against the real store, using an alias loader for `@/` imports. They created draft orders and deleted them afterwards (`draftOrderDelete`). Never complete a draft order in tests: that creates a real order and lowers stock.
 - Contact-form tests stubbed `resend` and `next/headers` so no email is sent.
+- Login tests stubbed `next/headers` cookies with an in-memory jar; they used only failing/logged-out paths (no test customer created: it couldn't be deleted).
 - Product used in tests: Dor Jug `gid://shopify/ProductVariant/45347877388322` (stock 1, ₪89 / $31).
 
 ## Open items needing the user

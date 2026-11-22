@@ -1,0 +1,42 @@
+# ─── CI ───────────────────────────────────────────────────────
+# Runs on every push and pull request: install, security audit,
+# lint, build. A red ❌ on GitHub means something here failed.
+#
+# The build fetches products from Shopify (for the sitemap), so the
+# repository needs two secrets (GitHub → Settings → Secrets and
+# variables → Actions → New repository secret):
+#   NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN
+#   NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4 # uses the pnpm version from package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Security audit (fails on high/critical)
+        run: pnpm audit --prod --audit-level high
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN: ${{ secrets.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN }}
+          NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN: ${{ secrets.NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN }}

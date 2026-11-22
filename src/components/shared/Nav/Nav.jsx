@@ -55,9 +55,9 @@ export default function Nav({ isMenuOpen, onClose }) {
       <li
         className={`nav__item ${activeAnchor === "#about" ? "nav__item--active" : ""}`}
       >
-        <a href="/#about" onClick={(e) => handleAnchorClick(e, "/#about")}>
+        <Link href="/#about" onClick={(e) => handleAnchorClick(e, "/#about")}>
           {t.nav.about}
-        </a>
+        </Link>
       </li>
       <li
         className={`nav__item ${pathname === "/fashion" ? "nav__item--active" : ""}`}
@@ -83,9 +83,9 @@ export default function Nav({ isMenuOpen, onClose }) {
       <li
         className={`nav__item ${activeAnchor === "#contact" ? "nav__item--active" : ""}`}
       >
-        <a href="/#contact" onClick={(e) => handleAnchorClick(e, "/#contact")}>
+        <Link href="/#contact" onClick={(e) => handleAnchorClick(e, "/#contact")}>
           {t.nav.contact}
-        </a>
+        </Link>
       </li>
     </>
   );

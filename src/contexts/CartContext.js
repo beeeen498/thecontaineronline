@@ -49,22 +49,34 @@ export function CartProvider({ children }) {
     };
   }, [variantKey]);
 
-  useEffect(() => {
-    const savedCartId = localStorage.getItem(CART_ID_KEY);
-    if (!savedCartId) return;
-
+  // ─── Restore saved cart on mount ──────────────────────
+  const restoreCart = useCallback(async (savedCartId) => {
     setIsLoading(true);
-    getCart(savedCartId)
-      .then((fetchedCart) => {
-        if (fetchedCart) {
-          setCart(fetchedCart);
-        } else {
-          localStorage.removeItem(CART_ID_KEY);
-        }
-      })
-      .catch(() => localStorage.removeItem(CART_ID_KEY))
-      .finally(() => setIsLoading(false));
+    try {
+      const fetchedCart = await getCart(savedCartId);
+      if (fetchedCart) {
+        setCart(fetchedCart);
+      } else {
+        localStorage.removeItem(CART_ID_KEY);
+      }
+    } catch {
+      localStorage.removeItem(CART_ID_KEY);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    let savedCartId = null;
+    try {
+      savedCartId = localStorage.getItem(CART_ID_KEY);
+    } catch {}
+    // Intentional: mark the cart as loading immediately so "Add to cart"
+    // stays disabled until the saved cart is back (otherwise a click in
+    // that moment would start a new, empty cart).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (savedCartId) restoreCart(savedCartId);
+  }, [restoreCart]);
 
   // ─── Add item to cart ──────────────────────────────────
   const addToCart = useCallback(

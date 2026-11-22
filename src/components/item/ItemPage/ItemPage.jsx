@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslations } from "@/hooks/useTranslations";
@@ -120,27 +120,27 @@ export default function ItemPage({ product, relatedProducts }) {
 
   // ─── Image State ──────────────────────────────────────
   // Show images for selected color, or all product images if no color picked
-  const variantImages =
-    hasVariants && selectedOptions["Colors"]
-      ? [
-          ...new Set(
-            product.variants
-              .filter((v) =>
-                v.selectedOptions.some(
-                  (o) =>
-                    o.name === "Colors" &&
-                    o.value === selectedOptions["Colors"],
-                ),
-              )
-              .map((v) => v.image)
-              .filter(Boolean),
-          ),
-        ]
-      : [];
-
-  // Use variant images if available, otherwise fall back to product images
-  const images =
-    variantImages.length > 0 ? variantImages : product.images || [];
+  // Memoized so the image-preload effect only reruns when the images change
+  const colorForImages = selectedOptions["Colors"];
+  const images = useMemo(() => {
+    const variantImages =
+      hasVariants && colorForImages
+        ? [
+            ...new Set(
+              product.variants
+                .filter((v) =>
+                  v.selectedOptions.some(
+                    (o) => o.name === "Colors" && o.value === colorForImages,
+                  ),
+                )
+                .map((v) => v.image)
+                .filter(Boolean),
+            ),
+          ]
+        : [];
+    // Use variant images if available, otherwise fall back to product images
+    return variantImages.length > 0 ? variantImages : product.images || [];
+  }, [hasVariants, colorForImages, product]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const mainImage = images[currentImageIndex] || "";
 
@@ -170,9 +170,13 @@ export default function ItemPage({ product, relatedProducts }) {
   }, [currentImageIndex, images]);
 
   // ─── Reset image index when color changes ──────────────
-  useEffect(() => {
+  // (state adjusted during render instead of in an effect)
+  const selectedColor = selectedOptions["Colors"];
+  const [prevColor, setPrevColor] = useState(selectedColor);
+  if (selectedColor !== prevColor) {
+    setPrevColor(selectedColor);
     setCurrentImageIndex(0);
-  }, [selectedOptions["Colors"]]);
+  }
 
   // ─── Product Data ─────────────────────────────────────
   const name = isEnglish ? product.englishName : product.hebrewName;

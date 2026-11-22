@@ -1,10 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslations } from '@/hooks/useTranslations';
 import './CookieConsent.scss';
+
+const subscribeNoop = () => () => {};
+
+function readConsent() {
+  try {
+    return localStorage.getItem('cookie-consent');
+  } catch {
+    return 'unavailable'; // storage blocked — don't nag on every page
+  }
+}
 
 // ─── CookieConsent ────────────────────────────────────────────
 // Shows a cookie consent banner on first visit
@@ -15,26 +25,28 @@ export default function CookieConsent({ onAccept, onDecline }) {
   const { language } = useLanguage();
   const t = useTranslations();
   const isHebrew = language === 'Hebrew';
-  const [isVisible, setIsVisible] = useState(false);
-
   // ─── Check existing consent ───────────────────────────
-  useEffect(() => {
-    const consent = localStorage.getItem('cookie-consent');
-    if (!consent) setIsVisible(true);
-  }, []);
+  // Read from localStorage after hydration (server snapshot = hidden)
+  const consent = useSyncExternalStore(subscribeNoop, readConsent, () => 'unknown');
+  const [dismissed, setDismissed] = useState(false);
 
-  if (!isVisible) return null;
+  if (dismissed || consent !== null) return null;
 
   // ─── Handlers ─────────────────────────────────────────
+  const saveConsent = (value) => {
+    try {
+      localStorage.setItem('cookie-consent', value);
+    } catch {}
+    setDismissed(true);
+  };
+
   const handleAccept = () => {
-    localStorage.setItem('cookie-consent', 'accepted');
-    setIsVisible(false);
+    saveConsent('accepted');
     onAccept?.();
   };
 
   const handleDecline = () => {
-    localStorage.setItem('cookie-consent', 'declined');
-    setIsVisible(false);
+    saveConsent('declined');
     onDecline?.();
   };
 

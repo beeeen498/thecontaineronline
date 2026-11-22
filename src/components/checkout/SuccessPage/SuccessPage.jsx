@@ -20,13 +20,20 @@ export default function SuccessPage() {
 
   const [status, setStatus] = useState("loading");
 
+  // confirmHypPayment is safe to call more than once for the same order,
+  // so re-running when searchParams/clearCart change is harmless.
   useEffect(() => {
+    let cancelled = false;
+    const finish = (value) => {
+      if (!cancelled) setStatus(value);
+    };
+
     const processPayment = async () => {
       const cCode = searchParams.get("CCode");
 
       // ─── Payment failed ──────────────────────────────
       if (cCode !== "0") {
-        setStatus("failed");
+        finish("failed");
         return;
       }
 
@@ -41,20 +48,23 @@ export default function SuccessPage() {
         const { success } = await confirmHypPayment(paramsObj);
 
         if (!success) {
-          setStatus("failed");
+          finish("failed");
           return;
         }
 
         clearCart();
-        setStatus("success");
+        finish("success");
       } catch (error) {
         console.error("Error processing payment:", error);
-        setStatus("failed");
+        finish("failed");
       }
     };
 
     processPayment();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [searchParams, clearCart]);
 
   return (
     <div className={`success-page ${isHebrew ? "success-page--rtl" : ""}`}>

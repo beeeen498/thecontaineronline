@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# The Container
 
-## Getting Started
+Online store for **thecontaineronline.com**: handmade ceramic art and luxury fashion, in English and Hebrew.
 
-First, run the development server:
+- **Framework:** Next.js 16 (App Router), React 19, JavaScript, SCSS
+- **Products & orders:** Shopify (Storefront API for the catalog, Admin API for orders)
+- **Payments:** Hyp Pay (Israeli payment gateway)
+- **Contact form email:** Resend
+- **Hosting:** Vercel
+- **Package manager:** pnpm (version pinned in `package.json`)
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm dev        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Other scripts: `pnpm build`, `pnpm start`, `pnpm lint`, `pnpm audit --prod`.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Put these in `.env.local` (never commit it), and in Vercel → Project → Settings → Environment Variables.
 
-## Learn More
+| Variable | Used for |
+|---|---|
+| `NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN` | Shopify store domain (`xxx.myshopify.com`) |
+| `NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN` | Storefront API token (public, read-only catalog + carts + customer login) |
+| `SHOPIFY_ADMIN_ACCESS_TOKEN` | Admin API token from the **Inventory Manager** app. Scopes: `read_products`, `read_inventory`, `write_inventory`, `read_draft_orders`, `write_draft_orders` |
+| `HYP_TERMINAL_NUMBER`, `HYP_API_KEY`, `HYP_PASS_P` | Hyp Pay terminal credentials |
+| `RESEND_API_KEY` | Sending contact-form emails |
+| `CONTACT_FROM_EMAIL` | _Optional._ Sender for contact emails once your domain is verified in Resend |
+| `SITE_URL` | _Optional._ Where Hyp sends customers back after paying (defaults to the live site; set `http://localhost:3000` to test checkout locally) |
 
-To learn more about Next.js, take a look at the following resources:
+## How checkout works
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. The cart is a Shopify cart; its ID is kept in the browser.
+2. **Checkout:** the browser sends only the cart ID. The server prices the cart (₪ for Hebrew, $ for English), creates a Shopify **draft order** (tag `hyp-pending`), and redirects to Hyp's payment page. See `src/app/actions/createHypPayment.js`.
+3. **After payment:** Hyp redirects to `/checkout/success`. The server verifies the payment with Hyp and checks the amount against the draft order. It then completes the draft order, so Shopify creates the real order (tag `hyp-paid`) and lowers stock. See `src/app/actions/handlePaymentSuccess.js`.
+4. Abandoned checkouts leave open draft orders in Shopify Admin → Orders → Drafts. Those can be deleted.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Other notes
 
-## Deploy on Vercel
+- **Language:** saved in a `language` cookie so pages render in the right language on the server. First-time visitors see a language picker.
+- **Customer login:** the Shopify customer token is kept in an httpOnly cookie by server actions (`src/app/actions/customer.js`).
+- **Caching:** product data is cached for 60 seconds (`src/lib/catalog.js`).
+- **Security headers:** see `next.config.mjs`. The full Content-Security-Policy is report-only for now.
+- **CI:** `.github/workflows/ci.yml` runs audit, lint and build on every push. It needs the two `NEXT_PUBLIC_SHOPIFY_*` values as GitHub repository secrets.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project docs
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `progress.md`: what has been done and why (read first)
+- `todo.md`: what's left
+- `report.md`: test results
+- `upgrade.md`: original review and recommendations

@@ -25,12 +25,19 @@ export default function Header({ isMenuOpen, onToggleMenu }) {
     router.push(isLoggedIn ? "/account" : "/account/login");
   };
 
+  // ─── Bounce the cart icon when the item count changes ──
+  // (state adjusted during render, as React recommends, instead of in an effect)
+  const [prevItemCount, setPrevItemCount] = useState(itemCount);
+  if (itemCount !== prevItemCount) {
+    setPrevItemCount(itemCount);
+    if (itemCount > 0) setIsBouncing(true);
+  }
+
   useEffect(() => {
-    if (itemCount === 0) return;
-    setIsBouncing(true);
+    if (!isBouncing) return;
     const timer = setTimeout(() => setIsBouncing(false), 400);
     return () => clearTimeout(timer);
-  }, [itemCount]);
+  }, [isBouncing]);
 
   return (
     <header className={`header ${isHebrew ? "header--rtl" : ""}`}>

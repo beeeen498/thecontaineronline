@@ -1,3 +1,41 @@
+# Test Report — Step 5
+_2026-11-22 · branch `security-fixes`_
+
+## Result: ✅ all checks pass · lint is now clean (0 problems, was 11)
+
+| Area | Check | Result |
+|---|---|---|
+| Lint | `pnpm lint` | ✅ **0 problems** (was 8 errors + 3 warnings) |
+| Build | `pnpm build` | ✅ |
+| CI steps run locally | `pnpm install --frozen-lockfile`, `pnpm audit --prod --audit-level high` | ✅ |
+| Login | Logged out: no customer, update/delete refused, logout works | ✅ |
+| Login | Wrong password → error, no cookie set; Hebrew error translation still matches | ✅ |
+| Login | Garbage input (objects, missing fields) rejected | ✅ |
+| Login | Fake old-style token → ignored, no cookie | ✅ |
+| Login | Expired/invalid cookie → logged out and cookie removed | ✅ |
+| Login | Token never sent to the browser | ✅ |
+| Pages | 12 pages incl. all account pages (Hebrew cookie) | ✅ 200, no server errors |
+
+## What changed
+- **Login token moved to an httpOnly cookie** (#12). New server actions in `src/app/actions/customer.js`. `CustomerContext.js` calls them and never sees the token. Customers already logged in are moved over automatically on their next visit.
+- **Lint errors fixed** in Nav, Header, ItemPage, CookieConsent, LanguageContext, CartContext and SuccessPage. Behaviour is unchanged. One line in `CartContext.js` is an intentional, commented exception.
+- **Cleanup:** removed `package-lock.json`, pinned `pnpm@11.5.0`, rewrote the README.
+- **CI** (`.github/workflows/ci.yml`): audit, lint and build on every push. **Dependabot** (`.github/dependabot.yml`): weekly dependency-update PRs.
+
+## Bugs found
+- **"Delete account" has never worked (not fixed yet, needs your decision).** Shopify's Storefront API has no delete-customer action (confirmed by asking the API). The button always showed an error. Fixing it needs the Admin API permission `write_customers`. Shopify also refuses to delete customers who have orders, so for those the shop would need a "request deletion" flow instead.
+- **Old account-page flicker (fixed).** On a fresh page load, a logged-in customer could be bounced to the login page for a moment, because the login check started as "not loading".
+- **Cookie banner crashed if browser storage was blocked (fixed).** The banner now stays hidden in that case.
+
+## Not tested (needs a real account / browser)
+- Logging in with a real account, staying logged in after reload, updating email/password, logging out. No test customer was created, because it couldn't be deleted afterwards (see above).
+
+## Notes
+- Login requests now reach Shopify from Vercel's servers instead of each shopper's browser. Shopify's per-IP protection against password guessing therefore sees Vercel's IP. That's fine at this shop's traffic level.
+- **Customer Account API** (Shopify's newer login system) wasn't adopted. It means a redirect-based login hosted by Shopify, which is a bigger UX change. The current classic login keeps working.
+
+---
+
 # Test Report — Step 4
 _2026-11-22 · branch `security-fixes`_
 
