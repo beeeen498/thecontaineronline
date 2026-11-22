@@ -1,0 +1,88 @@
+# Progress — Security & Upgrade Work
+
+> **Read this first when resuming.** Then `todo.md` (what's left) and `report.md` (test results).
+> `upgrade.md` is the original review; findings are referenced as #1–#24.
+
+_Last updated: 2026-11-22_
+
+## Project in one paragraph
+**The Container** (thecontaineronline.com): Next.js 16 App Router + React 19, plain JS, SCSS, pnpm. Bilingual English/Hebrew (RTL). Products come from the **Shopify Storefront API** (`src/lib/shopifyQueries.js`). Payment goes through **Hyp Pay** (Israeli gateway), not Shopify Checkout. The contact form sends email through **Resend**. Hosted on **Vercel**. Secrets are in `.env.local` (gitignored; never paste or commit it).
+
+## Git state
+- Branch **`security-fixes`** (all work is here). `main` and GitHub are untouched; branch not pushed.
+- Commits on top of `main` (`0348e9d`):
+  1. `1d40193`: steps 1–2: dependency upgrade, removed secret logs, server-side checkout
+  2. `766e125`: fixes from the retest: removed draft-order stock hold; `SITE_URL` for the Hyp return address
+  3. `b7b481b`: step 3: contact form hardening + security headers
+  4. `bb43060`: step 4: server-rendered language, caching, cart lookup
+- To undo everything: `git checkout main`. To return to a step: `git reset --hard <hash>`.
+
+## Plan (from upgrade.md "Suggested order of work")
+| Step | Scope | Status |
+|---|---|---|
+| 1 | Upgrade Next/React (#5), remove secret logs (#4) | ✅ done |
+| 2 | Server-side checkout (#1 #2 #3 #6 #7 #13 #14 #15) | ✅ code done + tested · ⏳ full paid test pending |
+| 3 | Contact form (#8), security headers / CSP (#10 #11) | ✅ done · ⏳ user tasks (Resend domain, CSP console check) |
+| 4 | SEO language rendering (#9), caching + cart catalog (#17 #18) | ✅ done · ⏳ browser check |
+| 5 | Auth token → httpOnly cookie / Customer Account API (#12); CI, remove `package-lock.json`, README, lint errors (#19–24) | ⬜ not started |
+
+## What changed, by area
+
+### Step 1: dependencies & logs
+- next 16.2.9 → **16.4.6**, react/react-dom → **19.3.1**, plus indirect dependencies. `pnpm audit --prod` = 0 vulnerabilities (was 40, incl. 5 critical).
+- Removed `console.log`s that printed the Hyp `KEY`/`PassP`. **Key rotation skipped:** user confirmed no sales were ever made, so the logging code never ran in production.
+
+### Step 2: checkout (most important)
+Flow now:
+1. `CartDrawer.jsx` sends only `{ cartId, language }` to `createHypPayment` (`src/app/actions/createHypPayment.js`).
+2. The server loads the cart (`getCart`) and prices it with `getVariantPricing` (`shopifyQueries.js`), using the same rules as the display (`parseIsraelPrice` / `parseGlobalPrice`). Hebrew → ILS `israelPrice`, Coin 1. English → USD `globalPrice`, Coin 2.
+3. It creates a Shopify **draft order** (`createDraftOrder` in `src/lib/shopifyAdmin.js`, tag `hyp-pending`, custom attributes `hyp_amount` / `hyp_currency` / `language`). The draft order's numeric ID becomes Hyp's `Order` parameter.
+4. Hyp redirects to `/checkout/success`, and `SuccessPage.jsx` calls `confirmHypPayment` (`src/app/actions/handlePaymentSuccess.js`). That function:
+   - sends the redirect params to Hyp VERIFY (our credentials can't be overridden) and requires `CCode=0`;
+   - checks the amount against the draft order;
+   - calls `completeDraftOrder`, which tags `hyp-paid`, adds the transaction to the note, and completes the draft. Shopify then creates the order and lowers inventory.
+
+   Idempotent: an already-completed draft returns success.
+- Removed: the exported `updateInventoryAfterPayment` / `decreaseInventory` and the `sessionStorage` cart lines.
+- **No stock hold** on draft orders: it allowed anyone to make items look sold out, and didn't prevent double booking.
+- `SITE_URL` env (optional) overrides the Hyp return address for local testing.
+- Shopify Admin app **"Inventory Manager"** (Dev Dashboard app) now has scopes `write_inventory, read_inventory, read_products, write_draft_orders, read_draft_orders`. The token didn't change.
+- Product lookup by handle now uses GraphQL variables (#13).
+
+### Step 3: contact form & headers
+- `src/app/actions/sendEmail.js`: HTML escaping, server-side validation and length limits, honeypot field `website`, in-memory rate limit (3 messages per 10 minutes per IP), `replyTo`, sender from `CONTACT_FROM_EMAIL` env (falls back to `onboarding@resend.dev`). Resend errors are now reported (before, failures showed "Sent!").
+- `ContactUs.jsx`: honeypot input, `maxLength`, phone validation, error message. New translation keys `phoneInvalid`, `sendFailed`, `rateLimited` (EN + HE).
+- `next.config.mjs` `headers()`:
+  - **enforced:** `frame-ancestors`/`base-uri`/`object-src`/`form-action`, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy, HSTS;
+  - **full CSP in `Content-Security-Policy-Report-Only`**, because the Negishot accessibility widget loads from negishot.co.il, cdn.jsdelivr.net, Google Fonts and media.getmood.io.
+
+### Step 4: SEO, language, caching
+- Language is saved in cookie `language` (constants in `src/lib/language.js`) plus localStorage.
+- `src/app/layout.js` (now async) reads the cookie, sets `<html lang dir>`, and passes `initialLanguage` to `LanguageProvider`.
+- `LanguageContext.js` no longer returns `null` before mount (that made every server page empty). It exposes `ready` and migrates old localStorage choices to the cookie.
+- `LanguageGate.jsx` always renders the page. When `ready && !language` it shows `SelectLanguagePage` on top, with the page wrapped in a `display: contents` + `inert` wrapper.
+- Fixed `language.toLowerCase()` crashes when no language is set (4 components → `language !== 'Hebrew'`).
+- `src/lib/catalog.js`: `unstable_cache` wrappers (60 s, tag `products`) used by server pages. Removed `revalidate = 0`. Sitemap now revalidates.
+- `CartContext.js`: `getProductsForVariants` (in `shopifyQueries.js`) loads only the products in the cart, instead of the whole catalog.
+- Missing product: `generateMetadata` calls `notFound()`. **User chose to keep** `item/[handle]/loading.js`, so the status is 200 with `noindex`, not 404.
+
+## Decisions made by the user
+- Fix work happens on branch `security-fixes`; commit after each step.
+- No Hyp key rotation (no sales ever made).
+- Keep the product loading screen (noindex instead of a real 404).
+- Keep track of remaining work in `todo.md`; report test results in `report.md`.
+
+## How to test (reusable)
+- `pnpm audit --prod`, `pnpm build`, `pnpm lint`. Lint baseline: **11 problems (8 errors, 3 warnings)**, all in files we didn't change (set-state-in-effect rule, `<a href="/">` in Nav.jsx). Anything above 11 is new.
+- Run the site: `PORT=3123 pnpm start`, test with curl, then stop it. Don't leave servers running.
+- Live checkout tests ran node scripts against the real store, using an alias loader for `@/` imports. They created draft orders and deleted them afterwards (`draftOrderDelete`). Never complete a draft order in tests: that creates a real order and lowers stock.
+- Contact-form tests stubbed `resend` and `next/headers` so no email is sent.
+- Product used in tests: Dor Jug `gid://shopify/ProductVariant/45347877388322` (stock 1, ₪89 / $31).
+
+## Open items needing the user
+See `todo.md`. Main ones:
+1. Full paid checkout test (needs `SITE_URL=http://localhost:3000` in `.env.local`).
+2. Verify the domain in Resend and set `CONTACT_FROM_EMAIL`.
+3. Check the browser console for CSP report-only warnings; if none, enforce the CSP.
+4. Browser check of the language picker and language switching.
+5. Merge `security-fixes` into `main` and deploy (only after the tests above).
