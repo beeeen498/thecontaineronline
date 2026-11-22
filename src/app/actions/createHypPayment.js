@@ -4,7 +4,9 @@ import { getCart, getVariantPricing } from "@/lib/shopifyQueries";
 import { createDraftOrder } from "@/lib/shopifyAdmin";
 
 const HYP_BASE_URL = "https://pay.hyp.co.il/p/";
-const SITE_URL = "https://thecontaineronline.com";
+// Where Hyp sends the customer back. Override with SITE_URL in
+// .env.local (e.g. http://localhost:3000) to test checkout locally.
+const SITE_URL = process.env.SITE_URL || "https://thecontaineronline.com";
 const TERMINAL = process.env.HYP_TERMINAL_NUMBER;
 const API_KEY = process.env.HYP_API_KEY;
 const PASS_P = process.env.HYP_PASS_P;

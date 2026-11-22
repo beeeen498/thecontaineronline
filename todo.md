@@ -3,7 +3,7 @@
 Working branch: `security-fixes` · Full details for each item are in [upgrade.md](upgrade.md).
 
 ## Before merging `security-fixes` into `main`
-- [ ] **Full checkout test** (`pnpm dev`)
+- [ ] **Full checkout test** (`pnpm dev`, with `SITE_URL=http://localhost:3000` added to `.env.local` so Hyp returns to your machine)
   - [ ] Hebrew: add an item → Checkout → Hyp page shows the right ₪ amount
   - [ ] English: add an item → Checkout → Hyp page shows the right $ amount
   - [ ] Shopify Admin → Orders → Drafts shows a `hyp-pending` draft order with the right items
@@ -26,6 +26,7 @@ Working branch: `security-fixes` · Full details for each item are in [upgrade.m
 - [ ] Shipping address isn't collected anywhere: decide how to get it (checkout form, Hyp fields, or contact the customer)
 - [ ] Abandoned checkouts leave open draft orders in Shopify: delete them from time to time, or automate it
 - [ ] Products with several variants at different prices are charged the lowest price: confirm this is OK
+- [ ] Two buyers paying for the same one-of-a-kind item at the same moment could both succeed: add rate limiting + a short stock hold later (see report.md)
 - [ ] Optional: Shopify's suggestions for Inventory Manager (IP restrictions, expiring access tokens)
 
 ## Done

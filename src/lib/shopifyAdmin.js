@@ -52,10 +52,9 @@ function throwOnUserErrors(userErrors) {
 // ─── Create a pending draft order for a checkout ──────────────
 // lines: [{ variantId, quantity }]
 // attributes: [{ key, value }] — stored on the draft order
-// Inventory is reserved for 30 minutes while the customer pays.
+// Inventory is NOT reserved: anyone can start a checkout, so reserving
+// would let visitors make items look sold out without paying.
 export async function createDraftOrder({ lines, attributes, note }) {
-  const reserveUntil = new Date(Date.now() + 30 * 60 * 1000).toISOString();
-
   const data = await adminRequest(
     `mutation draftOrderCreate($input: DraftOrderInput!) {
       draftOrderCreate(input: $input) {
@@ -72,7 +71,6 @@ export async function createDraftOrder({ lines, attributes, note }) {
         customAttributes: attributes,
         note,
         tags: ["hyp-pending"],
-        reserveInventoryUntil: reserveUntil,
       },
     },
   );
