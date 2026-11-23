@@ -6,10 +6,13 @@ import { IoLogoWhatsapp } from 'react-icons/io';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslations } from '@/hooks/useTranslations';
 import { sendContactEmail } from '@/app/actions/sendEmail';
+import Turnstile from '@/components/shared/Turnstile/Turnstile';
 import './ContactUs.scss';
 
 // ─── Constants ────────────────────────────────────────────────
 const PHONE_NUMBER = '+972553000357';
+// Cloudflare Turnstile site key (public). Not set → no human check.
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 // ─── ContactUs ────────────────────────────────────────────────
 // Contact form with email sending via Resend
@@ -33,6 +36,12 @@ export default function ContactUs() {
   const [sendError, setSendError] = useState(null);
   const [isSent, setIsSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // ─── Human check ────────────────────────────────────────
+  // Tokens are single-use: bumping `turnstileKey` re-mounts the
+  // widget to get a fresh one after each send attempt.
+  const [turnstileToken, setTurnstileToken] = useState(null);
+  const [turnstileKey, setTurnstileKey] = useState(0);
 
   // ─── Handlers ───────────────────────────────────────────
   const handleChange = (e) => {
@@ -71,21 +80,34 @@ export default function ContactUs() {
     e.preventDefault();
     if (!validate()) return;
 
-    setIsLoading(true);
     setSendError(null);
+    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+      setSendError('captcha');
+      return;
+    }
+
+    setIsLoading(true);
     let result;
     try {
-      result = await sendContactEmail(formData);
+      result = await sendContactEmail({ ...formData, turnstileToken });
     } catch {
       result = { success: false };
     }
     setIsLoading(false);
+    setTurnstileToken(null);
+    setTurnstileKey((k) => k + 1);
 
     if (result.success) {
       setIsSent(true);
       setFormData({ fullName: '', phone: '', email: '', message: '', website: '' });
     } else {
-      setSendError(result.error === 'rate_limited' ? 'rateLimited' : 'sendFailed');
+      setSendError(
+        result.error === 'rate_limited'
+          ? 'rateLimited'
+          : result.error === 'captcha'
+            ? 'captcha'
+            : 'sendFailed',
+      );
     }
   };
 
@@ -171,6 +193,16 @@ export default function ContactUs() {
             aria-hidden="true"
             style={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clipPath: 'inset(50%)', opacity: 0, pointerEvents: 'none' }}
           />
+
+          {/* human check — hidden once the message is sent */}
+          {!isSent && (
+            <Turnstile
+              key={turnstileKey}
+              siteKey={TURNSTILE_SITE_KEY}
+              language={language}
+              onToken={setTurnstileToken}
+            />
+          )}
 
           {sendError && (
             <span className="contact__error" role="alert">{t.contact.errors[sendError]}</span>

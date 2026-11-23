@@ -84,6 +84,11 @@ Flow now:
 - `package-lock.json` removed; `"packageManager": "pnpm@11.5.0"`; README rewritten; `.github/workflows/ci.yml` (install, audit high, lint, build; needs 2 GitHub secrets); `.github/dependabot.yml`.
 - **Lint baseline is now 0.** Any lint problem is new.
 
+### Spam protection + instant product updates
+- **Turnstile:** `src/lib/turnstile.js` (server verify; skipped when `TURNSTILE_SECRET_KEY` is unset) and `src/components/shared/Turnstile/Turnstile.jsx` (explicit render; re-mounted via `key` after each send, because tokens are single-use). `sendEmail.js` checks it after validation and before the rate limit (error `captcha`). CSP allows `challenges.cloudflare.com` (script, connect, frame). Test keys: site `1x00000000000000000000AA`; secrets `1x0000000000000000000000000000000AA` (pass) and `2x0000000000000000000000000000000AA` (fail). `NEXT_PUBLIC_*` is inlined at build time.
+- **Webhook:** `src/app/api/shopify-webhook/route.js` checks `?token=` against `SHOPIFY_WEBHOOK_TOKEN` (timing-safe; 503 if unset), then calls `revalidateTag("products", { expire: 0 })` (Next 16 needs the 2nd arg; `{ expire: 0 }` = never serve stale). `scripts/shopify-webhooks.mjs` (`--list`, `--create`, `--delete`) registers PRODUCTS_CREATE/UPDATE/DELETE, INVENTORY_LEVELS_UPDATE and COLLECTIONS_UPDATE on the Inventory Manager app (`uri` field, `includeFields: ["id"]`). It probes the live URL first and never prints the token.
+- Vercel env vars added by the user: `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `SHOPIFY_WEBHOOK_TOKEN`.
+
 ### Re-check fixes
 - SEO: the layout no longer sets `alternates.canonical` (every page inherited the home page). `metadataBase` is set in the layout; each public page sets `alternates: { canonical: "/path" }`.
 

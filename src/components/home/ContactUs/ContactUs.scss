@@ -39,6 +39,12 @@
     flex-direction: column;
     gap: $spacing-sm;
 
+    // Cloudflare Turnstile box (fixed 65px tall): reserve the space
+    // so the button doesn't jump when the widget appears
+    .turnstile {
+      min-height: 65px;
+    }
+
     input {
       all: unset;
       text-transform: uppercase;

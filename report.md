@@ -1,3 +1,31 @@
+# Test Report — Spam protection + instant product updates
+_2026-11-23 · branch `security-fixes`_
+
+## Result: ✅ all checks pass
+
+### Contact form: Cloudflare Turnstile (Cloudflare's official test keys, real calls to Cloudflare, email faked)
+| Check | Result |
+|---|---|
+| No keys set → form works as before | ✅ |
+| Keys set, no token → refused, nothing sent | ✅ |
+| Genuine token → sent | ✅ |
+| Token refused by Cloudflare / not text / oversized → refused, nothing sent | ✅ |
+| Hidden trap field still works | ✅ |
+| Failed human checks don't use up the visitor's rate limit | ✅ |
+| Rate limit still applies (4th message in 10 minutes) | ✅ |
+| Browser (you): widget shows above Send, in Hebrew too; console has no CSP messages | ✅ |
+
+### Product webhook `/api/shopify-webhook`
+| Check | Result |
+|---|---|
+| No token / wrong token / token off by one character → 401 | ✅ |
+| GET → 405 | ✅ |
+| Right token → 200; next product page view is fetched fresh from Shopify (0.57 s instead of 0.02 s), then cached again | ✅ |
+| No server errors | ✅ |
+| Shopify notifications themselves | ⏳ set up after deploy (`scripts/shopify-webhooks.mjs --create`) |
+
+---
+
 # Test Report — Browser check (local production build)
 _2026-11-23 · branch `security-fixes` · checked by you in Chrome_
 

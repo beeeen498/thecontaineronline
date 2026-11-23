@@ -30,6 +30,8 @@ Put these in `.env.local` (never commit it), and in Vercel → Project → Setti
 | `HYP_TERMINAL_NUMBER`, `HYP_API_KEY`, `HYP_PASS_P` | Hyp Pay terminal credentials |
 | `RESEND_API_KEY` | Sending contact-form emails |
 | `CONTACT_FROM_EMAIL` | _Optional._ Sender for contact emails once your domain is verified in Resend |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | _Optional._ Cloudflare Turnstile "are you human" check on the contact form (Cloudflare → Turnstile). Without them the form still works (hidden trap field + rate limit) |
+| `SHOPIFY_WEBHOOK_TOKEN` | Long random secret for `/api/shopify-webhook` (instant product updates). Set up the Shopify side once with `node --env-file=.env.local scripts/shopify-webhooks.mjs --create` |
 | `SITE_URL` | _Optional._ Where Hyp sends customers back after paying (defaults to the live site; set `http://localhost:3000` to test checkout locally) |
 
 ## How checkout works
@@ -43,7 +45,7 @@ Put these in `.env.local` (never commit it), and in Vercel → Project → Setti
 
 - **Language:** saved in a `language` cookie so pages render in the right language on the server. First-time visitors see a language picker.
 - **Customer login:** the Shopify customer token is kept in an httpOnly cookie by server actions (`src/app/actions/customer.js`).
-- **Caching:** product data is cached for 60 seconds (`src/lib/catalog.js`).
+- **Caching:** product data is cached for 60 seconds (`src/lib/catalog.js`). Shopify calls `/api/shopify-webhook` when products, stock or collections change, which clears it immediately.
 - **Security headers:** see `next.config.mjs`. The full Content-Security-Policy is report-only for now.
 - **CI:** `.github/workflows/ci.yml` runs audit, lint and build on every push. It needs the two `NEXT_PUBLIC_SHOPIFY_*` values as GitHub repository secrets.
 

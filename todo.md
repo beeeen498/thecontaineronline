@@ -19,25 +19,30 @@ Working branch: `security-fixes` · Full details for each item are in [upgrade.m
 - [ ] Merge into `main` and deploy
 
 ## Right after deploying (only work on the live domain)
+- [ ] GitHub → Actions: the first CI run (audit, lint, build) is green
+- [ ] Contact form shows the Cloudflare check; send yourself one message
+- [ ] Turn on instant product updates: `node --env-file=.env.local scripts/shopify-webhooks.mjs --create` (it checks the live site first), then edit a product's title in Shopify → the site shows it within seconds
 - [ ] Negishot accessibility widget appears and works (it only loads on thecontaineronline.com, not on localhost)
 - [ ] Browser console on the live site: no `[Report Only] Refused to…` messages with the widget and Vercel Analytics running → then switch the CSP to enforced (`next.config.mjs`)
 
 ## Next steps (from upgrade.md)
 - [ ] **Step 3 (your part):** verify your domain in Resend (DNS is at **GoDaddy**; use Resend's **Auto configure**, and check that it only *adds* records), then add `CONTACT_FROM_EMAIL="The Container <contact@thecontaineronline.com>"` to `.env.local` and Vercel
-- [ ] Optional: stronger contact-form spam protection (Vercel KV/Upstash rate limit or Cloudflare Turnstile)
-- [ ] Optional: instant updates when you edit a product in Shopify (webhook → clear the `products` cache); right now changes show within 60 seconds
-- [ ] **Step 5 (your part):** add GitHub repository secrets `NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN` and `NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN` (Settings → Secrets and variables → Actions) so CI can build
 - [ ] Optional: move to Shopify Customer Account API (newer login system, Shopify-hosted login page)
 
 ## Open questions / follow-ups
-- [ ] **Ask your accountant:** orders are created tax-exempt so the total matches the price paid. Alternative: Shopify Settings → Taxes → "All prices include tax" (orders then show VAT inside the price). See report.md.
-- [ ] English (USD) orders are recorded in Shopify in ₪ at the Israel price; the real amount paid in $ is in the order's `hyp_amount` / `hyp_currency` attributes
 - [ ] Abandoned checkouts leave open draft orders in Shopify: delete them from time to time, or automate it
-- [ ] Products with several variants at different prices are charged the lowest price: confirm this is OK
 - [ ] Two buyers paying for the same one-of-a-kind item at the same moment could both succeed: add rate limiting + a short stock hold later (see report.md)
 - [ ] Optional: Shopify's suggestions for Inventory Manager (IP restrictions, expiring access tokens)
 
+## Later (no rush, the site works correctly as is)
+- [ ] **VAT (ask your accountant): עוסק פטור or עוסק מורשה?** Exempt dealer → tax-exempt orders are exactly right. Licensed dealer → still fine; optionally switch Shopify to "prices include tax" so reports show the VAT (needs a small code change). Orders are created tax-exempt so the total matches the price paid. Alternative: Shopify Settings → Taxes → "All prices include tax" (orders then show VAT inside the price). See report.md.
+
 ## Done
+- [x] Contact form: Cloudflare Turnstile human check (keys added to Vercel 2026-11-23); for local use, add `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` to `.env.local` (optional)
+- [x] Instant product updates: `/api/shopify-webhook` + setup script; `SHOPIFY_WEBHOOK_TOKEN` in `.env.local` and Vercel
+- [x] Decided: English (USD) orders stay recorded in ₪ in Shopify; the real $ amount is in the order's `hyp_amount` / `hyp_currency` attributes
+- [x] Decided: variants always share one price, so "charged the lowest price" never matters
+- [x] GitHub repository secrets added for CI (2026-11-23); first CI run happens when the branch is pushed
 - [x] Browser check on a local production build (2026-11-23): language picker + switching, all pages, cart, checkout form (both languages, phone view), "Current password" field; console has no CSP messages (only the Vercel Analytics script, which exists only on Vercel)
 - [x] Cart: **+** greyed out when the cart already holds all the stock (was clickable, then said "No more in stock")
 - [x] Shipping details at checkout: new `/checkout` page (address form + order summary), saved on the Shopify order, pre-fills Hyp's page; free shipping, Israel + worldwide, guest checkout (live-tested, report.md)

@@ -2,6 +2,7 @@
 
 import { headers } from 'next/headers';
 import { Resend } from 'resend';
+import { verifyTurnstile } from '@/lib/turnstile';
 
 // ─── Resend Client ────────────────────────────────────────────
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -52,6 +53,7 @@ function clean(value, max) {
 
 // ─── Send Contact Email ───────────────────────────────────────
 // `website` is a hidden honeypot field — real visitors leave it empty.
+// `turnstileToken` is Cloudflare's "are you human" token (when set up).
 export async function sendContactEmail(input) {
   try {
     const data = input && typeof input === 'object' ? input : {};
@@ -70,6 +72,12 @@ export async function sendContactEmail(input) {
 
     const h = await headers();
     const ip = h.get('x-forwarded-for')?.split(',')[0]?.trim() || h.get('x-real-ip') || 'unknown';
+
+    // ─── Human check (Cloudflare Turnstile) ─────────────────
+    if (!(await verifyTurnstile(data.turnstileToken, ip))) {
+      return { success: false, error: 'captcha' };
+    }
+
     if (isRateLimited(ip)) {
       return { success: false, error: 'rate_limited' };
     }

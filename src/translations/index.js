@@ -60,6 +60,7 @@ export const translations = {
         message: "Message is required.",
         sendFailed: "Message could not be sent. Please try again or contact us on WhatsApp.",
         rateLimited: "Too many messages. Please try again in a few minutes.",
+        captcha: "Please complete the security check above the Send button.",
       },
     },
 
@@ -169,6 +170,7 @@ export const translations = {
         message: "שדה הודעה חובה.",
         sendFailed: "לא ניתן לשלוח את ההודעה. נסו שוב או פנו אלינו בוואטסאפ.",
         rateLimited: "נשלחו יותר מדי הודעות. נסו שוב בעוד כמה דקות.",
+        captcha: "נא להשלים את בדיקת האבטחה שמעל כפתור השליחה.",
       },
     },
 

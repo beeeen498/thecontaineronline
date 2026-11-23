@@ -16,13 +16,13 @@ const enforcedCsp = [
 // to "Content-Security-Policy" to enforce it.
 const reportOnlyCsp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://negishot.co.il https://cdn.jsdelivr.net https://va.vercel-scripts.com`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://negishot.co.il https://cdn.jsdelivr.net https://va.vercel-scripts.com https://challenges.cloudflare.com`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://negishot.co.il",
   "font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net https://negishot.co.il",
   "img-src 'self' data: blob: https://cdn.shopify.com https://negishot.co.il https://media.getmood.io",
   "media-src 'self' https://media.getmood.io",
-  `connect-src 'self'${shopifyStore ? ` https://${shopifyStore}` : ''} https://negishot.co.il https://media.getmood.io https://vitals.vercel-insights.com`,
-  "frame-src 'self'",
+  `connect-src 'self'${shopifyStore ? ` https://${shopifyStore}` : ''} https://negishot.co.il https://media.getmood.io https://vitals.vercel-insights.com https://challenges.cloudflare.com`,
+  "frame-src 'self' https://challenges.cloudflare.com", // Turnstile widget
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "object-src 'none'",
