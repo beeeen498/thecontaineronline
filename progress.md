@@ -90,6 +90,11 @@ Flow now:
 - **Webhook:** `src/app/api/shopify-webhook/route.js` checks `?token=` against `SHOPIFY_WEBHOOK_TOKEN` (timing-safe; 503 if unset), then calls `revalidateTag("products", { expire: 0 })` (Next 16 needs the 2nd arg; `{ expire: 0 }` = never serve stale). `scripts/shopify-webhooks.mjs` (`--list`, `--create`, `--delete`) registers PRODUCTS_CREATE/UPDATE/DELETE, INVENTORY_LEVELS_UPDATE and COLLECTIONS_UPDATE on the Inventory Manager app (`uri` field, `includeFields: ["id"]`). It probes the live URL first and never prints the token.
 - Vercel env vars added by the user: `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `SHOPIFY_WEBHOOK_TOKEN`.
 
+### Live site (2026-11-23)
+- Main domain `thecontaineronline.com` (Vercel; `www` → 308). Webhooks registered (5 topics).
+- **Full CSP now enforced** (single `Content-Security-Policy` header in `next.config.mjs`; report-only removed). Allowed: negishot.co.il, cdn.jsdelivr.net, media.getmood.io (Negishot fonts/media), Google Fonts, cdn.shopify.com, the store domain, Vercel Analytics, challenges.cloudflare.com. Expected console noise: Negishot `ajax.php` CORS (their server), Turnstile's own frame messages.
+- Turnstile is in **Invisible** mode (Cloudflare setting); no space is reserved for the box.
+
 ### Re-check fixes
 - SEO: the layout no longer sets `alternates.canonical` (every page inherited the home page). `metadataBase` is set in the layout; each public page sets `alternates: { canonical: "/path" }`.
 

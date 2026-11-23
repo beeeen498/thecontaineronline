@@ -46,7 +46,7 @@ Put these in `.env.local` (never commit it), and in Vercel → Project → Setti
 - **Language:** saved in a `language` cookie so pages render in the right language on the server. First-time visitors see a language picker.
 - **Customer login:** the Shopify customer token is kept in an httpOnly cookie by server actions (`src/app/actions/customer.js`).
 - **Caching:** product data is cached for 60 seconds (`src/lib/catalog.js`). Shopify calls `/api/shopify-webhook` when products, stock or collections change, which clears it immediately.
-- **Security headers:** see `next.config.mjs`. The full Content-Security-Policy is report-only for now.
+- **Security headers:** see `next.config.mjs`. The Content-Security-Policy is enforced: a new outside script, font or image host must be added there.
 - **CI:** `.github/workflows/ci.yml` runs audit, lint and build on every push. It needs the two `NEXT_PUBLIC_SHOPIFY_*` values as GitHub repository secrets.
 
 ## Project docs

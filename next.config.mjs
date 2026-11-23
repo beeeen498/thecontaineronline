@@ -2,19 +2,13 @@
 const isDev = process.env.NODE_ENV !== 'production';
 const shopifyStore = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
 
-// Enforced: directives that can't break the site or the accessibility widget
-const enforcedCsp = [
-  "frame-ancestors 'none'", // no one can embed the site (clickjacking)
-  "base-uri 'self'",
-  "object-src 'none'",
-  "form-action 'self'",
-].join('; ');
-
-// Report-only: full allow-list. Browsers log violations in the console
-// instead of blocking. Once the console shows no violations (including
-// with the Negishot accessibility widget open), rename the header below
-// to "Content-Security-Policy" to enforce it.
-const reportOnlyCsp = [
+// Content-Security-Policy: which sources the browser may load.
+// Enforced since 2026-11-23, after the live console showed no violations
+// (including with the Negishot accessibility widget open and the
+// Cloudflare Turnstile check on the contact form). If you add a new
+// third-party script, font, image host or embed, add its domain here,
+// or the browser will block it (look for "Refused to…" in the console).
+const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://negishot.co.il https://cdn.jsdelivr.net https://va.vercel-scripts.com https://challenges.cloudflare.com`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://negishot.co.il",
@@ -30,8 +24,7 @@ const reportOnlyCsp = [
 ].join('; ');
 
 const securityHeaders = [
-  { key: 'Content-Security-Policy', value: enforcedCsp },
-  { key: 'Content-Security-Policy-Report-Only', value: reportOnlyCsp },
+  { key: 'Content-Security-Policy', value: csp },
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },

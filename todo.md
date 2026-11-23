@@ -20,13 +20,12 @@ Working branch: `security-fixes` · Full details for each item are in [upgrade.m
 
 ## Right after deploying (only work on the live domain)
 - [ ] GitHub → Actions: the first CI run (audit, lint, build) is green
-- [x] Contact form shows the Cloudflare check on the live site
-- [ ] Send yourself one message through the contact form
+- [x] Contact form works on the live site (message received); Turnstile switched to **Invisible** mode in Cloudflare
 - [x] Instant product updates turned on (5 Shopify webhooks → `https://thecontaineronline.com/api/shopify-webhook`)
 - [ ] Edit a product's title in Shopify → the site shows it within seconds
 - [x] Negishot accessibility widget appears and works (it only loads on thecontaineronline.com, not on localhost)
 - [x] Main domain set in Vercel: `thecontaineronline.com`; `www` redirects to it (308)
-- [ ] Browser console on the live site: the only report-only message was Negishot's fonts (`media.getmood.io`, now allowed). After this deploy, check once more → no `[Report Only]` messages → switch the CSP to enforced (`next.config.mjs`). Ignore messages from `normal?lang=…` (inside Cloudflare's box) and Negishot's `ajax.php` CORS error (their server; the widget works)
+- [x] **CSP enforced** (2026-11-23) after a clean live console. If something stops loading after adding a new outside service, add its domain in `next.config.mjs`. Earlier note: the only report-only message was Negishot's fonts (`media.getmood.io`, now allowed). After this deploy, check once more → no `[Report Only]` messages → switch the CSP to enforced (`next.config.mjs`). Ignore messages from `normal?lang=…` (inside Cloudflare's box) and Negishot's `ajax.php` CORS error (their server; the widget works)
 
 ## Next steps (from upgrade.md)
 - [ ] **Step 3 (your part):** verify your domain in Resend (DNS is at **GoDaddy**; use Resend's **Auto configure**, and check that it only *adds* records), then add `CONTACT_FROM_EMAIL="The Container <contact@thecontaineronline.com>"` to `.env.local` and Vercel
