@@ -18,14 +18,15 @@ Working branch: `security-fixes` · Full details for each item are in [upgrade.m
   - [ ] Cancel on the Hyp page → "Payment Failed" page, no order created
 - [ ] Merge into `main` and deploy
 
+## Right after deploying (only work on the live domain)
+- [ ] Negishot accessibility widget appears and works (it only loads on thecontaineronline.com, not on localhost)
+- [ ] Browser console on the live site: no `[Report Only] Refused to…` messages with the widget and Vercel Analytics running → then switch the CSP to enforced (`next.config.mjs`)
+
 ## Next steps (from upgrade.md)
-- [ ] **Step 3 (your part):** verify your domain in Resend, then add `CONTACT_FROM_EMAIL="The Container <contact@thecontaineronline.com>"` to `.env.local` and Vercel
-- [ ] **Step 3 (your part):** open the site, use the cart + Negishot widget, check the browser console for `Content-Security-Policy` warnings; if none → switch the CSP to enforced (see `next.config.mjs`)
+- [ ] **Step 3 (your part):** verify your domain in Resend (DNS is at **GoDaddy**; use Resend's **Auto configure**, and check that it only *adds* records), then add `CONTACT_FROM_EMAIL="The Container <contact@thecontaineronline.com>"` to `.env.local` and Vercel
 - [ ] Optional: stronger contact-form spam protection (Vercel KV/Upstash rate limit or Cloudflare Turnstile)
-- [ ] **Step 4 (browser check):** in a private window: picker appears → choose Hebrew → reload → page loads in Hebrew with no picker; switch language with the nav button → reload → stays switched
 - [ ] Optional: instant updates when you edit a product in Shopify (webhook → clear the `products` cache); right now changes show within 60 seconds
 - [ ] **Step 5 (your part):** add GitHub repository secrets `NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN` and `NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN` (Settings → Secrets and variables → Actions) so CI can build
-- [ ] **Browser check (look & feel only, logic tested live):** Account page → email form shows the new "Current password" field correctly in Hebrew and English
 - [ ] Optional: move to Shopify Customer Account API (newer login system, Shopify-hosted login page)
 
 ## Open questions / follow-ups
@@ -37,6 +38,8 @@ Working branch: `security-fixes` · Full details for each item are in [upgrade.m
 - [ ] Optional: Shopify's suggestions for Inventory Manager (IP restrictions, expiring access tokens)
 
 ## Done
+- [x] Browser check on a local production build (2026-11-23): language picker + switching, all pages, cart, checkout form (both languages, phone view), "Current password" field; console has no CSP messages (only the Vercel Analytics script, which exists only on Vercel)
+- [x] Cart: **+** greyed out when the cart already holds all the stock (was clickable, then said "No more in stock")
 - [x] Shipping details at checkout: new `/checkout` page (address form + order summary), saved on the Shopify order, pre-fills Hyp's page; free shipping, Israel + worldwide, guest checkout (live-tested, report.md)
 - [x] Upgrade Next.js 16.4.6 / React 19.3.1, `pnpm audit` clean (#5)
 - [x] Remove logs that exposed Hyp keys (#4): key rotation not needed, no sales were made

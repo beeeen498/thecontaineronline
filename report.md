@@ -1,3 +1,23 @@
+# Test Report — Browser check (local production build)
+_2026-11-23 · branch `security-fixes` · checked by you in Chrome_
+
+| Check | Result |
+|---|---|
+| Language picker in a private window; Hebrew stays after reload; menu button switches | ✅ |
+| Pages, cart, checkout form in both languages and in phone view | ✅ |
+| "Current password" field on the account page | ✅ |
+| Console: no `[Report Only]` CSP messages | ✅ (see the note below) |
+| Negishot widget | ⏳ only loads on the live domain (confirmed: from localhost it sends an empty 55-byte reply instead of the widget) |
+
+### Found and fixed
+- **Cart + button** stayed clickable for a one-of-a-kind item, then said "No more in stock". Now it's greyed out (tooltip "No more in stock") when the cart holds all the available stock. If the stock number is ever missing, the button stays enabled and Shopify's limit still applies.
+
+### Note
+- `Refused to execute script … /_vercel/insights/script.js` is expected locally: Vercel Analytics only exists on Vercel. It isn't a CSP message.
+- The CSP stays report-only until a console check on the live site, with Negishot and Analytics loaded.
+
+---
+
 # Test Report — Full re-check of the branch
 _2026-11-22 · branch `security-fixes`_
 

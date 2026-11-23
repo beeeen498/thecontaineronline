@@ -127,6 +127,14 @@ export default function CartDrawer() {
                   matched?.handle || line.merchandise.product.handle;
                 const isMaxedOut = maxedOutLines[line.id];
 
+                // ─── All available stock already in the cart? ──
+                // Unknown stock (0/missing) keeps + enabled; Shopify
+                // still caps the quantity either way.
+                const stock = matched?.variants?.find(
+                  (v) => v.id === line.merchandise.id,
+                )?.quantityAvailable;
+                const atStockLimit = stock > 0 && line.quantity >= stock;
+
                 return (
                   <div key={line.id} className="cart-drawer__item">
                     {/* ─── Image ────────────────────────── */}
@@ -185,8 +193,15 @@ export default function CartDrawer() {
                           onClick={() =>
                             handleIncrease(line.id, line.quantity + 1)
                           }
-                          disabled={isLoading}
+                          disabled={isLoading || atStockLimit}
                           aria-label="Increase quantity"
+                          title={
+                            atStockLimit
+                              ? isHebrew
+                                ? "אין יותר במלאי"
+                                : "No more in stock"
+                              : undefined
+                          }
                         >
                           <FiPlus size={14} />
                         </button>
