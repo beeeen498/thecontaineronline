@@ -22,6 +22,7 @@ _Last updated: 2026-11-22_
   9. `2b1f607`: shipping details at checkout
   10. `bb429db`: canonical URL fix (found in full re-check)
   11. `a145e6b`: cart + button greyed out at the stock limit
+  12. `651aace`: Turnstile on the contact form + instant product updates (webhook)
 - To undo everything: `git checkout main`. To return to a step: `git reset --hard <hash>`.
 
 ## Plan (from upgrade.md "Suggested order of work")
