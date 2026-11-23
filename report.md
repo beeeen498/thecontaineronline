@@ -1,3 +1,20 @@
+# Test Report — Live deploy
+_2026-11-23 · `main` = `dda7c97`, live on Vercel ~50 s after the push_
+
+| Check | Result |
+|---|---|
+| All pages in English and Hebrew → 200 (unknown → 404); Hebrew renders RTL | ✅ |
+| Security headers present | ✅ |
+| Old "change inventory" server actions gone from the site's code | ✅ |
+| Canonical links per page | ✅ |
+| Main domain: `thecontaineronline.com`, `www` → 308 (changed in Vercel by you) | ✅ |
+| Cloudflare check shows on the live contact form | ✅ |
+| Negishot widget appears and works | ✅ |
+| Console: one report-only message (Negishot fonts from `media.getmood.io`) → allowed | ✅ fixed |
+| Shopify webhooks: live site accepted the token; 5 notifications set up | ✅ |
+
+---
+
 # Test Report — Spam protection + instant product updates
 _2026-11-23 · branch `security-fixes`_
 

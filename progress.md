@@ -9,7 +9,7 @@ _Last updated: 2026-11-22_
 **The Container** (thecontaineronline.com): Next.js 16 App Router + React 19, plain JS, SCSS, pnpm. Bilingual English/Hebrew (RTL). Products come from the **Shopify Storefront API** (`src/lib/shopifyQueries.js`). Payment goes through **Hyp Pay** (Israeli gateway), not Shopify Checkout. The contact form sends email through **Resend**. Hosted on **Vercel**. Secrets are in `.env.local` (gitignored; never paste or commit it).
 
 ## Git state
-- Branch **`security-fixes`** (all work is here). `main` and GitHub are untouched; branch not pushed.
+- Branch **`security-fixes`** (all work is here). **2026-11-23: fast-forwarded into `main` and pushed to GitHub at `dda7c97`** (Vercel deploys `main`). Old live version was `0348e9d`.
 - Commits on top of `main` (`0348e9d`):
   1. `1d40193`: steps 1–2: dependency upgrade, removed secret logs, server-side checkout
   2. `766e125`: fixes from the retest: removed draft-order stock hold; `SITE_URL` for the Hyp return address
@@ -23,7 +23,7 @@ _Last updated: 2026-11-22_
   10. `bb429db`: canonical URL fix (found in full re-check)
   11. `a145e6b`: cart + button greyed out at the stock limit
   12. `651aace`: Turnstile on the contact form + instant product updates (webhook)
-- To undo everything: `git checkout main`. To return to a step: `git reset --hard <hash>`.
+- To roll back the live site: Vercel → Deployments → previous deployment → Instant Rollback. In git, the pre-work state is `0348e9d`.
 
 ## Plan (from upgrade.md "Suggested order of work")
 | Step | Scope | Status |
