@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@shopify/storefront-api-client':
-        specifier: ^1.0.10
-        version: 1.0.10
+        specifier: ^2.0.1
+        version: 2.0.1
       '@vercel/analytics':
         specifier: ^2.0.1
         version: 2.0.1(next@16.4.6(@babel/core@7.29.13)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.108.2))(react@19.3.1)
@@ -516,11 +516,11 @@ packages:
   '@rtsao/scc@1.1.0':
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
 
-  '@shopify/graphql-client@1.4.2':
-    resolution: {integrity: sha512-C/fEyx6BZmTGeJv0HSsduhfn5ZbkXk0nePkyo0+xXxorP1I+uvx9pobdFxTfiPnOrh+P6QiKzBgIviksnSo4YA==}
+  '@shopify/graphql-client@2.0.1':
+    resolution: {integrity: sha512-rMWnql45haEQdVnz62azY6yKt67W2jNgyuYLb6cJc6GuQzEp3LNgIUuQRuroGrF0rklt/ZxqPWS2g013ci3lWQ==}
 
-  '@shopify/storefront-api-client@1.0.10':
-    resolution: {integrity: sha512-A0ItFW58L5+y/jnnJDEsmt2YcQSt2BG+pNoQOYRpPBJaOLpTj7A13q1QVrE5XYVGZCA6ZQ6FqAtgosHHrkut0Q==}
+  '@shopify/storefront-api-client@2.0.1':
+    resolution: {integrity: sha512-GsEb5L3y8ffqWHr7LPyrs8tFtfZJPlyC1kS3YClGQXX1eWS3HqWysvMwnEiXbYwCA0pUkthvAcqLZj/xXx3wCQ==}
 
   '@stablelib/base64@1.0.1':
     resolution: {integrity: sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ==}
@@ -2346,11 +2346,11 @@ snapshots:
 
   '@rtsao/scc@1.1.0': {}
 
-  '@shopify/graphql-client@1.4.2': {}
+  '@shopify/graphql-client@2.0.1': {}
 
-  '@shopify/storefront-api-client@1.0.10':
+  '@shopify/storefront-api-client@2.0.1':
     dependencies:
-      '@shopify/graphql-client': 1.4.2
+      '@shopify/graphql-client': 2.0.1
 
   '@stablelib/base64@1.0.1': {}
 
