@@ -12,6 +12,7 @@ _2026-11-23 · `main` = `dda7c97`, live on Vercel ~50 s after the push_
 | Negishot widget appears and works | ✅ |
 | Console: one report-only message (Negishot fonts from `media.getmood.io`) → allowed | ✅ fixed |
 | Shopify webhooks: live site accepted the token; 5 notifications set up | ✅ |
+| **CSP enforced** (`4ed64e5`, live 30 s after the push): pages load; your console check found no `Refused to…` messages with Negishot, the cart and the contact form | ✅ |
 
 ---
 
