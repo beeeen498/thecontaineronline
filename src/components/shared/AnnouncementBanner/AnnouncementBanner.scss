@@ -1,0 +1,68 @@
+@use "@/styles/variables" as *;
+
+// ─── Announcement Banner ──────────────────────────────────────
+// Thin endless marquee above the header, on every page.
+.announcement-banner {
+  position: relative;
+  height: $banner-height;
+  background-color: $color-white;
+  font-weight: bold;
+  color: $color-black;
+  overflow: hidden;
+  direction: ltr; // scroll the same way in both languages
+
+  // ─── Moving strips ──────────────────────────────────────
+  &__track {
+    display: flex;
+    height: 100%;
+    width: max-content;
+  }
+
+  &__strip {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    animation: bannerMarquee 60s linear infinite;
+  }
+
+  &__item {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+
+    // separator dot after every item (also after the last one,
+    // so the gap between the two strips matches the others)
+    &::after {
+      content: "·";
+      margin: 0 $spacing-lg;
+    }
+  }
+
+  // ─── Screen-reader copy (visually hidden) ───────────────
+  &__sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  // ─── Reduced motion: stop scrolling ─────────────────────
+  @media (prefers-reduced-motion: reduce) {
+    &__strip {
+      animation: none;
+    }
+  }
+}
+
+@keyframes bannerMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}

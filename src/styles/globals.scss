@@ -10,8 +10,10 @@
 }
 
 // ─── Top Bar ──────────────────────────────────────────────────
-$topbar-height-desktop: 107.5px;
-$topbar-height-mobile: 75px; // header only, no nav row on mobile
+// Fixed at the top: announcement banner + header (+ nav row on desktop).
+// --topbar-height is used to push page content below it.
+$topbar-height-desktop: 107.5px + $banner-height;
+$topbar-height-mobile: 75px + $banner-height; // no nav row on mobile
 
 :root {
   --topbar-height: #{$topbar-height-desktop};

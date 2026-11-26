@@ -50,7 +50,9 @@ function QuoteCarousel() {
 }
 
 // ─── About ────────────────────────────────────────────────────
-// Grid layout with marquee, heading, images, quote carousel, and text
+// Grid layout with heading, images, quote carousel, and text.
+// (The marquee that used to sit above the heading is now the site-wide
+// AnnouncementBanner; the heading fills its cell so the grid keeps its shape.)
 export default function About() {
   const t = useTranslations();
   const { language } = useLanguage();
@@ -59,24 +61,6 @@ export default function About() {
   return (
     <section id="about" className={`about ${isHebrew ? "about--rtl" : ""}`}>
       <div className="about__grid">
-        {/* ─── Marquee ────────────────────────────────── */}
-        <div className="about__marquee">
-          <p className="about__marquee-text">
-            100% LEGIT &nbsp;&nbsp;·&nbsp;&nbsp; 100% LEGIT
-            &nbsp;&nbsp;·&nbsp;&nbsp; 100% LEGIT &nbsp;&nbsp;·&nbsp;&nbsp; 100%
-            LEGIT &nbsp;&nbsp;·&nbsp;&nbsp; 100% LEGIT &nbsp;&nbsp;·&nbsp;&nbsp;
-            100% LEGIT &nbsp;&nbsp;·&nbsp;&nbsp; 100% LEGIT
-            &nbsp;&nbsp;·&nbsp;&nbsp; 100% LEGIT &nbsp;&nbsp;·&nbsp;&nbsp;
-          </p>
-          <p className="about__marquee-text">
-            100% LEGIT &nbsp;&nbsp;·&nbsp;&nbsp; 100% LEGIT
-            &nbsp;&nbsp;·&nbsp;&nbsp; 100% LEGIT &nbsp;&nbsp;·&nbsp;&nbsp; 100%
-            LEGIT &nbsp;&nbsp;·&nbsp;&nbsp; 100% LEGIT &nbsp;&nbsp;·&nbsp;&nbsp;
-            100% LEGIT &nbsp;&nbsp;·&nbsp;&nbsp; 100% LEGIT
-            &nbsp;&nbsp;·&nbsp;&nbsp; 100% LEGIT &nbsp;&nbsp;·&nbsp;&nbsp;
-          </p>
-        </div>
-
         {/* ─── Heading ────────────────────────────────── */}
         <div className="about__heading">
           <h2>{t.about.heading}</h2>

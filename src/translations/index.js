@@ -6,6 +6,12 @@
 export const translations = {
   // ─── English ────────────────────────────────────────────────
   english: {
+    // ─── Banner (top of every page) ───────────────────────
+    banner: {
+      freeShipping: "Free shipping",
+      legit: "100% Legit",
+    },
+
     // ─── Nav ──────────────────────────────────────────────
     nav: {
       home: "Home",
@@ -116,6 +122,12 @@ export const translations = {
 
   // ─── Hebrew ─────────────────────────────────────────────────
   hebrew: {
+    // ─── Banner (top of every page) ───────────────────────
+    banner: {
+      freeShipping: "FREE SHIPPING",
+      legit: "100% LEGIT", // kept in English, as in the original marquee
+    },
+
     // ─── Nav ──────────────────────────────────────────────
     nav: {
       home: "בית",
