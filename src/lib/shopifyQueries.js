@@ -196,7 +196,19 @@ async function getCollectionProducts(collectionId) {
     cursor = pageInfo.endCursor;
   }
 
-  return allProducts;
+  return inStockFirst(allProducts);
+}
+
+// ─── In-stock items first, keeping the collection's own order ──
+// Products arrive in the order set in Shopify (drag and drop in the
+// collection). Out-of-stock items move to the end; within each group
+// that order is kept, so an out-of-stock item dragged to the top in
+// Shopify becomes the first out-of-stock item on the site.
+function inStockFirst(products) {
+  return [
+    ...products.filter((p) => p.inStock),
+    ...products.filter((p) => !p.inStock),
+  ];
 }
 
 // ─── getAllProducts ───────────────────────────────────────────
