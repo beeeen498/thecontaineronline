@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
+import imageLoader from "@/lib/imageLoader";
 import Link from "next/link";
 import { useCart } from "@/contexts/CartContext";
 import { useCustomer } from "@/contexts/CustomerContext";
@@ -358,6 +359,7 @@ export default function CheckoutPage() {
                   {item.image && (
                     <Image
                       src={item.image}
+                      loader={imageLoader}
                       alt={item.title}
                       fill
                       sizes="64px"

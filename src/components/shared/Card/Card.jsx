@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import imageLoader from "@/lib/imageLoader";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "@/hooks/useTranslations";
 import { useCart } from "@/contexts/CartContext";
@@ -29,6 +30,7 @@ export default function Card({ item }) {
       <div className="card__image-wrapper">
         <Image
           src={item.imagePath}
+          loader={imageLoader}
           alt={item.title || "Product"}
           fill
           style={{ objectFit: "cover", objectPosition: "center" }}

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
+import imageLoader from "@/lib/imageLoader";
 import { IoMdClose } from "react-icons/io";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import "./ImagePopUp.scss";
@@ -67,6 +68,7 @@ export default function ImagePopUp({
       >
         <Image
           src={images[currentIndex]}
+          loader={imageLoader}
           alt={`Image ${currentIndex + 1}`}
           width={1200}
           height={1200}

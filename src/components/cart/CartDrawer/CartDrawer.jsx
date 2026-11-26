@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import imageLoader from "@/lib/imageLoader";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { IoMdClose } from "react-icons/io";
@@ -146,6 +147,7 @@ export default function CartDrawer() {
                       {image && (
                         <Image
                           src={image}
+                          loader={imageLoader}
                           alt={title}
                           fill
                           sizes="80px"

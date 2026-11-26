@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
+import imageLoader from "@/lib/imageLoader";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslations } from "@/hooks/useTranslations";
 import {
@@ -287,6 +288,7 @@ export default function ItemPage({ product, relatedProducts }) {
                 >
                   <Image
                     src={img}
+                    loader={imageLoader}
                     alt={`${name} ${idx + 1}`}
                     fill
                     sizes="60px"
@@ -306,6 +308,7 @@ export default function ItemPage({ product, relatedProducts }) {
             {mainImage && (
               <Image
                 src={mainImage}
+                loader={imageLoader}
                 alt={name || "Product image"}
                 fill
                 sizes="(max-width: 768px) 100vw, 55vw"

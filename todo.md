@@ -40,6 +40,7 @@ Working branch: `security-fixes` · Full details for each item are in [upgrade.m
 - [ ] **VAT (ask your accountant): עוסק פטור or עוסק מורשה?** Exempt dealer → tax-exempt orders are exactly right. Licensed dealer → still fine; optionally switch Shopify to "prices include tax" so reports show the VAT (needs a small code change). Orders are created tax-exempt so the total matches the price paid. Alternative: Shopify Settings → Taxes → "All prices include tax" (orders then show VAT inside the price). See report.md.
 
 ## Done
+- [x] Product photos load straight from Shopify's CDN (resized, WebP) instead of Vercel's image optimizer, whose plan limit was blocking new photos with 402 (2026-11-26)
 - [x] Store pages: in-stock items first, out-of-stock last, each group in the collection's drag-and-drop order from Shopify (2026-11-26)
 - [x] Site-wide scrolling banner at the top ("FREE SHIPPING · 100% LEGIT"), replacing the About section's marquee; About grid keeps its shape (2026-11-26)
 - [x] Contact form: Cloudflare Turnstile human check (keys added to Vercel 2026-11-23); for local use, add `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` to `.env.local` (optional)
